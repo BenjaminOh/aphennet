@@ -27,7 +27,7 @@ EXPOSE 3000
 CMD ["npm", "run", "dev"]
 
 # 프로덕션 환경
-FROM node:20-alpine as production
+FROM node:20 as production
 
 WORKDIR /app
 
