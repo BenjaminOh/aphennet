@@ -7,11 +7,20 @@ const development = {
     logging: process.env.APP_ENV === 'development' ? console.log : false,
     port: process.env.DB_PORT,
     timezone: '+09:00',
+    pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+    },
     dialectOptions: {
         charset: 'utf8mb4',
         collate: 'utf8mb4_unicode_ci',
         allowPublicKeyRetrieval: true, // MySQL 8.0 공개키 검색 허용
-        ssl: false
+        ssl: false,
+        connectTimeout: 60000, // 연결 타임아웃 60초
+        acquireTimeout: 60000, // 획득 타임아웃 60초
+        timeout: 60000 // 일반 타임아웃 60초
     },
 };
 const maintenance = {
