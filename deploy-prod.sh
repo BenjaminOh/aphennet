@@ -10,11 +10,11 @@ cp .env.prod .env
 
 # 2. 기존 컨테이너 중지
 echo "### 기존 컨테이너 중지 중..."
-docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml down
+docker compose -f docker-compose.base.yml -f docker-compose.prod.yml down
 
 # 3. 최신 이미지 빌드
 echo "### 이미지 빌드 중..."
-docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml build --no-cache
+docker compose -f docker-compose.base.yml -f docker-compose.prod.yml build --no-cache
 
 # 4. SSL 인증서 확인
 echo "### SSL 인증서 확인 중..."
@@ -25,12 +25,12 @@ fi
 
 # 5. 운영환경 시작
 echo "### 운영환경 시작 중..."
-docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d
 
 # 6. 상태 확인
 echo "### 배포 완료! 상태 확인 중..."
 sleep 10
-docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml ps
+docker compose -f docker-compose.base.yml -f docker-compose.prod.yml ps
 
 echo "=== 운영서버 배포 완료 ==="
 echo "접속 URL: https://aphennet.likeweb.co.kr"
