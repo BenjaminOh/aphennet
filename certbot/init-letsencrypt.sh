@@ -18,8 +18,8 @@ email=${CERTBOT_EMAIL:-admin@likeweb.co.kr}
 staging=${CERTBOT_STAGING:-0} # 0으로 설정하면 프로덕션 환경
 
 # 도메인 설정 확인
-if [ "$domains" = "yourdomain.com" ]; then
-    echo "### 경고: 기본 도메인(yourdomain.com)이 설정되어 있습니다."
+if [ "$domains" = "yourdomain.com" ] || [ "$domains" = "localhost" ]; then
+    echo "### 경고: 기본 도메인($domains)이 설정되어 있습니다."
     echo "### .env 파일에서 CERTBOT_DOMAIN을 실제 도메인으로 변경해주세요."
     echo "### 예: CERTBOT_DOMAIN=example.com"
     read -p "계속하시겠습니까? (y/N): " -n 1 -r
@@ -27,7 +27,7 @@ if [ "$domains" = "yourdomain.com" ]; then
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         exit 1
     fi
-fi
+fi 
 
 # 이메일 설정 확인
 if [ "$email" = "your-email@example.com" ]; then
@@ -86,14 +86,26 @@ if [ "$domains" = "localhost" ] || [ "$domains" = "yourdomain.com" ]; then
     exit 1
 fi
 
-docker compose -f docker-compose.base.yml -f docker-compose.prod.yml run --rm certbot certonly \
+# 도메인을 쉼표로 분리하여 배열로 변환
+IFS=',' read -ra DOMAIN_ARRAY <<< "$domains"
+
+# certbot 명령어 구성
+certbot_cmd="docker compose -f docker-compose.base.yml -f docker-compose.prod.yml run --rm certbot certonly \
     --webroot \
     --webroot-path=/var/www/certbot \
     --email $email \
     --agree-tos \
     --no-eff-email \
-    $staging_arg \
-    -d $domains
+    $staging_arg"
+
+# 각 도메인에 대해 -d 옵션 추가
+for domain in "${DOMAIN_ARRAY[@]}"; do
+    domain=$(echo $domain | xargs)  # 공백 제거
+    certbot_cmd="$certbot_cmd -d $domain"
+done
+
+# certbot 실행
+eval $certbot_cmd
 
 # nginx 설정 다시 로드
 echo "### nginx 설정 다시 로드 중..."
