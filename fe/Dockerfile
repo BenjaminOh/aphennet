@@ -42,7 +42,7 @@ ENV NEXT_PUBLIC_SITE_ID=$NEXT_PUBLIC_SITE_ID
 ENV NEXT_PUBLIC_MAINT_NAME=$NEXT_PUBLIC_MAINT_NAME
 ENV NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY
 
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
 # 모든 의존성 설치 (standalone 빌드에 필요)
 RUN npm ci
