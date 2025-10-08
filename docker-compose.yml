@@ -1,61 +1,114 @@
 version: "3.8"
 
 services:
+    # Nginx 리버스 프록시
+    nginx:
+        container_name: aphennet-nginx
+        image: nginx:alpine
+        restart: always
+        ports:
+            - "${NGINX_EXPOSE_PORT:-80}:80"
+        volumes:
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        depends_on:
+            - react-app
+            - node-app
+        networks:
+            - aphennet_net
+
+    # MariaDB 데이터베이스
+    mariadb:
+        container_name: aphennet-mariadb
+        image: mariadb:10.11
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
+            MYSQL_DATABASE: ${DB_NAME:-aphennet_db}
+            MYSQL_USER: ${DB_USER:-aphennet_user}
+            MYSQL_PASSWORD: ${DB_PASS:-aphennet_password}
+            TZ: Asia/Seoul
+        ports:
+            - "${DB_EXPOSE_PORT:-3306}:3306"
+        volumes:
+            - mariadb_data:/var/lib/mysql
+            - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+        networks:
+            - aphennet_net
+        command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+    # Next.js 프론트엔드
     react-app:
-        container_name: basic-react-app
+        container_name: aphennet-nextjs
         build:
             context: ./fe
             dockerfile: Dockerfile
-            target: ${APP_ENV}
+            target: ${APP_ENV:-development}
             args:
-                NEXT_PUBLIC_API_URL: ${API_URL}
-                NEXT_PUBLIC_SITE_ID: ${NEXT_PUBLIC_SITE_ID}
-                NEXT_PUBLIC_MAINT_NAME: ${NEXT_PUBLIC_MAINT_NAME}
-                NEXT_PUBLIC_ENCRYPTION_KEY: ${NEXT_PUBLIC_ENCRYPTION_KEY}
+                NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+                NEXT_PUBLIC_SITE_ID: ${NEXT_PUBLIC_SITE_ID:-aphennet}
+                NEXT_PUBLIC_MAINT_NAME: ${NEXT_PUBLIC_MAINT_NAME:-Aphennet}
+                NEXT_PUBLIC_ENCRYPTION_KEY: ${NEXT_PUBLIC_ENCRYPTION_KEY:-your_encryption_key}
         restart: always
-        ports:
-            - "${REACT_EXPOSE_PORT}:${REACT_CONTAINER_PORT}"
         volumes:
-            - basic_fe_node_modules:/app/node_modules
+            - nextjs_node_modules:/app/node_modules
         environment:
-            - NODE_ENV=${APP_ENV}
+            - NODE_ENV=${APP_ENV:-development}
             - TZ=Asia/Seoul
         env_file:
             - ./.env
         networks:
-            - basic_net
+            - aphennet_net
+        depends_on:
+            - mariadb
         command: >
             sh -c "
-              if [ \"$APP_ENV\" = \"production\" ]; then
+              if [ \"${APP_ENV:-development}\" = \"production\" ]; then
                 node .next/standalone/server.js;
               else
                 npm run dev;
               fi"
 
+    # Node.js 백엔드
     node-app:
-        container_name: basic-node-app
+        container_name: aphennet-nodejs
         build:
             context: ./be
             dockerfile: Dockerfile
-            target: ${APP_ENV}
+            target: ${APP_ENV:-development}
         restart: always
-        ports:
-            - "${NODE_EXPOSE_PORT}:${NODE_CONTAINER_PORT}"
         volumes:
             - ./be:/app
-            - basic_be_node_modules:/app/node_modules
+            - nodejs_node_modules:/app/node_modules
+            - ./be/upload:/app/upload
         environment:
             - TZ=Asia/Seoul
-            - NODE_ENV=${APP_ENV}
+            - NODE_ENV=${APP_ENV:-development}
+            - DB_HOST=mariadb
+            - DB_PORT=3306
+            - DB_NAME=${DB_NAME:-aphennet_db}
+            - DB_USER=${DB_USER:-aphennet_user}
+            - DB_PASS=${DB_PASS:-aphennet_password}
         env_file:
             - ./.env
         networks:
-            - basic_net
+            - aphennet_net
+        depends_on:
+            - mariadb
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
 
 volumes:
-    basic_fe_node_modules:
-    basic_be_node_modules:
+    mariadb_data:
+        driver: local
+    nextjs_node_modules:
+        driver: local
+    nodejs_node_modules:
+        driver: local
 
 networks:
-    basic_net:
+    aphennet_net:
         driver: bridge
