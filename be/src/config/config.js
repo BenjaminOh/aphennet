@@ -7,6 +7,12 @@ const development = {
     logging: process.env.APP_ENV === 'development' ? console.log : false,
     port: process.env.DB_PORT,
     timezone: '+09:00',
+    dialectOptions: {
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_unicode_ci',
+        allowPublicKeyRetrieval: true, // MySQL 8.0 공개키 검색 허용
+        ssl: false
+    },
 };
 const maintenance = {
     username: process.env.LW_USER,
