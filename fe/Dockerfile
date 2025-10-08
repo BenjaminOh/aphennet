@@ -55,10 +55,19 @@ RUN npm run build
 # 빌드 결과 확인
 RUN ls -la .next/
 RUN ls -la .next/standalone/ || echo "standalone directory not found"
+RUN ls -la .next/standalone/server.js || echo "standalone server.js not found"
+
+# standalone 모드에서 필요한 파일들 복사
+RUN if [ -d ".next/standalone" ]; then \
+        echo "Standalone build successful"; \
+        cp -r .next/standalone/* .; \
+    else \
+        echo "Standalone build failed, using regular build"; \
+    fi
 
 ENV NODE_ENV=production
 
 EXPOSE 3000
 
-# Next.js 프로덕션 서버 시작
-CMD ["npm", "start"]
+# Next.js 프로덕션 서버 시작 (standalone 모드)
+CMD ["node", "server.js"]
