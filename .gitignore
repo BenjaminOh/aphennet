@@ -1,0 +1,8 @@
+node_modules/
+.idea/
+.env
+.DS_Store
+**/.DS_Store
+*.sql
+docker-compose.override.yml
+fe/package-lock.json

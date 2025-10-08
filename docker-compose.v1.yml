@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+    react-app:
+        container_name: basic-react-v1
+        image: basic_solution_web_v1-react-app
+        build:
+            context: ./fe
+            dockerfile: Dockerfile
+            target: ${APP_ENV}
+            args:
+                NEXT_PUBLIC_API_URL: ${API_URL}
+                NEXT_PUBLIC_SITE_ID: ${NEXT_PUBLIC_SITE_ID}
+                NEXT_PUBLIC_MAINT_NAME: ${NEXT_PUBLIC_MAINT_NAME}
+                NEXT_PUBLIC_ENCRYPTION_KEY: ${NEXT_PUBLIC_ENCRYPTION_KEY}
+        restart: always
+        ports:
+            - "${REACT_V1_PORT}:${REACT_CONTAINER_PORT}"
+        volumes:
+            - basic_fe_node_modules_v1:/app/node_modules
+        environment:
+            - NODE_ENV=${APP_ENV}
+            - REACT_APP_API_URL=${API_URL}
+            - TZ=Asia/Seoul
+        env_file:
+            - ./.env
+        command: >
+            sh -c "
+              if [ \"$APP_ENV\" = \"production\" ]; then
+                node .next/standalone/server.js;
+              else
+                npm run dev;
+              fi"
+        networks:
+            - basic_net_v1
+
+    node-app:
+        container_name: basic-node-v1
+        image: basic_solution_web_v1-node-app
+        build:
+            context: ./be
+            dockerfile: Dockerfile
+            target: ${APP_ENV}
+        restart: always
+        ports:
+            - "${NODE_V1_PORT}:${NODE_CONTAINER_PORT}"
+        volumes:
+            - ./be:/app
+            - basic_be_node_modules_v1:/app/node_modules
+            - ../storage:/app/storage
+        environment:
+            - NODE_ENV=${APP_ENV}
+            - TZ=Asia/Seoul
+        env_file:
+            - ./.env
+        networks:
+            - basic_net_v1
+volumes:
+    basic_fe_node_modules_v1:
+    basic_be_node_modules_v1:
+
+networks:
+    basic_net_v1:
