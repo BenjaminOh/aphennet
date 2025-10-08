@@ -10,19 +10,19 @@ const nextConfig = {
         // SWC 컴파일러 완전 비활성화
         removeConsole: false,
     },
-    async headers() {
-        return [
-            {
-                source: "/(.*)",
-                headers: [
-                    {
-                        key: "Cache-Control",
-                        value: "public, max-age=31536000, immutable",
-                    },
-                ],
-            },
-        ];
-    },
+    // async headers() {
+    //     return [
+    //         {
+    //             source: "/(.*)",
+    //             headers: [
+    //                 {
+    //                     key: "Cache-Control",
+    //                     value: "public, max-age=31536000, immutable",
+    //                 },
+    //             ],
+    //         },
+    //     ];
+    // },
 };
 
 module.exports = nextConfig;

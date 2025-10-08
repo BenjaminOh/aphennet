@@ -49,10 +49,12 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
+RUN npm run build || (echo "Build failed, checking for errors..." && exit 1)
 
 # 빌드 결과 확인
 RUN ls -la .next/
+RUN ls -la .next/static/ || echo "static directory not found"
+RUN cat .next/BUILD_ID || echo "BUILD_ID not found"
 
 ENV NODE_ENV=production
 
