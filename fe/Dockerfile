@@ -53,25 +53,10 @@ RUN npm run build
 
 # 빌드 결과 확인
 RUN ls -la .next/
-RUN ls -la .next/standalone/ || echo "standalone directory not found"
-
-# standalone 디렉토리가 존재하는 경우에만 복사
-RUN if [ -d ".next/standalone" ]; then \
-        cp -r .next/static .next/standalone/.next/static && \
-        cp -r public .next/standalone/public; \
-    else \
-        echo "Standalone build not found, using regular build"; \
-    fi
 
 ENV NODE_ENV=production
 
 EXPOSE 3000
 
-# standalone 빌드가 있으면 사용, 없으면 일반 빌드 사용
-CMD if [ -f ".next/standalone/server.js" ]; then \
-        echo "Using standalone build"; \
-        node .next/standalone/server.js; \
-    else \
-        echo "Using regular build"; \
-        npm start; \
-    fi
+# Next.js 프로덕션 서버 시작
+CMD ["npm", "start"]

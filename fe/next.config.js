@@ -4,7 +4,7 @@ const nextConfig = {
     experimental: {
         scrollRestoration: true,
     },
-    output: "standalone",
+    // output: "standalone", // standalone 빌드 비활성화
     swcMinify: false, // SWC 비활성화
     compiler: {
         // SWC 컴파일러 완전 비활성화
