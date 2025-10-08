@@ -45,7 +45,7 @@ ENV NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY
 COPY package*.json ./
 
 # 모든 의존성 설치 (standalone 빌드에 필요)
-RUN npm ci
+RUN npm install
 
 COPY . .
 
