@@ -10,10 +10,6 @@ const nextConfig = {
         // SWC 컴파일러 완전 비활성화
         removeConsole: false,
     },
-    // Babel 사용으로 SWC 우회
-    babel: {
-        presets: ['next/babel'],
-    },
     async headers() {
         return [
             {
