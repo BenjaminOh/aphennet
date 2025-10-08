@@ -5,11 +5,11 @@ const nextConfig = {
         scrollRestoration: true,
     },
     // output: "standalone", // standalone 빌드 비활성화
-    swcMinify: false, // SWC 비활성화
-    compiler: {
-        // SWC 컴파일러 완전 비활성화
-        removeConsole: false,
-    },
+    // swcMinify: false, // SWC 재활성화
+    // compiler: {
+    //     // SWC 컴파일러 재활성화
+    //     removeConsole: false,
+    // },
     // async headers() {
     //     return [
     //         {
