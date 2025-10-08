@@ -55,10 +55,10 @@ fi
 
 # Docker Compose로 nginx와 certbot 실행
 echo "### nginx와 certbot 컨테이너 시작 중..."
-docker compose up -d nginx
+docker compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d nginx
 
 echo "### certbot 컨테이너 시작 중..."
-docker compose up -d certbot
+docker compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d certbot
 
 # nginx가 시작될 때까지 대기
 echo "### nginx가 시작될 때까지 대기 중..."
@@ -86,7 +86,7 @@ if [ "$domains" = "localhost" ] || [ "$domains" = "yourdomain.com" ]; then
     exit 1
 fi
 
-docker compose run --rm certbot certonly \
+docker compose -f docker-compose.base.yml -f docker-compose.prod.yml run --rm certbot certonly \
     --webroot \
     --webroot-path=/var/www/certbot \
     --email $email \
@@ -97,7 +97,7 @@ docker compose run --rm certbot certonly \
 
 # nginx 설정 다시 로드
 echo "### nginx 설정 다시 로드 중..."
-docker compose exec nginx nginx -s reload
+docker compose -f docker-compose.base.yml -f docker-compose.prod.yml exec nginx nginx -s reload
 
 echo "### 인증서 설정 완료!"
 echo "### HTTPS로 접속 가능합니다: https://$domains"
