@@ -44,17 +44,17 @@ ENV NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY
 
 COPY package*.json ./
 
-# 프로젝트 의존성 설치
-RUN npm install
+# 모든 의존성 설치 (standalone 빌드에 필요)
+RUN npm ci
 
 COPY . .
 
-RUN npm run build || (echo "Build failed, checking for errors..." && exit 1)
+# Next.js 빌드
+RUN npm run build
 
 # 빌드 결과 확인
 RUN ls -la .next/
-RUN ls -la .next/static/ || echo "static directory not found"
-RUN cat .next/BUILD_ID || echo "BUILD_ID not found"
+RUN ls -la .next/standalone/ || echo "standalone directory not found"
 
 ENV NODE_ENV=production
 

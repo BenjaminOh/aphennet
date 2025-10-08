@@ -14,4 +14,4 @@ RUN echo "0 12 * * * /usr/local/bin/renew.sh >> /var/log/cron.log 2>&1" | cronta
 RUN touch /var/log/cron.log
 
 # cron 실행
-CMD ["sh", "-c", "crond -f"]
+CMD ["crond", "-f"]

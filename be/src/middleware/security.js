@@ -10,10 +10,9 @@ const whiteIPs = new Set(ipAllowed);
 const ipDenied = process.env.DENIED_IP ? process.env.DENIED_IP.split(',').map(ip => ip.trim()) : [];
 const suspiciousIPs = new Set(ipDenied);
 
-// 차단 user agent
+// 차단 user agent (curl은 허용)
 const blockedUserAgents = [
     /^$/, // 빈 User-Agent 추가
-    /curl/i,
     /wget/i,
     /python-requests/i,
     /postman/i,
@@ -99,6 +98,12 @@ exports.security = (req, res, next) => {
         return errorHandler.errorThrow(enumConfig.statusErrorCode._403_ERROR[0], '');
     }
 
+    // curl은 명시적으로 허용
+    if (userAgent.toLowerCase().includes('curl')) {
+        console.log(`curl 요청 허용: ${userAgent} from IP: ${clientIP}`);
+        return next();
+    }
+
     // User-Agent가 없거나 차단 목록에 있는 경우
     const isBlockedUserAgent = blockedUserAgents.some(pattern => pattern.test(userAgent));
 
@@ -108,11 +113,9 @@ exports.security = (req, res, next) => {
         return errorHandler.errorThrow(enumConfig.statusErrorCode._403_ERROR[0], '');
     }
 
-    // curl은 허용하되, 다른 봇들은 차단
-    if (userAgent.toLowerCase().includes('curl')) {
-        // curl은 허용
-    } else if (blockedAgents.some(agent => userAgent.toLowerCase().includes(agent))) {
-        return errorThrow(res, 'Access Denied.', 403);
+    // 다른 봇들은 차단
+    if (blockedAgents.some(agent => userAgent.toLowerCase().includes(agent))) {
+        return errorHandler.errorThrow(enumConfig.statusErrorCode._403_ERROR[0], '');
     }
 
     // 의심스러운 패턴 감지

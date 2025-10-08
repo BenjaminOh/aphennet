@@ -48,12 +48,13 @@ app.use(requestIp.mw());
 const corsOptions = {
     origin: [
         'http://localhost:3028',
-        'http://basic.likeweb.co.kr',
-        'http://basicapi.likeweb.co.kr',
-        'https://basic.likeweb.co.kr',
-        'https://basicapi.likeweb.co.kr',
+        'http://aphennet.likeweb.co.kr',
+        'http://aphennetapi.likeweb.co.kr',
+        'https://aphennet.likeweb.co.kr',
+        'https://aphennetapi.likeweb.co.kr',
     ],
-    methods: ['GET', 'PUT', 'POST', 'DELETE'],
+    methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+    credentials: true,
 };
 
 app.set('trust proxy', 1); // 1단계 프록시 신뢰
@@ -77,8 +78,13 @@ app.use((req, res, next) => {
     next();
 });
 
-// 보안 미들웨어 적용
-app.use(securityMiddleware.security);
+// 보안 미들웨어 적용 (헬스체크 제외)
+app.use((req, res, next) => {
+    if (req.path === '/health') {
+        return next();
+    }
+    return securityMiddleware.security(req, res, next);
+});
 
 // Routes
 app.use('/v1/board', boardRoutes);
