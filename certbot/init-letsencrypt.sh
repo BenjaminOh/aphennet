@@ -11,11 +11,11 @@ else
 fi
 
 # 환경 변수 설정 (기본값 포함)
-domains=${CERTBOT_DOMAIN:-yourdomain.com}
+domains=${CERTBOT_DOMAIN:-aphennet.likeweb.co.kr}
 rsa_key_size=4096
 data_path="./certbot"
-email=${CERTBOT_EMAIL:-your-email@example.com}
-staging=${CERTBOT_STAGING:-1} # 1로 설정하면 테스트 환경 (staging)
+email=${CERTBOT_EMAIL:-admin@likeweb.co.kr}
+staging=${CERTBOT_STAGING:-0} # 0으로 설정하면 프로덕션 환경
 
 # 도메인 설정 확인
 if [ "$domains" = "yourdomain.com" ]; then
