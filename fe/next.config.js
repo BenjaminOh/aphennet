@@ -4,7 +4,7 @@ const nextConfig = {
     experimental: {
         scrollRestoration: true,
     },
-    output: "standalone", // standalone 빌드 활성화
+    output: "standalone", // 운영 모드에서는 활성화
     swcMinify: true, // SWC 사용
     compiler: {
         removeConsole: false,

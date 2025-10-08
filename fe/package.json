@@ -48,6 +48,7 @@
   "devDependencies": {
     "@babel/plugin-transform-private-methods": "^7.24.0",
     "@babel/plugin-transform-runtime": "^7.24.0",
+    "@babel/plugin-transform-typescript": "^7.24.0",
     "@eslint/eslintrc": "^3.0.0",
     "@tanstack/eslint-plugin-query": "^5.67.2",
     "@types/node": "^20",
