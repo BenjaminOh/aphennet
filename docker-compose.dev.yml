@@ -1,0 +1,71 @@
+version: "3.8"
+
+services:
+    # Nginx 리버스 프록시 (개발환경 - HTTP만)
+    nginx:
+        container_name: aphennet-nginx-dev
+        image: nginx:alpine
+        restart: always
+        ports:
+            - "${NGINX_EXPOSE_PORT:-80}:80"
+        volumes:
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        environment:
+            - NGINX_SERVER_NAME=${NGINX_SERVER_NAME:-aphennet.likeweb.co.kr}
+            - USE_SSL=false
+        depends_on:
+            - react-app
+            - node-app
+        networks:
+            - aphennet_net
+
+    # Next.js 프론트엔드 (개발환경)
+    react-app:
+        container_name: aphennet-nextjs
+        build:
+            context: ./fe
+            dockerfile: Dockerfile
+            target: development
+            args:
+                NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL_DEV:-http://aphennetapi.likeweb.co.kr:3001}
+                NEXT_PUBLIC_SITE_ID: ${NEXT_PUBLIC_SITE_ID:-aphennet}
+                NEXT_PUBLIC_MAINT_NAME: ${NEXT_PUBLIC_MAINT_NAME:-Aphennet}
+                NEXT_PUBLIC_ENCRYPTION_KEY: ${NEXT_PUBLIC_ENCRYPTION_KEY:-your_encryption_key}
+        restart: always
+        volumes:
+            - ./fe:/app
+            - nextjs_node_modules:/app/node_modules
+        environment:
+            - NODE_ENV=development
+            - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL_DEV:-http://aphennetapi.likeweb.co.kr:3001}
+            - TZ=Asia/Seoul
+        env_file:
+            - ./.env
+        networks:
+            - aphennet_net
+        depends_on:
+            - mariadb
+
+    # Node.js 백엔드 (개발환경)
+    node-app:
+        extends:
+            file: docker-compose.base.yml
+            service: node-app
+        environment:
+            - NODE_ENV=development
+            - TZ=Asia/Seoul
+
+    # MariaDB (개발환경)
+    mariadb:
+        extends:
+            file: docker-compose.base.yml
+            service: mariadb
+
+volumes:
+    mariadb_data:
+    nextjs_node_modules:
+    nodejs_node_modules:
+
+networks:
+    aphennet_net:
+        driver: bridge

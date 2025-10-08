@@ -70,9 +70,21 @@ docker-compose up -d --build
 docker-compose up nginx mariadb react-app node-app
 ```
 
-### 3. 서비스 접속
+### 3. SSL 인증서 설정 (선택사항)
 
-- **웹 애플리케이션**: http://localhost (nginx를 통한 접속)
+```bash
+# SSL 인증서 초기화 (실제 도메인으로 변경 필요)
+./certbot/init-letsencrypt.sh
+
+# 또는 테스트 환경에서 실행
+# certbot/init-letsencrypt.sh 파일에서 staging=1로 변경 후 실행
+```
+
+### 4. 서비스 접속
+
+- **웹 애플리케이션**: 
+  - HTTP: http://localhost (nginx를 통한 접속)
+  - HTTPS: https://localhost (SSL 인증서 설정 후)
 - **Next.js 개발 서버**: http://localhost:3000 (직접 접속)
 - **Node.js API**: http://localhost:3001 (직접 접속)
 - **MariaDB**: localhost:3306
@@ -121,6 +133,14 @@ aphennet/
 - 정적 파일 캐싱
 - Gzip 압축
 - 파일 업로드 지원 (최대 50MB)
+- SSL/HTTPS 지원 (certbot과 연동)
+- HTTP에서 HTTPS로 자동 리다이렉트
+
+### SSL/HTTPS 설정
+- Let's Encrypt 인증서 자동 발급 및 갱신
+- TLS 1.2/1.3 지원
+- 보안 헤더 설정 (HSTS, X-Frame-Options 등)
+- ACME 챌린지 지원
 
 ### MariaDB 설정
 - UTF8MB4 문자셋 지원
@@ -157,6 +177,16 @@ docker-compose down -v
 
 # 이미지 재빌드
 docker-compose build --no-cache
+
+# SSL 인증서 관련 명령어
+# 인증서 수동 갱신
+docker-compose run --rm certbot renew
+
+# 인증서 상태 확인
+docker-compose exec certbot certbot certificates
+
+# 테스트 인증서 발급 (staging)
+docker-compose run --rm certbot certonly --webroot --webroot-path=/var/www/certbot --staging -d yourdomain.com
 ```
 
 ## 🔍 문제 해결

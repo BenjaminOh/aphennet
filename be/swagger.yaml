@@ -173,7 +173,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 m_password:
                                     type: string
                                     description: '비밀번호'
@@ -206,7 +206,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             m_mobile:
                                                 type: string
                                                 description: '연락처'
@@ -243,7 +243,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 m_password:
                                     type: string
                                     description: '비밀번호'
@@ -272,7 +272,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             m_level:
                                                 type: integer
                                                 description: '회원 레벨'
@@ -336,7 +336,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             m_mobile:
                                                 type: string
                                                 description: '연락처'
@@ -379,7 +379,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 m_password:
                                     type: string
                                     description: '비밀번호'
@@ -408,7 +408,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             m_level:
                                                 type: integer
                                                 description: '회원 레벨'
@@ -487,7 +487,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             m_mobile:
                                                 type: string
                                                 description: '연락처'
@@ -655,7 +655,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
             responses:
                 '200':
                     description: 'Success.'
@@ -789,7 +789,7 @@ paths:
                                                         m_email:
                                                             type: string
                                                             description: '회원 이메일'
-                                                            example: 'likeweb@likeweb.co.kr'
+                                                            example: 'ohsjwe@gmail.com'
                                                         m_name:
                                                             type: string
                                                             description: '회원명'
@@ -1170,7 +1170,7 @@ paths:
                                                             m_email:
                                                                 type: string
                                                                 description: '작성자 이메일'
-                                                                example: 'likeweb@likeweb.co.kr'
+                                                                example: 'ohsjwe@gmail.com'
                                                             m_name:
                                                                 type: string
                                                                 description: '작성자명'
@@ -1248,7 +1248,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '작성자 이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 m_name:
                                     type: string
                                     description: '작성자명'
@@ -1302,7 +1302,7 @@ paths:
                                 b_email:
                                     type: string
                                     description: '알림email주소'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 b_secret:
                                     type: string
                                     description: '비밀글'
@@ -1359,7 +1359,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '작성자 이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 m_name:
                                     type: string
                                     description: '작성자명'
@@ -1546,7 +1546,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '작성자 이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             m_name:
                                                 type: string
                                                 description: '작성자명'
@@ -1612,7 +1612,7 @@ paths:
                                             b_email:
                                                 type: string
                                                 description: '알림email주소'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             b_secret:
                                                 type: string
                                                 description: '비밀글'
@@ -2049,7 +2049,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '본인 이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
             responses:
                 '200':
                     description: ''
@@ -2216,7 +2216,7 @@ paths:
                                                             m_email:
                                                                 type: string
                                                                 description: '작성자 이메일'
-                                                                example: 'likeweb@likeweb.co.kr'
+                                                                example: 'ohsjwe@gmail.com'
                                                             m_name:
                                                                 type: string
                                                                 description: '작성자명'
@@ -6395,7 +6395,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 m_name:
                                     type: string
                                     description: '이름'
@@ -6640,7 +6640,7 @@ paths:
                                                 m_email:
                                                     type: string
                                                     description: '이메일'
-                                                    example: 'likeweb@likeweb.co.kr'
+                                                    example: 'ohsjwe@gmail.com'
                                                 m_name:
                                                     type: string
                                                     description: '이름'
@@ -6678,7 +6678,7 @@ paths:
                                                             m_email:
                                                                 type: string
                                                                 description: '이메일'
-                                                                example: 'likeweb@likeweb.co.kr'
+                                                                example: 'ohsjwe@gmail.com'
                                                             m_name:
                                                                 type: string
                                                                 description: '이름'
@@ -6770,7 +6770,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '회원 이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 m_name:
                                     type: string
                                     description: '회원명'
@@ -6965,7 +6965,7 @@ paths:
                                                             m_email:
                                                                 type: string
                                                                 description: '이메일'
-                                                                example: 'likeweb@likeweb.co.kr'
+                                                                example: 'ohsjwe@gmail.com'
                                                             m_mobile:
                                                                 type: string
                                                                 description: '연락처'
@@ -7084,7 +7084,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '회원 이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             m_name:
                                                 type: string
                                                 description: '회원명'
@@ -7255,7 +7255,7 @@ paths:
                                                             m_email:
                                                                 type: string
                                                                 description: '이메일'
-                                                                example: 'likeweb@likeweb.co.kr'
+                                                                example: 'ohsjwe@gmail.com'
                                                             sec_date:
                                                                 type: string
                                                                 description: '탈퇴일 (YYYY.MM.DD HH:mm)'
@@ -7380,7 +7380,7 @@ paths:
                                                             m_email:
                                                                 type: string
                                                                 description: '이메일'
-                                                                example: 'likeweb@likeweb.co.kr'
+                                                                example: 'ohsjwe@gmail.com'
                                                             m_name:
                                                                 type: string
                                                                 description: '회원명'
@@ -8093,7 +8093,7 @@ paths:
                                             email:
                                                 type: string
                                                 description: '이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             company:
                                                 type: string
                                                 description: '사이트 아이디'
@@ -8133,7 +8133,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '담당자이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                 '400':
                     $ref: '#/components/400Error'
                 '401':
@@ -8188,7 +8188,7 @@ paths:
                                 email:
                                     type: string
                                     description: '이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
             responses:
                 '200':
                     description: ''

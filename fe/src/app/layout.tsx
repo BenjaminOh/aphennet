@@ -6,8 +6,8 @@ import QueryProvider from "@/components/common/common/QueryProvider";
 import ConsolePopup from "@/components/console/popup/Popup";
 
 export const metadata: Metadata = {
-    title: "기본솔루션",
-    description: "기본솔루션",
+    title: "아시아평화와역사교육연대",
+    description: "아시아평화와역사교육연대",
 };
 
 export default function RootLayout({
