@@ -4,12 +4,11 @@ const nextConfig = {
     experimental: {
         scrollRestoration: true,
     },
-    // output: "standalone", // standalone 빌드 비활성화
-    // swcMinify: false, // SWC 재활성화
-    // compiler: {
-    //     // SWC 컴파일러 재활성화
-    //     removeConsole: false,
-    // },
+    output: "standalone", // standalone 빌드 활성화
+    swcMinify: true, // SWC 사용
+    compiler: {
+        removeConsole: false,
+    },
     // async headers() {
     //     return [
     //         {
