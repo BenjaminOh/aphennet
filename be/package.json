@@ -1,17 +1,16 @@
 {
-    "name": "basic_solution",
+    "name": "aphennet",
     "version": "1.0.0",
     "description": "basic solution",
     "main": "app.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "nodemon --config nodemon.json -L"
+        "start": "node app.js",
+        "dev": "node app.js"
     },
     "author": "",
     "license": "ISC",
-    "devDependencies": {
-        "nodemon": "^3.0.1"
-    },
+    "devDependencies": {},
     "dependencies": {
         "axios": "^1.5.0",
         "bcryptjs": "^2.4.3",
