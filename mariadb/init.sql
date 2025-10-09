@@ -517,6 +517,33 @@ CREATE TABLE `i_sms_txt` (
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+-- ===========================================
+-- 기본 관리자 계정 생성
+-- ===========================================
+
+-- 기본 관리자 계정 삽입
+INSERT INTO i_member (
+    m_email, 
+    m_password, 
+    m_name, 
+    m_mobile, 
+    m_level,
+    m_sms_yn,
+    m_mail_yn
+) VALUES (
+    'ohsjwe@gmail.com',
+    '$2y$12$vqfUdPvhscz9H4aSFDUDyu4Ip6sZC2XC5Vw9HoI/WbsV79TaZubHG',
+    '관리자',
+    '010-4802-0138',
+    9,
+    'N',
+    'N'
+) ON DUPLICATE KEY UPDATE 
+    m_password = VALUES(m_password),
+    m_name = VALUES(m_name),
+    m_mobile = VALUES(m_mobile),
+    m_level = VALUES(m_level);
+
 -- 설정 복원
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
