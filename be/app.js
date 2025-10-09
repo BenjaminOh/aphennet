@@ -47,7 +47,7 @@ app.use(requestIp.mw());
 
 const corsOptions = {
     origin: [
-        'http://localhost:3028',
+        'http://localhost:3000',
         'http://aphennet.likeweb.co.kr',
         'http://aphennetapi.likeweb.co.kr',
         'https://aphennet.likeweb.co.kr',
