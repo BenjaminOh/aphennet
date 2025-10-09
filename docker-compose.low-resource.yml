@@ -35,6 +35,7 @@ services:
       TZ: Asia/Seoul
     volumes:
       - mariadb_data:/var/lib/mysql
+      - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - aphennet_net
     command: --innodb-buffer-pool-size=128M --innodb-log-file-size=32M --innodb-flush-log-at-trx-commit=2

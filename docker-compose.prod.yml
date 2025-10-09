@@ -97,6 +97,7 @@ services:
             - "${DB_EXPOSE_PORT:-3306}:3306"
         volumes:
             - mariadb_data:/var/lib/mysql
+            - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
         networks:
             - aphennet_net
         healthcheck:
