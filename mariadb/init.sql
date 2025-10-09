@@ -4,7 +4,16 @@ CREATE DATABASE IF NOT EXISTS aphennet_db CHARACTER SET utf8mb4 COLLATE utf8mb4_
 
 -- 사용자 생성 및 권한 부여
 CREATE USER IF NOT EXISTS 'aphennet'@'%' IDENTIFIED BY 'aphennet!@34';
-GRANT ALL PRIVILEGES ON aphennet_db.* TO 'aphennet'@'%';
+
+-- 기존 권한 제거 후 재부여
+REVOKE ALL PRIVILEGES ON *.* FROM 'aphennet'@'%';
+REVOKE ALL PRIVILEGES ON aphennet_db.* FROM 'aphennet'@'%';
+
+-- 필요한 권한 명시적으로 부여
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, 
+      CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, CREATE VIEW, 
+      SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, EVENT, TRIGGER 
+      ON aphennet_db.* TO 'aphennet'@'%';
 
 -- 권한 새로고침
 FLUSH PRIVILEGES;
