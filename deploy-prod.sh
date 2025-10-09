@@ -16,12 +16,12 @@ fi
 
 # 2. 기존 컨테이너 중지
 echo "### 기존 컨테이너 중지 중..."
-docker compose -f docker-compose.base.yml -f docker-compose.prod.yml down
+docker compose -f docker-compose.prod.yml down
 echo "✅ 기존 컨테이너가 중지되었습니다."
 
 # 3. 최신 이미지 빌드
 echo "### 이미지 빌드 중..."
-docker compose -f docker-compose.base.yml -f docker-compose.prod.yml build --no-cache
+docker compose -f docker-compose.prod.yml build --no-cache
 echo "✅ 이미지 빌드가 완료되었습니다."
 
 # 4. SSL 인증서 확인
@@ -35,7 +35,7 @@ fi
 
 # 5. 운영환경 시작
 echo "### 운영환경 시작 중..."
-docker compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml up -d
 echo "✅ 모든 컨테이너가 시작되었습니다."
 
 # 6. 상태 확인
@@ -44,7 +44,7 @@ sleep 10
 
 echo ""
 echo "=== 컨테이너 상태 ==="
-docker compose -f docker-compose.base.yml -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml ps
 
 echo ""
 echo "=== 서비스 상태 확인 ==="
@@ -65,7 +65,7 @@ echo "🌐 프론트엔드: https://aphennet.likeweb.co.kr"
 echo "🔌 API: https://aphennetapi.likeweb.co.kr"
 echo ""
 echo "📋 유용한 명령어:"
-echo "  - 컨테이너 상태 확인: docker compose -f docker-compose.base.yml -f docker-compose.prod.yml ps"
+echo "  - 컨테이너 상태 확인: docker compose -f docker-compose.prod.yml ps"
 echo "  - 로그 확인: docker logs [컨테이너명] --tail=20"
 echo "  - nginx 설정 테스트: docker exec aphennet-nginx-prod nginx -t"
-echo "  - nginx 설정 다시 로드: docker compose -f docker-compose.base.yml -f docker-compose.prod.yml exec nginx nginx -s reload"
+echo "  - nginx 설정 다시 로드: docker compose -f docker-compose.prod.yml exec nginx nginx -s reload"

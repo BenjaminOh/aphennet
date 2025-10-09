@@ -15,7 +15,7 @@ if [ ! -f "./certbot/conf/live/aphennet.likeweb.co.kr/fullchain.pem" ]; then
 fi
 
 # 운영환경으로 컨테이너 시작
-docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d
+docker-compose -f docker-compose.prod.yml up -d
 
 echo "=== 운영환경이 시작되었습니다 ==="
 echo "접속 URL: https://aphennet.likeweb.co.kr"
