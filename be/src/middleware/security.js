@@ -98,16 +98,19 @@ exports.security = (req, res, next) => {
         return errorHandler.errorThrow(enumConfig.statusErrorCode._403_ERROR[0], '');
     }
 
-    // curl은 명시적으로 허용
-    if (userAgent.toLowerCase().includes('curl')) {
-        console.log(`curl 요청 허용: ${userAgent} from IP: ${clientIP}`);
+    // curl과 wget은 명시적으로 허용
+    if (userAgent.toLowerCase().includes('curl') || userAgent.toLowerCase().includes('wget')) {
+        console.log(`허용된 도구 요청: ${userAgent} from IP: ${clientIP}`);
         return next();
     }
 
     // User-Agent가 없거나 차단 목록에 있는 경우
     const isBlockedUserAgent = blockedUserAgents.some(pattern => pattern.test(userAgent));
 
-    if (userAgent === '' || isBlockedUserAgent) {
+    // 내부 요청 (localhost, 127.0.0.1)은 User-Agent 없이도 허용
+    const isInternalRequest = clientIP === '127.0.0.1' || clientIP === '::1' || clientIP.includes('172.18.0.');
+
+    if ((userAgent === '' || isBlockedUserAgent) && !isInternalRequest) {
         console.log(`차단된 User-Agent: ${userAgent} from IP: ${clientIP}`);
         // suspiciousIPs.add(clientIP);
         return errorHandler.errorThrow(enumConfig.statusErrorCode._403_ERROR[0], '');
