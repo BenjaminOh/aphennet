@@ -32,7 +32,7 @@ export default function Login() {
         resolver: zodResolver(schema),
         defaultValues: {
             m_email: "ohsjwe@gmail.com",
-            m_password: "akdntm&^*@0910",
+            m_password: "test1!@#$",
         },
     });
 

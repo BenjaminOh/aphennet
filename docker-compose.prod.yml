@@ -82,10 +82,10 @@ services:
             retries: 3
             start_period: 40s
 
-    # MariaDB (운영환경) - MySQL 8.0 사용
+    # MariaDB (운영환경) - MariaDB 최신 버전 사용
     mariadb:
         container_name: aphennet-mariadb
-        image: mysql:8.0
+        image: mariadb:10.11
         restart: always
         environment:
             MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-aphennet_root!@34}
