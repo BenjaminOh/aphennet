@@ -7,19 +7,19 @@ import { Autoplay, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import banner from "@/assets/images/user/sample/banner.png";
-import { API_URL } from "@/config/apiConfig";
-import { useGetBannerList } from "@/service/user/main";
+// import { API_URL } from "@/config/apiConfig";
+// import { useGetBannerList } from "@/service/user/main";
 
-interface BannerItem {
-    idx: number;
-    b_file: string;
-    b_title: string;
-    b_open: string[];
-    b_s_date: string;
-    b_e_date: string;
-    b_url: string;
-    b_url_target: string;
-}
+// interface BannerItem {
+//     idx: number;
+//     b_file: string;
+//     b_title: string;
+//     b_open: string[];
+//     b_s_date: string;
+//     b_e_date: string;
+//     b_url: string;
+//     b_url_target: string;
+// }
 
 const swiperStyle = `
     [&>.swiper-pagination]:leading-[0]
@@ -46,6 +46,7 @@ const swiperStyle = `
 export default function MainBanner() {
     const router = useRouter();
     const [type, setType] = useState<"P" | "M">("P");
+    console.log(type);
     // const [bannerList, setBannerList] = useState<BannerItem[]>([]);
     const bannerList = [
         {
@@ -137,11 +138,11 @@ export default function MainBanner() {
                         clickable: true,
                     }}
                     autoplay={{
-                        delay: 8000,
+                        delay: 5000,
                         disableOnInteraction: false,
                     }}
                     spaceBetween={20}
-                    modules={[Pagination]}
+                    modules={[Autoplay, Pagination]}
                     observer={true}
                     observeParents={true}
                 >

@@ -3,6 +3,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
+import Footer from "./Footer";
 import Header from "./Header";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -10,6 +11,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="user-layout">
             <Header />
             {children}
+            <Footer />
         </div>
     );
 }
