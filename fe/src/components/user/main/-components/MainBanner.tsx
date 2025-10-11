@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Autoplay, Pagination } from "swiper/modules";
+import { Autoplay, EffectFade, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-import banner from "@/assets/images/user/sample/banner.png";
+import banner1 from "@/assets/images/user/sample/banner1.png";
+import banner2 from "@/assets/images/user/sample/banner2.png";
 // import { API_URL } from "@/config/apiConfig";
 // import { useGetBannerList } from "@/service/user/main";
 
@@ -51,7 +51,7 @@ export default function MainBanner() {
     const bannerList = [
         {
             idx: 1,
-            b_file: "https://via.placeholder.com/150",
+            b_file: banner1.src,
             b_title: "한중일 3국\n공동부 교재",
             b_open: ["Y", "노출"],
             b_s_date: "",
@@ -61,7 +61,7 @@ export default function MainBanner() {
         },
         {
             idx: 2,
-            b_file: "https://via.placeholder.com/150",
+            b_file: banner2.src,
             b_title: "한중일 3국 공동부 교재",
             b_open: ["Y", "노출"],
             b_s_date: "",
@@ -137,12 +137,15 @@ export default function MainBanner() {
                     pagination={{
                         clickable: true,
                     }}
+                    effect="fade"
+                    fadeEffect={{
+                        crossFade: true,
+                    }}
                     autoplay={{
                         delay: 5000,
                         disableOnInteraction: false,
                     }}
-                    spaceBetween={20}
-                    modules={[Autoplay, Pagination]}
+                    modules={[Autoplay, Pagination, EffectFade]}
                     observer={true}
                     observeParents={true}
                 >
@@ -162,12 +165,7 @@ export default function MainBanner() {
                                 }}
                             >
                                 <div className="relative flex flex-col gap-[14px] md:gap-[47px] xl:flex-row xl:justify-end">
-                                    {/* <img
-                                    src={`${API_URL}/${item.b_file}`}
-                                    alt={item.b_title}
-                                    className="w-full xl:h-full xl:object-cover"
-                                /> */}
-                                    <Image src={banner} alt={item.b_title} className="w-full xl:w-auto" />
+                                    <img src={item.b_file} alt={item.b_title} className="w-full xl:w-auto" />
                                     <div className="whitespace-pre-line px-[20px] text-left text-[24px] font-[700] md:px-[28px] md:text-[48px] xl:absolute xl:left-1/2 xl:top-[30%] xl:mx-auto xl:w-full xl:max-w-[1360px] xl:-translate-x-1/2 xl:px-0 xl:text-[60px]">
                                         {item.b_title}
                                     </div>

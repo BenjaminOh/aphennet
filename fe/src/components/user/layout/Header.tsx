@@ -16,7 +16,7 @@ export default function Header() {
 
     return (
         <header className="sticky top-0 z-50 bg-white">
-            <div className="mx-auto flex h-[60px] max-w-[1720px] items-center justify-between px-[20px] md:px-[28px] xl:h-[80px] xl:gap-[20px] min-[1730px]:px-0">
+            <div className="mx-auto flex h-[60px] max-w-[1720px] items-center justify-between px-[20px] md:px-[28px] xl:h-[80px] xl:gap-[20px] min-[1760px]:px-0">
                 <Link
                     href="/"
                     className="h-[40px] w-[183px] bg-logo bg-contain bg-center bg-no-repeat xl:h-[60px] xl:w-[274px]"
