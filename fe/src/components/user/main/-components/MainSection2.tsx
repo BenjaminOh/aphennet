@@ -1,14 +1,68 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 
 import mainSection2Img1 from "@/assets/images/user/mainSection2Img1.png";
 import mainSection2Img2 from "@/assets/images/user/mainSection2Img2.png";
 import mainSection2Img3 from "@/assets/images/user/mainSection2Img3.png";
 
-export default function MainSection2() {
+export default function MainSection2({
+    sectRef,
+    sectOn,
+}: {
+    sectRef: React.RefObject<HTMLDivElement>;
+    sectOn: boolean;
+}) {
+    const cont2Ref = useRef<HTMLDivElement>(null);
+    const cont3Ref = useRef<HTMLDivElement>(null);
+    const [cont2On, setCont2On] = useState(false);
+    const [cont3On, setCont3On] = useState(false);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = entry.target as HTMLDivElement;
+                        if (target === cont2Ref.current) setCont2On(true);
+                        if (target === cont3Ref.current) setCont3On(true);
+                    }
+                });
+            },
+            {
+                threshold: 0.2,
+                rootMargin: "0px 0px -100px 0px",
+            },
+        );
+
+        const refs = [cont2Ref, cont3Ref];
+        refs.forEach(ref => {
+            if (ref.current) {
+                observer.observe(ref.current);
+            }
+        });
+
+        return () => {
+            refs.forEach(ref => {
+                if (ref.current) {
+                    observer.unobserve(ref.current);
+                }
+            });
+        };
+    }, []);
+
     return (
-        <div className="mx-auto flex max-w-[1360px] flex-col gap-[80px] p-[120px_20px] md:p-[160px_28px] xl:gap-[120px] min-[1400px]:px-0">
+        <div
+            ref={sectRef}
+            className="mx-auto flex max-w-[1360px] flex-col gap-[80px] p-[120px_20px] md:p-[160px_28px] xl:gap-[120px] min-[1400px]:px-0"
+        >
             <div className="flex flex-col gap-[40px] md:gap-[60px] xl:flex-row xl:items-center xl:gap-0">
-                <div className="xl:flex-1">
+                <div
+                    className={`opacity-0 transition-all duration-700 ease-in-out xl:flex-1${
+                        sectOn ? " opacity-100" : ""
+                    }`}
+                >
                     <p className="w-fit rounded-[30px] bg-[#056547] p-[8px_20px] font-[700] text-white md:text-[18px]">
                         연대 설립 이야기
                     </p>
@@ -22,10 +76,20 @@ export default function MainSection2() {
                         일본교과서바로잡기운동본부를 결성하였습니다.
                     </p>
                 </div>
-                <Image src={mainSection2Img1} alt="연대 설립 이야기" className="mx-auto xl:mx-0" />
+                <Image
+                    src={mainSection2Img1}
+                    alt="연대 설립 이야기"
+                    className={`mx-auto translate-y-[50%] opacity-0 transition-all duration-700 ease-in-out xl:mx-0${
+                        sectOn ? " !translate-y-0 opacity-100" : ""
+                    }`}
+                />
             </div>
-            <div className="flex flex-col gap-[40px] xl:flex-row xl:items-center xl:gap-0">
-                <div className="xl:order-2 xl:flex-1">
+            <div ref={cont2Ref} className="flex flex-col gap-[40px] xl:flex-row xl:items-center xl:gap-0">
+                <div
+                    className={`opacity-0 transition-all duration-700 ease-in-out xl:order-2 xl:flex-1${
+                        cont2On ? " opacity-100" : ""
+                    }`}
+                >
                     <p className="w-fit rounded-[30px] bg-[#056547] p-[8px_20px] font-[700] text-white md:text-[18px]">
                         우리의 철학
                     </p>
@@ -36,10 +100,20 @@ export default function MainSection2() {
                         <li>미래: 아이들에게 거짓을 가르치지 않기 위한 우리의 약속입니다.</li>
                     </ul>
                 </div>
-                <Image src={mainSection2Img2} alt="우리의 철학" className="mx-auto xl:order-1 xl:mx-0" />
+                <Image
+                    src={mainSection2Img2}
+                    alt="우리의 철학"
+                    className={`mx-auto translate-y-[50%] opacity-0 transition-all duration-700 ease-in-out xl:order-1 xl:mx-0${
+                        cont2On ? " !translate-y-0 opacity-100" : ""
+                    }`}
+                />
             </div>
-            <div className="flex flex-col gap-[40px] xl:flex-row xl:items-center xl:gap-0">
-                <div className="xl:flex-1">
+            <div ref={cont3Ref} className="flex flex-col gap-[40px] xl:flex-row xl:items-center xl:gap-0">
+                <div
+                    className={`opacity-0 transition-all duration-700 ease-in-out xl:flex-1${
+                        cont3On ? " opacity-100" : ""
+                    }`}
+                >
                     <p className="w-fit rounded-[30px] bg-[#056547] p-[8px_20px] font-[700] text-white md:text-[18px]">
                         비전과 약속
                     </p>
@@ -55,7 +129,13 @@ export default function MainSection2() {
                         </ul>
                     </div>
                 </div>
-                <Image src={mainSection2Img3} alt="비전과 약속" className="mx-auto xl:mx-0" />
+                <Image
+                    src={mainSection2Img3}
+                    alt="비전과 약속"
+                    className={`mx-auto translate-y-[50%] opacity-0 transition-all duration-700 ease-in-out xl:mx-0${
+                        cont3On ? " !translate-y-0 opacity-100" : ""
+                    }`}
+                />
             </div>
         </div>
     );
