@@ -14,11 +14,14 @@ export default function Header() {
 
     return (
         <header className="sticky top-0 z-50 bg-white">
-            <div className="flex h-[60px] items-center justify-between px-[20px] md:px-[28px]">
-                <Link href="/" className="h-[40px] w-[183px] bg-logo bg-contain bg-center bg-no-repeat" />
+            <div className="mx-auto flex h-[60px] max-w-[1720px] items-center justify-between px-[20px] md:px-[28px] xl:h-[80px] xl:gap-[20px] min-[1730px]:px-0">
+                <Link
+                    href="/"
+                    className="h-[40px] w-[183px] bg-logo bg-contain bg-center bg-no-repeat xl:h-[60px] xl:w-[274px]"
+                />
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
-                        <button className="size-[40px] bg-icMenu bg-contain bg-center bg-no-repeat">
+                        <button className="size-[40px] bg-icMenu bg-contain bg-center bg-no-repeat xl:hidden">
                             <span className="sr-only">메뉴 열기</span>
                         </button>
                     </PopoverTrigger>
@@ -126,6 +129,82 @@ export default function Header() {
                         </div>
                     </PopoverContent>
                 </Popover>
+                <div className="hidden flex-1 items-center justify-between xl:flex">
+                    <ul className="flex items-center">
+                        <li className="group relative">
+                            <button
+                                type="button"
+                                className="relative h-[80px] w-[180px] text-[18px] font-[500] transition-all duration-300 after:absolute after:bottom-[8px] after:left-1/2 after:h-[4px] after:w-0 after:-translate-x-1/2 after:rounded-[4px] after:bg-primary after:transition-all after:duration-300 group-hover:font-[700] group-hover:text-primary group-hover:after:w-[50px]"
+                            >
+                                소개
+                            </button>
+                            <div className="absolute left-1/2 top-[100%] flex max-h-0 w-[200px] -translate-x-1/2 flex-col gap-[20px] overflow-hidden bg-white transition-all duration-300 group-hover:max-h-[500px]">
+                                <ul className="flex flex-col gap-[20px] p-[34px_24px_24px]">
+                                    <li>
+                                        <button
+                                            type="button"
+                                            className="w-full font-[300] transition-all duration-300 hover:font-[500]"
+                                        >
+                                            인사말
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li className="group relative">
+                            <button
+                                type="button"
+                                className="relative h-[80px] w-[180px] text-[18px] font-[500] transition-all duration-300 after:absolute after:bottom-[8px] after:left-1/2 after:h-[4px] after:w-0 after:-translate-x-1/2 after:rounded-[4px] after:bg-primary after:transition-all after:duration-300 group-hover:font-[700] group-hover:text-primary group-hover:after:w-[50px]"
+                            >
+                                소개
+                            </button>
+                            <div className="absolute left-1/2 top-[100%] flex max-h-0 w-[200px] -translate-x-1/2 flex-col gap-[20px] overflow-hidden bg-white transition-all duration-300 group-hover:max-h-[500px]">
+                                <ul className="flex flex-col gap-[20px] p-[34px_24px_24px]">
+                                    <li>
+                                        <button
+                                            type="button"
+                                            className="w-full font-[300] transition-all duration-300 hover:font-[500]"
+                                        >
+                                            인사말
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                    <div className="flex items-center gap-[20px]">
+                        <ul className="flex items-center gap-[40px] rounded-[20px] border border-[#ddd] p-[8px_24px]">
+                            <li>
+                                <a href="/" className="text-[18px] font-[500] text-[#666]">
+                                    후원하기
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/" className="text-[18px] font-[500] text-[#666]">
+                                    아시아평화와역사연구소
+                                </a>
+                            </li>
+                        </ul>
+                        <ul className="flex gap-[40px]">
+                            <li>
+                                <a
+                                    href="/"
+                                    className="block size-[40px] bg-icInstagram bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
+                                >
+                                    인스타그램
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="/"
+                                    className="block size-[40px] bg-icFacebook bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
+                                >
+                                    페이스북
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </header>
     );

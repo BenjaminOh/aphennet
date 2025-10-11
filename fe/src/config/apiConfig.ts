@@ -26,6 +26,8 @@ export const COMMON_API_ROUTES = {
 export const USER_API_ROUTES = {
     // 로그인 --------------------
     LOGIN: "/v1/auth/login",
+
+    GET_MAIN_BANNER: "/v1/main/banner",
 };
 
 // 관리자
