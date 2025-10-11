@@ -63,7 +63,11 @@ export default function MainSection3({
                     <div className="mt-[45px] md:mt-[52px] md:flex md:justify-end xl:mt-[152px]">
                         <LinkButton
                             txt="후원하러 가기"
-                            handleClick={() => {}}
+                            handleClick={() => {
+                                window.open(
+                                    "https://link.donationbox.co.kr/donationBoxList.jsp?campaignuid=okIiz0H7Vu",
+                                );
+                            }}
                             type="black"
                             className="w-full md:w-[240px]"
                         />
