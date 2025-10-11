@@ -129,14 +129,14 @@ exports.getCategoryList = async (req, res, next) => {
 
         const resultObj = buildMenu(categoryListY, 0);
 
-        resultObj.push({
-            id: '0',
-            c_depth: '1',
-            c_depth_parent: '0',
-            c_num: '0',
-            c_name: '미사용 카테고리',
-            submenu: categoryListNResult,
-        });
+        // resultObj.push({
+        //     id: '0',
+        //     c_depth: '1',
+        //     c_depth_parent: '0',
+        //     c_num: '0',
+        //     c_name: '미사용 카테고리',
+        //     submenu: categoryListNResult,
+        // });
 
         return errorHandler.successThrow(res, '', resultObj);
     } catch (err) {
