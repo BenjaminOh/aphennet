@@ -6,13 +6,23 @@ import arrowRightWhite from "@/assets/images/user/arrowRightWhite.png";
 import mainSection3Img from "@/assets/images/user/mainSection3Img.jpg";
 import LinkButton from "@/components/user/button/LinkButton";
 
-export default function MainSection3() {
+export default function MainSection3({
+    sectRef,
+    sectOn,
+}: {
+    sectRef: React.RefObject<HTMLDivElement>;
+    sectOn: boolean;
+}) {
     return (
-        <div className="relative xl:pt-[120px]">
+        <div ref={sectRef} className="relative xl:pt-[120px]">
             <div className="relative p-[60px_20px] md:p-[120px_28px] xl:p-[120px_0_180px]">
                 <Image src={mainSection3Img} alt="배경이미지" fill className="object-cover" />
                 <div className="xl:mx-auto xl:flex xl:max-w-[1360px] xl:justify-end">
-                    <div className="relative flex flex-col gap-[40px] md:gap-[60px]">
+                    <div
+                        className={`relative flex translate-x-[50%] flex-col gap-[40px] opacity-0 transition-all duration-700 ease-in-out md:gap-[60px]${
+                            sectOn ? " !translate-x-0 opacity-100" : ""
+                        }`}
+                    >
                         <p className="text-[22px] font-[700] leading-[1.5] text-white md:text-[40px]">
                             아시아평화와역사교육연대는
                             <br />
@@ -37,7 +47,11 @@ export default function MainSection3() {
                 </div>
             </div>
             <div className="xl:pointer-events-none xl:absolute xl:left-1/2 xl:top-0 xl:flex xl:w-full xl:max-w-[1360px] xl:-translate-x-1/2">
-                <div className="pointer-events-auto bg-[#056547] p-[40px_20px] md:p-[60px_28px] xl:w-[640px] xl:rounded-[24px] xl:p-[60px]">
+                <div
+                    className={`pointer-events-auto translate-y-[50%] bg-[#056547] p-[40px_20px] opacity-0 transition-all duration-700 ease-in-out md:p-[60px_28px] xl:w-[640px] xl:rounded-[24px] xl:p-[60px]${
+                        sectOn ? " !translate-y-0 opacity-100" : ""
+                    }`}
+                >
                     <p className="text-[24px] font-[700] leading-[1.5] text-white md:text-[40px]">
                         함께 하는 마음으로,
                         <br />
@@ -49,7 +63,11 @@ export default function MainSection3() {
                     <div className="mt-[45px] md:mt-[52px] md:flex md:justify-end xl:mt-[152px]">
                         <LinkButton
                             txt="후원하러 가기"
-                            handleClick={() => {}}
+                            handleClick={() => {
+                                window.open(
+                                    "https://link.donationbox.co.kr/donationBoxList.jsp?campaignuid=okIiz0H7Vu",
+                                );
+                            }}
                             type="black"
                             className="w-full md:w-[240px]"
                         />
