@@ -2,6 +2,7 @@
 
 import { DragEndEvent } from "@dnd-kit/core";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { notFound } from "next/navigation";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -9,7 +10,7 @@ import { z } from "zod";
 
 import DraggableList from "@/components/console/common/DraggableList";
 import LoadingSpinner from "@/components/console/common/LoadingSpinner";
-import NoData from "@/components/console/common/Nodata";
+import NoData from "@/components/console/common/NoData";
 import Pagination from "@/components/console/common/Pagination";
 import ResizableSplit from "@/components/console/common/ResizableSplit";
 import AllCheckbox from "@/components/console/form/AllCheckbox";
@@ -19,15 +20,17 @@ import SelectBox, { SelectItem } from "@/components/console/form/SelectBox";
 import Toggle from "@/components/console/form/Toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { API_URL } from "@/config/apiConfig";
-import { BoardListParams, initialListSize, listSearchTypes } from "@/constants/console/listParams";
-import useCheckboxList from "@/hooks/console/useCheckboxList";
-import usePagination from "@/hooks/console/usePagination";
-import useUrlParams from "@/hooks/console/useUrlParams";
+import { BoardListParams, initialListSize, initialPage, listSearchTypes } from "@/constants/console/listParams";
+import { useCheckboxList } from "@/hooks/console/useCheckboxList";
+import { usePagination } from "@/hooks/console/usePagination";
+import { useUrlParams } from "@/hooks/console/useUrlParams";
+import { useToast } from "@/hooks/use-toast";
 import { useDelPost, useGetPostList } from "@/service/common";
 import { usePutPostMove, usePutPostNotice, usePutPostOrder } from "@/service/console/board/post";
 import { initialBoardSettingData, useBoardStore } from "@/store/common/useBoardStore";
 import { usePopupStore } from "@/store/common/usePopupStore";
 import { makeIntComma } from "@/utils/numberUtils";
+import { calculatePrevPage } from "@/utils/paginationUtils";
 
 import PostDetail from "./PostDetail";
 import PostForm from "./PostForm";
@@ -62,7 +65,7 @@ export default function PostList() {
     const [moveBoardList, setMoveBoardList] = useState<SelectItem[]>([]);
     const [moveCategory, setMoveCategory] = useState("");
     const { urlParams, updateUrlParams, resetUrlParams } = useUrlParams<BoardListParams>({
-        page: { defaultValue: 1, type: "number" },
+        page: { defaultValue: initialPage, type: "number" },
         search: { defaultValue: "titlecontents", type: "string", validValues: listSearchTypes.map(type => type.value) },
         searchtxt: { defaultValue: "", type: "string" },
         detail: { defaultValue: "", type: "string" },
@@ -87,6 +90,7 @@ export default function PostList() {
         data: configData,
         isLoading: isInitialLoading,
         refetch,
+        error: getPostListError,
     } = useGetPostList(
         category || "",
         initialListSize.toString(),
@@ -100,6 +104,7 @@ export default function PostList() {
     const putBoardMoveMutation = usePutPostMove();
     const delBoardMutation = useDelPost();
     const { setConfirmPop, setLoadingPop } = usePopupStore();
+    const { toast } = useToast();
 
     // category 변경 시 초기화
     useEffect(() => {
@@ -207,6 +212,13 @@ export default function PostList() {
         }
     }, [configData]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    // 404 에러 처리
+    useEffect(() => {
+        if (getPostListError) {
+            notFound();
+        }
+    }, [getPostListError]);
+
     // 리스트 idx 값만 배열로 (전체 체크박스리스트 만들기)
     useEffect(() => {
         setCheckList(items && items.length > 0 ? items.map(item => item.idx) : []);
@@ -257,6 +269,9 @@ export default function PostList() {
 
         putBoardOrderMutation.mutate(body, {
             onSuccess: () => {
+                toast({
+                    title: "순서가 변경되었습니다.",
+                });
                 refetch();
             },
         });
@@ -273,6 +288,9 @@ export default function PostList() {
 
         putBoardNoticeMutation.mutate(body, {
             onSuccess: () => {
+                toast({
+                    title: "공지설정이 변경되었습니다.",
+                });
                 refetch();
                 setDetailRefetch(true);
             },
@@ -295,29 +313,44 @@ export default function PostList() {
         const body = { idx: checkedList, category: Number(moveCategory) };
         putBoardMoveMutation.mutate(body, {
             onSuccess: () => {
-                setConfirmPop(true, "이동되었습니다.", 1);
+                toast({
+                    title: "이동되었습니다.",
+                });
                 refetch();
             },
         });
     };
 
     // 삭제 확인
-    const handleConfirmDelete = () => {
-        if (checkedList.length > 0) {
-            setConfirmPop(true, "삭제하시겠습니까?", 2, () => handleDelete());
+    const handleConfirmDelete = (idx?: string) => {
+        if (idx || checkedList.length > 0) {
+            setConfirmPop(true, "삭제하시겠습니까?", 2, () => handleDelete(idx));
         } else {
             setConfirmPop(true, "게시글을 선택해주세요.", 1);
         }
     };
 
     // 삭제하기
-    const handleDelete = () => {
+    const handleDelete = (idx?: string) => {
         if (!category) return;
-        const body = { idx: checkedList, category: Number(category), pass: "T" };
+        const body = { idx: idx ? [idx] : checkedList, category: Number(category), pass: "T" };
         delBoardMutation.mutate(body, {
             onSuccess: () => {
-                setConfirmPop(true, "삭제되었습니다.", 1);
+                toast({
+                    title: "삭제되었습니다.",
+                });
+
+                // 삭제 후 refetch 전에 페이지 이동 처리
+                const prevPage = calculatePrevPage(urlParams.page, items.length);
+
+                updateUrlParams({
+                    ...urlParams,
+                    page: prevPage,
+                    detail: undefined,
+                    edit: undefined,
+                });
                 refetch();
+                setCurrentPage(prevPage);
             },
         });
     };
@@ -353,14 +386,20 @@ export default function PostList() {
 
     // 게시글 삭제 완료시
     const onDeleteComplete = (reply: boolean) => {
+        // 삭제 후 refetch 전에 페이지 이동 처리
+        const prevPage = calculatePrevPage(urlParams.page, items.length);
+
         // 답글 삭제 아닐때만 게시글상세 닫기
         if (!reply) {
             updateUrlParams({
                 ...urlParams,
+                page: prevPage,
                 detail: undefined,
+                edit: undefined,
             });
         }
         refetch();
+        setCurrentPage(prevPage);
     };
 
     return (
@@ -388,23 +427,27 @@ export default function PostList() {
                                             checked={allCheck}
                                             onChange={e => handleAllCheck(e.currentTarget.checked)}
                                         />
-                                        <SelectBox
-                                            list={moveBoardList}
-                                            value={moveCategory}
-                                            onChange={setMoveCategory}
-                                            triggerClassName="h-[34px]"
-                                        />
-                                        <button
-                                            type="button"
-                                            className="h-[34px] rounded-[8px] border border-[#181818] bg-white px-[16px] font-[500]"
-                                            onClick={handleConfirmMove}
-                                        >
-                                            이동
-                                        </button>
+                                        {moveBoardList.length > 0 && (
+                                            <>
+                                                <SelectBox
+                                                    list={moveBoardList}
+                                                    value={moveCategory}
+                                                    onChange={setMoveCategory}
+                                                    triggerClassName="h-[34px]"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="h-[34px] rounded-[8px] border border-[#181818] bg-white px-[16px] font-[500]"
+                                                    onClick={handleConfirmMove}
+                                                >
+                                                    이동
+                                                </button>
+                                            </>
+                                        )}
                                         <button
                                             type="button"
                                             className="h-[34px] rounded-[8px] bg-[#FEE2E2] px-[16px] font-[500] text-[#E5313D]"
-                                            onClick={handleConfirmDelete}
+                                            onClick={() => handleConfirmDelete()}
                                         >
                                             삭제
                                         </button>
@@ -527,13 +570,11 @@ export default function PostList() {
                             handleCancel={handlePostCancel}
                             refetch={detailRefetch}
                             onRefetched={() => setDetailRefetch(false)}
+                            handleConfirmDelete={handleConfirmDelete}
                         />
                     ) : (
                         <div className="h-full p-[0_20px_20px_7px]">
-                            <NoData
-                                txt="선택된 컨텐츠가 없습니다."
-                                className="h-full rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]"
-                            />
+                            <NoData txt="선택된 컨텐츠가 없습니다." className="h-full rounded-[12px] bg-white" />
                         </div>
                     )}
                 </ScrollArea>

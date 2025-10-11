@@ -19,7 +19,7 @@ const Toggle = React.forwardRef<HTMLButtonElement, ToggleProps>(
         <div className={twMerge("flex items-center gap-[8px]", className)}>
             <Switch
                 className={twMerge(
-                    "w-[48px] h-[24px] border-none data-[state=checked]:bg-[#00BA97] data-[state=unchecked]:bg-[#D9D9D9] [&>span]:size-[18px] [&>span]:bg-white [&>span]:data-[state=checked]:translate-x-[27px] [&>span]:data-[state=unchecked]:translate-x-[3px]",
+                    "w-[48px] h-[24px] border-none data-[state=checked]:bg-[#0CB2AD] data-[state=unchecked]:bg-[#D9D9D9] [&>span]:size-[18px] [&>span]:bg-white [&>span]:data-[state=checked]:translate-x-[27px] [&>span]:data-[state=unchecked]:translate-x-[3px]",
                     switchClassName,
                 )}
                 checked={checked}

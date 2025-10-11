@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export default function useCheckboxList() {
+export const useCheckboxList = () => {
     const [checkedNum, setCheckedNum] = useState(0);
     const [allCheck, setAllCheck] = useState(false);
     const [checkList, setCheckList] = useState<(string | number)[]>([]);
@@ -51,4 +51,4 @@ export default function useCheckboxList() {
         handleAllCheck,
         handleCheck,
     };
-}
+};

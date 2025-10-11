@@ -15,7 +15,7 @@ export default function DatePickerInput({ date, setDate, timePicker, className }
     registerLocale("ko", ko);
 
     const inputStyle = twMerge(
-        "w-full h-[34px] rounded-[5px] text-[14px] text-[#222] border border-[#D9D9D9] rounded-[5px] focus:border-console p-[0_48px_0_12px] !bg-console-ic-calendar bg-no-repeat bg-[right_12px_center]",
+        "w-full h-[48px] rounded-[5px] text-[#222] border border-[#D9D9D9] rounded-[8px] focus:border-console p-[0_48px_0_12px] !bg-console-ic-calendar bg-no-repeat bg-[right_12px_center]",
         className,
     );
 

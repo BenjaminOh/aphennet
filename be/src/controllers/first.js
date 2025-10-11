@@ -224,7 +224,18 @@ exports.putFirstBoardAlarmReadDelete = async (req, res, next) => {
 // 최근 게시글 정보
 exports.getFirstBoardCnt = async (req, res, next) => {
     try {
-        const boardTotalCnt = await i_board.count();
+        // 게시글 조건
+        const whereCondition = {
+            idx: {
+                [Op.in]: Sequelize.literal(`(
+                        SELECT b.idx FROM i_board b JOIN i_category c 
+                            ON c.id = b.category
+                        WHERE c.c_use_yn = '${enumConfig.useType.Y[0]}'
+                    )`),
+            },
+        };
+
+        const boardTotalCnt = await i_board.count({ where: whereCondition });
 
         const currentDate = new Date();
         currentDate.setHours(0, 0, 0, 0);
@@ -232,22 +243,32 @@ exports.getFirstBoardCnt = async (req, res, next) => {
         const endOfDay = new Date();
         endOfDay.setHours(23, 59, 59, 999);
 
+        // 오늘 게시글 조건
+        whereCondition.b_reg_date = { [Op.between]: [currentDate, endOfDay] };
+
         const boardTodayCnt = await i_board.count({
-            where: {
-                b_reg_date: {
-                    [Op.between]: [currentDate, endOfDay],
-                },
-            },
+            where: whereCondition,
         });
 
-        const commentTotalCnt = await i_board_comment.count();
+        // 댓글 조건
+        const commentWhereCondition = {
+            board_idx: {
+                [Op.in]: Sequelize.literal(`(
+                    SELECT b.idx FROM i_board b JOIN i_category c 
+                        ON c.id = b.category
+                    WHERE b.idx = i_board_comment.board_idx
+                    AND c.c_use_yn = '${enumConfig.useType.Y[0]}'
+                )`),
+            },
+        };
+
+        // 오늘 댓글 조건
+        commentWhereCondition.c_reg_date = { [Op.between]: [currentDate, endOfDay] };
+
+        const commentTotalCnt = await i_board_comment.count({ where: commentWhereCondition });
 
         const commentTodayCnt = await i_board_comment.count({
-            where: {
-                c_reg_date: {
-                    [Op.between]: [currentDate, endOfDay],
-                },
-            },
+            where: commentWhereCondition,
         });
 
         const resultObj = {
@@ -268,12 +289,20 @@ exports.getFirstBoardList = async (req, res, next) => {
     const { limit = 5 } = req.params;
 
     try {
-        //const subQuery = Sequelize.literal(`
-        //   (SELECT c_name FROM i_category WHERE i_category.id = i_board.category)
-        //`);
+        // 게시글 조건
+        const whereCondition = {
+            idx: {
+                [Op.in]: Sequelize.literal(`(
+                        SELECT b.idx FROM i_board b JOIN i_category c 
+                            ON c.id = b.category
+                        WHERE c.c_use_yn = '${enumConfig.useType.Y[0]}'
+                    )`),
+            },
+        };
 
         const result = await i_board.findAll({
             limit: parseInt(limit),
+            where: whereCondition,
             attributes: [
                 'idx',
                 'category',

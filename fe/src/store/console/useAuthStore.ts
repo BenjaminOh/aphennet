@@ -25,6 +25,7 @@ interface UserItem {
     m_email: string;
     m_level: number | null;
     m_name: string;
+    m_menu_auth: string | null;
     siteId: string;
     maintName: string;
 }
@@ -41,6 +42,7 @@ const initialLoginUser: UserItem = {
     m_email: "",
     m_level: null,
     m_name: "",
+    m_menu_auth: null,
     siteId: "",
     maintName: "",
 };

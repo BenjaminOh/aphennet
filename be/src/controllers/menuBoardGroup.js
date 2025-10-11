@@ -14,10 +14,10 @@ exports.getBoardGroupList = async (req, res, next) => {
     try {
         utilMiddleware.validateIdx(parent_id, 'parent_id');
 
-        const categoryGroupListY = await i_category_board_group.findAll({
+        const categoryGroupList = await i_category_board_group.findAll({
             where: {
                 parent_id: parent_id,
-                use_yn: enumConfig.useType.Y[0],
+                use_yn: { [Op.in]: [enumConfig.useType.Y[0], enumConfig.useType.N[0]] },
             },
             attributes: [
                 'id',
@@ -33,11 +33,11 @@ exports.getBoardGroupList = async (req, res, next) => {
             order: [['g_num', 'ASC']],
         });
 
-        if (!categoryGroupListY) {
+        if (!categoryGroupList) {
             return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
         }
 
-        const categoryGroupListYResult = categoryGroupListY.map(list => {
+        const categoryGroupListResult = categoryGroupList.map(list => {
             const listObj = {
                 id: list.id,
                 parent_id: list.parent_id,
@@ -47,61 +47,61 @@ exports.getBoardGroupList = async (req, res, next) => {
                 g_menu_ui: list.g_menu_ui,
                 g_img_on: list.g_img_on,
                 g_img_off: list.g_img_off,
-                use_yn: list.use_yn,
+                use_yn: list.use_yn === enumConfig.useType.Y[0] ? enumConfig.useType.Y : enumConfig.useType.N,
             };
             return listObj;
         });
 
-        const categorGroupListN = await i_category_board_group.findAll({
-            where: {
-                parent_id: parent_id,
-                use_yn: enumConfig.useType.N[0],
-            },
-            attributes: [
-                'id',
-                'parent_id',
-                'g_num',
-                'g_name',
-                'all_board',
-                'g_menu_ui',
-                'g_img_on',
-                'g_img_off',
-                'use_yn',
-            ],
-            order: [['g_num', 'ASC']],
-        });
+        // const categorGroupListN = await i_category_board_group.findAll({
+        //     where: {
+        //         parent_id: parent_id,
+        //         use_yn: enumConfig.useType.N[0],
+        //     },
+        //     attributes: [
+        //         'id',
+        //         'parent_id',
+        //         'g_num',
+        //         'g_name',
+        //         'all_board',
+        //         'g_menu_ui',
+        //         'g_img_on',
+        //         'g_img_off',
+        //         'use_yn',
+        //     ],
+        //     order: [['g_num', 'ASC']],
+        // });
 
-        const categoryGroupListNResult = categorGroupListN.map(list => {
-            const listObj = {
-                id: list.id,
-                parent_id: list.parent_id,
-                g_num: list.g_num,
-                all_board: list.all_board,
-                g_name: list.g_name,
-                g_menu_ui: list.g_menu_ui,
-                g_img_on: list.g_img_on,
-                g_img_off: list.g_img_off,
-                use_yn: list.use_yn,
-            };
-            return listObj;
-        });
+        // const categoryGroupListNResult = categorGroupListN.map(list => {
+        //     const listObj = {
+        //         id: list.id,
+        //         parent_id: list.parent_id,
+        //         g_num: list.g_num,
+        //         all_board: list.all_board,
+        //         g_name: list.g_name,
+        //         g_menu_ui: list.g_menu_ui,
+        //         g_img_on: list.g_img_on,
+        //         g_img_off: list.g_img_off,
+        //         use_yn: list.use_yn,
+        //     };
+        //     return listObj;
+        // });
 
-        const resultObj = categoryGroupListYResult;
+        // const resultObj = categoryGroupListYResult;
 
-        resultObj.push({
-            id: '',
-            parent_id: parent_id,
-            g_num: '0',
-            all_board: '',
-            g_name: '숨긴분류',
-            g_menu_ui: '',
-            g_img_on: '',
-            g_img_off: '',
-            use_yn: enumConfig.useType.N[0],
-            submenu: categoryGroupListNResult,
-        });
+        // resultObj.push({
+        //     id: '',
+        //     parent_id: parent_id,
+        //     g_num: '0',
+        //     all_board: '',
+        //     g_name: '숨긴분류',
+        //     g_menu_ui: '',
+        //     g_img_on: '',
+        //     g_img_off: '',
+        //     use_yn: enumConfig.useType.N[0],
+        //     submenu: categoryGroupListNResult,
+        // });
 
-        return errorHandler.successThrow(res, '', resultObj);
+        return errorHandler.successThrow(res, '', categoryGroupListResult);
     } catch (err) {
         next(err);
     }
@@ -118,10 +118,12 @@ exports.postBoardGroupCreate = async (req, res, next) => {
         const groupParent = await i_category.findOne({
             where: {
                 id: parent_id,
-                [Op.or]: [
-                    { c_content_type: enumConfig.contentType.FAQ[0] },
-                    { c_content_type: enumConfig.contentType.QNA[0] },
-                ],
+                // [Op.or]: [
+                //     { c_content_type: enumConfig.contentType.BOARD[0] },
+                //     { c_content_type: enumConfig.contentType.GALLERY[0] },
+                //     { c_content_type: enumConfig.contentType.FAQ[0] },
+                //     { c_content_type: enumConfig.contentType.QNA[0] },
+                // ],
             },
         });
 
@@ -417,7 +419,6 @@ exports.putBoardGroupMove = async (req, res, next) => {
     }
 };
 
-
 // Put Board Group Grade
 // 2025.08.06 ohsjwe
 exports.putBoardGroupGrade = async (req, res, next) => {
@@ -454,17 +455,20 @@ exports.putBoardGroupGrade = async (req, res, next) => {
             {
                 where: {
                     id: {
-                        [Op.in]: id
-                    }
+                        [Op.in]: id,
+                    },
                 },
                 transaction,
-            }
+            },
         );
 
         // 업데이트된 행이 없는 경우
         if (updateResult[0] === 0) {
             await transaction.rollback();
-            return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '업데이트할 데이터를 찾을 수 없습니다.');
+            return errorHandler.errorThrow(
+                enumConfig.statusErrorCode._404_ERROR[0],
+                '업데이트할 데이터를 찾을 수 없습니다.',
+            );
         }
 
         // 트랜잭션 커밋
@@ -484,7 +488,11 @@ exports.putBoardGroupGrade = async (req, res, next) => {
                 break;
         }
 
-        return errorHandler.successThrow(res, '', `${updateResult[0]}개 항목이 ${statusMessage} 상태로 변경되었습니다.`);
+        return errorHandler.successThrow(
+            res,
+            '',
+            `${updateResult[0]}개 항목이 ${statusMessage} 상태로 변경되었습니다.`,
+        );
     } catch (err) {
         // 트랜잭션 롤백
         if (transaction) {
@@ -492,4 +500,4 @@ exports.putBoardGroupGrade = async (req, res, next) => {
         }
         next(err);
     }
-}; 
+};

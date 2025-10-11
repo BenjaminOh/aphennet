@@ -21,6 +21,14 @@ export const useGetPostList = (
             return res.data;
         },
         enabled: options.enabled,
+        retry: (failureCount, error) => {
+            // 404 에러는 재시도하지 않음 (게시판 카테고리 없을때)
+            if ((error as { response?: { status?: number } })?.response?.status === 404) {
+                return false;
+            }
+            // 다른 에러는 최대 3번(기본값)까지 재시도
+            return failureCount < 3;
+        },
     });
 };
 

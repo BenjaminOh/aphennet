@@ -6,9 +6,11 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import InputError from "@/components/console/common/InputError";
+import TooltipBox from "@/components/console/common/TooltipBox";
 import Editor from "@/components/console/form/Editor";
 import FileUpload, { FileData } from "@/components/console/form/FileUpload";
 import Input from "@/components/console/form/Input";
+import { useToast } from "@/hooks/use-toast";
 import { usePostMaint } from "@/service/console/maintenance";
 import { usePopupStore } from "@/store/common/usePopupStore";
 
@@ -59,6 +61,7 @@ export default function MaintForm({ maintName, siteId, handleCancel, onComplete 
     const [filesData, setFilesData] = useState<File[]>([]);
     const postMaintMutation = usePostMaint();
     const { setConfirmPop } = usePopupStore();
+    const { toast } = useToast();
 
     // 등록 확인
     const handleConfirmSave = (data: FormValues) => {
@@ -94,7 +97,9 @@ export default function MaintForm({ maintName, siteId, handleCancel, onComplete 
 
         postMaintMutation.mutate(body, {
             onSuccess: () => {
-                setConfirmPop(true, "등록되었습니다.", 1);
+                toast({
+                    title: "등록되었습니다.",
+                });
                 onComplete();
             },
         });
@@ -102,7 +107,7 @@ export default function MaintForm({ maintName, siteId, handleCancel, onComplete 
 
     return (
         <div className="p-[0_20px_20px_7px]">
-            <div className="rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]">
+            <div className="rounded-[12px] bg-white">
                 <form onSubmit={handleSubmit(handleConfirmSave)}>
                     <div className="p-[16px_20px]">
                         <p className="text-[20px] font-[700]">유지보수 등록</p>
@@ -183,7 +188,12 @@ export default function MaintForm({ maintName, siteId, handleCancel, onComplete 
                             <InputError message={errors.content?.message} />
                         </li>
                         <li className="flex w-full flex-col gap-[8px]">
-                            <p className="text-[#666]">파일 첨부</p>
+                            <div className="flex items-center gap-[8px]">
+                                <p className="text-[#666]">파일 첨부</p>
+                                <TooltipBox
+                                    text={`&middot; 1개의 파일만 첨부 가능합니다.<br/> &middot; 총 용량: 50MB 이하<br/> &middot; 여러개 파일 등록시에는 압축하여 등록해주세요.`}
+                                />
+                            </div>
                             <FileUpload
                                 uploadFiles={files}
                                 setFiles={setFiles}

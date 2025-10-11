@@ -79,11 +79,19 @@ consoleAxios.interceptors.response.use(
         // 기존 에러 처리
         const { status, data } = error.response || {};
         const errorMessage = data?.message || "알 수 없는 에러가 발생했습니다.";
+
+        // 404 에러는 인터셉터에서 처리하지 않음 (개별 컴포넌트에서 처리)
+        if (status === 404) {
+            return Promise.reject(error);
+        }
+
         if (status === 500) {
             setConfirmPop(true, "서버 오류가 발생했습니다.", 1);
         } else {
             setConfirmPop(true, errorMessage, 1);
+            return Promise.reject(error);
         }
+        
         return Promise.reject(error);// 개별 호출에서도 에러 처리 가능하도록 전달
     }
 );

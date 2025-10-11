@@ -11,7 +11,7 @@ interface Level {
 }
 
 // 사용가능한 회원등급 옵션 목록
-export default function useLevelSelectOptions() {
+export const useLevelSelectOptions = () => {
     const [levelOptions, setLevelOptions] = useState<SelectItem[]>([]);
     const { data: configData } = useGetLevelList();
 

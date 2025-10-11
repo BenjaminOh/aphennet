@@ -4,24 +4,30 @@ const nextConfig = {
     experimental: {
         scrollRestoration: true,
     },
-    output: "standalone", // 운영 모드에서는 활성화
-    swcMinify: true, // SWC 사용
-    compiler: {
-        removeConsole: false,
+    output: "standalone",
+    images: {
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "likeweb.co.kr",
+                port: "",
+                pathname: "/admin/**",
+            },
+        ],
     },
-    // async headers() {
-    //     return [
-    //         {
-    //             source: "/(.*)",
-    //             headers: [
-    //                 {
-    //                     key: "Cache-Control",
-    //                     value: "public, max-age=31536000, immutable",
-    //                 },
-    //             ],
-    //         },
-    //     ];
-    // },
+    async headers() {
+        return [
+            {
+                source: "/(.*)",
+                headers: [
+                    {
+                        key: "Cache-Control",
+                        value: "public, max-age=31536000, immutable",
+                    },
+                ],
+            },
+        ];
+    },
 };
 
 module.exports = nextConfig;

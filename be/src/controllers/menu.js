@@ -14,7 +14,7 @@ exports.getCategoryList = async (req, res, next) => {
     try {
         const categoryListY = await i_category.findAll({
             where: {
-                c_use_yn: enumConfig.useType.Y[0],
+                c_use_yn: { [Op.in]: [enumConfig.useType.Y[0], enumConfig.useType.N[0]] },
                 c_lang: c_lang,
             },
             attributes: [
@@ -42,49 +42,49 @@ exports.getCategoryList = async (req, res, next) => {
             return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
         }
 
-        const categoryListN = await i_category.findAll({
-            where: {
-                c_use_yn: enumConfig.useType.N[0],
-                c_lang: c_lang,
-            },
-            attributes: [
-                'id',
-                'c_depth',
-                'c_depth_parent',
-                'c_num',
-                'c_name',
-                'c_use_yn',
-                'c_main_banner',
-                'c_main_banner_file',
-                'c_menu_ui',
-                'c_menu_on_img',
-                'c_menu_off_img',
-                'c_content_type',
-                'c_lang',
-            ],
-            order: [
-                ['c_depth', 'ASC'],
-                ['c_num', 'ASC'],
-            ],
-        });
+        // const categoryListN = await i_category.findAll({
+        //     where: {
+        //         c_use_yn: enumConfig.useType.N[0],
+        //         c_lang: c_lang,
+        //     },
+        //     attributes: [
+        //         'id',
+        //         'c_depth',
+        //         'c_depth_parent',
+        //         'c_num',
+        //         'c_name',
+        //         'c_use_yn',
+        //         'c_main_banner',
+        //         'c_main_banner_file',
+        //         'c_menu_ui',
+        //         'c_menu_on_img',
+        //         'c_menu_off_img',
+        //         'c_content_type',
+        //         'c_lang',
+        //     ],
+        //     order: [
+        //         ['c_depth', 'ASC'],
+        //         ['c_num', 'ASC'],
+        //     ],
+        // });
 
-        const categoryListNResult = categoryListN.map(list => {
-            const listObj = {
-                id: list.id,
-                c_depth: list.c_depth,
-                c_depth_parent: list.c_depth_parent,
-                c_num: list.c_num,
-                c_name: list.c_name,
-                c_main_banner: list.c_main_banner,
-                c_main_banner_file: list.c_main_banner_file,
-                c_menu_ui: list.c_menu_ui,
-                c_menu_on_img: list.c_menu_on_img,
-                c_menu_off_img: list.c_menu_off_img,
-                c_content_type: utilMiddleware.mapContentType(list.c_content_type),
-                c_lang: list.c_lang,
-            };
-            return listObj;
-        });
+        // const categoryListNResult = categoryListN.map(list => {
+        //     const listObj = {
+        //         id: list.id,
+        //         c_depth: list.c_depth,
+        //         c_depth_parent: list.c_depth_parent,
+        //         c_num: list.c_num,
+        //         c_name: list.c_name,
+        //         c_main_banner: list.c_main_banner,
+        //         c_main_banner_file: list.c_main_banner_file,
+        //         c_menu_ui: list.c_menu_ui,
+        //         c_menu_on_img: list.c_menu_on_img,
+        //         c_menu_off_img: list.c_menu_off_img,
+        //         c_content_type: utilMiddleware.mapContentType(list.c_content_type),
+        //         c_lang: list.c_lang,
+        //     };
+        //     return listObj;
+        // });
 
         const buildMenu = (menuItems, parentId) => {
             return menuItems
@@ -99,6 +99,7 @@ exports.getCategoryList = async (req, res, next) => {
                             c_depth_parent: item.c_depth_parent,
                             c_num: item.c_num,
                             c_name: item.c_name,
+                            c_use_yn: item.c_use_yn,
                             c_main_banner: item.c_main_banner,
                             c_main_banner_file: item.c_main_banner_file,
                             c_menu_ui: item.c_menu_ui,
@@ -115,6 +116,7 @@ exports.getCategoryList = async (req, res, next) => {
                             c_depth_parent: item.c_depth_parent,
                             c_num: item.c_num,
                             c_name: item.c_name,
+                            c_use_yn: item.c_use_yn,
                             c_main_banner: item.c_main_banner,
                             c_main_banner_file: item.c_main_banner_file,
                             c_menu_ui: item.c_menu_ui,
@@ -160,6 +162,8 @@ exports.postCategoryCreate = async (req, res, next) => {
         c_contents_type,
         c_use_yn,
         c_lang,
+        c_link_target,
+        c_link_url,
     } = req.body;
 
     try {
@@ -212,6 +216,8 @@ exports.postCategoryCreate = async (req, res, next) => {
             c_contents_type: c_contents_type,
             c_use_yn: c_use_yn || enumConfig.useType.Y[0],
             c_lang: c_lang || enumConfig.langType.KR[0],
+            c_link_target: c_link_target,
+            c_link_url: c_link_url,
         });
 
         if (!categoryCreate) {
@@ -248,20 +254,27 @@ exports.getCategoryView = async (req, res, next) => {
                 result.c_main_banner === enumConfig.bannerSizeType.COVER[0]
                     ? enumConfig.bannerSizeType.COVER
                     : result.c_main_banner === enumConfig.bannerSizeType.ORIGINAL[0]
-                        ? enumConfig.bannerSizeType.ORIGINAL
-                        : null,
+                    ? enumConfig.bannerSizeType.ORIGINAL
+                    : null,
             c_main_banner_file: result.c_main_banner_file,
             c_menu_ui:
                 result.c_menu_ui === enumConfig.menuUiType.TXT[0]
                     ? enumConfig.menuUiType.TXT
                     : result.c_menu_ui === enumConfig.menuUiType.IMG[0]
-                        ? enumConfig.menuUiType.IMG
-                        : null,
+                    ? enumConfig.menuUiType.IMG
+                    : null,
             c_menu_on_img: result.c_menu_on_img,
             c_menu_off_img: result.c_menu_off_img,
             c_content_type: result.c_content_type,
             c_use_yn: result.c_use_yn,
             c_lang: result.c_lang,
+            c_link_target:
+                result.c_link_target === enumConfig.bannerLinkType.PARENT[0]
+                    ? enumConfig.bannerLinkType.PARENT
+                    : result.c_link_target === enumConfig.bannerLinkType.BLANK[0]
+                    ? enumConfig.bannerLinkType.BLANK
+                    : null,
+            c_link_url: result.c_link_url,
         };
 
         return errorHandler.successThrow(res, '', resultObj);
@@ -270,7 +283,7 @@ exports.getCategoryView = async (req, res, next) => {
     }
 };
 
-// Put Menu Update
+// Put Menu Update //
 // 2023.09.04 ash
 exports.putCategoryUpdate = async (req, res, next) => {
     const {
@@ -280,13 +293,15 @@ exports.putCategoryUpdate = async (req, res, next) => {
         c_num,
         c_name,
         c_main_banner,
-        c_main_banner_file,
+        c_main_banner_file_del,
         c_menu_ui,
         c_menu_on_img,
         c_menu_off_img,
         c_contents_type,
         c_use_yn,
         c_lang,
+        c_link_target,
+        c_link_url,
     } = req.body;
 
     try {
@@ -332,15 +347,18 @@ exports.putCategoryUpdate = async (req, res, next) => {
         } else {
             menuOffImgPath = result.c_menu_off_img;
         }
-
+        console.log(mainBannerFilePath);
         const menuUpdate = await i_category.update(
             {
                 c_name: c_name,
                 c_main_banner: c_main_banner,
-                c_main_banner_file: mainBannerFilePath,
+                c_main_banner_file: c_main_banner_file_del === 'Y' ? null : mainBannerFilePath,
                 c_menu_ui: c_menu_ui,
                 c_menu_on_img: menuOnImgPath,
                 c_menu_off_img: menuOffImgPath,
+                c_use_yn: c_use_yn || enumConfig.useType.Y[0],
+                c_link_target: c_link_target,
+                c_link_url: c_link_url,
             },
             {
                 where: {
@@ -353,7 +371,7 @@ exports.putCategoryUpdate = async (req, res, next) => {
             return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
         }
 
-        return errorHandler.successThrow(res, '', '');
+        return errorHandler.successThrow(res, '', menuUpdate);
     } catch (err) {
         next(err);
     }
@@ -367,7 +385,7 @@ exports.deleteCategoryDestroy = async (req, res, next) => {
     try {
         utilMiddleware.validateIdx(id, 'id');
 
-        // const menuView = await i_category.findByPk(id);
+        //const menuView = await i_category.findByPk(id);
 
         // if (!menuView) {
         // 	return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
@@ -391,20 +409,39 @@ exports.deleteCategoryDestroy = async (req, res, next) => {
         //    },
         // });
 
-        const menuDelete = await i_category.update(
-            {
-                c_use_yn: enumConfig.useType.D[0],
-            },
-            {
-                where: {
-                    id: Array.isArray(id) ? { [Op.in]: id } : id,
-                },
-            },
-        );
+        // const menuDelete = await i_category.update(
+        //     {
+        //         c_use_yn: enumConfig.useType.D[0],
+        //     },
+        //     {
+        //         where: {
+        //             id: id,
+        //         },
+        //     },
+        // );
 
-        if (!menuDelete) {
-            return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
+        // if (!menuDelete) {
+        //     return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
+        // }
+
+        async function getAllChildIds(parentIds) {
+            const children = await i_category.findAll({
+                attributes: ['id'],
+                where: { c_depth_parent: { [Op.in]: parentIds } },
+            });
+
+            if (children.length === 0) return [];
+
+            const childIds = children.map(c => c.id);
+            return childIds.concat(await getAllChildIds(childIds));
         }
+
+        const allIds = [id].concat(await getAllChildIds([id]));
+
+        const menuDelete = await i_category.update(
+            { c_use_yn: enumConfig.useType.D[0] },
+            { where: { id: { [Op.in]: allIds } } },
+        );
 
         return errorHandler.successThrow(res, '', menuDelete);
     } catch (err) {
@@ -576,70 +613,60 @@ exports.putMoveLastCategory = async (req, res, next) => {
 //카테고리 매핑
 exports.putMappingCategory = async (req, res, next) => {
     const { id, c_depth, c_depth_parent, c_use_yn } = req.body;
-    let transaction;
 
     try {
-        transaction = await mariaDBSequelize.transaction();
+        let menuMapping;
 
-        // const menuView = await i_category.findByPk(id);
+        await db.mariaDBSequelize.transaction(async transaction => {
+            // const menuView = await i_category.findByPk(id);
 
-        // if (!menuView) {
-        // 	return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '메뉴 id 가 없습니다.');
-        // }
+            // if (!menuView) {
+            // 	return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '메뉴 id 가 없습니다.');
+            // }
 
-        // if (menuView.c_depth === 1) {
-        // 	return errorHandler.errorThrow(
-        // 		enumConfig.statusErrorCode._404_ERROR[0],
-        // 		'1 depth 메뉴는 매핑이 안됩니다.'
-        // 	);
-        // }
+            // if (menuView.c_depth === 1) {
+            // 	return errorHandler.errorThrow(
+            // 		enumConfig.statusErrorCode._404_ERROR[0],
+            // 		'1 depth 메뉴는 매핑이 안됩니다.'
+            // 	);
+            // }
 
-        const maxNumResult = await i_category.findOne({
-            attributes: [[Sequelize.fn('MAX', Sequelize.col('c_num')), 'maxNum']],
-            where: {
-                c_depth: c_depth,
-                c_use_yn: enumConfig.useType.Y[0],
-                c_depth_parent: c_depth_parent,
-            },
-            transaction,
-        });
-
-        const maxNum = maxNumResult.dataValues.maxNum || 0;
-        const newNum = maxNum + 1;
-
-        const menuMapping = await i_category.update(
-            {
-                c_depth: c_depth,
-                c_depth_parent: c_depth_parent,
-                c_num: c_use_yn === 'Y' ? newNum : Sequelize.literal('c_num'),
-                c_use_yn: c_use_yn,
-            },
-            {
+            const maxNumResult = await i_category.findOne({
+                attributes: [[Sequelize.fn('MAX', Sequelize.col('c_num')), 'maxNum']],
                 where: {
-                    c_depth: { [Op.ne]: 1 },
-                    id: Array.isArray(id) ? { [Op.in]: id } : id,
+                    c_depth: c_depth,
+                    c_use_yn: enumConfig.useType.Y[0],
+                    c_depth_parent: c_depth_parent,
                 },
                 transaction,
-            },
-        );
+            });
 
-        if (!menuMapping) {
-            return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
-        }
+            const maxNum = maxNumResult.dataValues.maxNum || 0;
+            const newNum = maxNum + 1;
 
-        await transaction.commit();
+            menuMapping = await i_category.update(
+                {
+                    c_depth: c_depth,
+                    c_depth_parent: c_depth_parent,
+                    c_num: c_use_yn === 'Y' ? newNum : Sequelize.literal('c_num'),
+                    c_use_yn: c_use_yn,
+                },
+                {
+                    where: {
+                        c_depth: { [Op.ne]: 1 },
+                        id: Array.isArray(id) ? { [Op.in]: id } : id,
+                    },
+                    transaction,
+                },
+            );
+
+            if (!menuMapping) {
+                return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
+            }
+        });
 
         return errorHandler.successThrow(res, '', menuMapping);
     } catch (err) {
-        if (transaction) {
-            try {
-                if (transaction.finished !== 'rollback' && transaction.finished !== 'commit') {
-                    await transaction.rollback();
-                }
-            } catch (rollbackError) {
-                console.error('Error rolling back transaction:', rollbackError);
-            }
-        }
         next(err);
     }
 };

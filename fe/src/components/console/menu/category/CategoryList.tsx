@@ -1,63 +1,50 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import AddButton from "@/components/console/button/AddButton";
+import AddSubButton from "@/components/console/button/AddSubButton";
 import LanguageTabs from "@/components/console/common/LanguageTabs";
-// import LoadingSpinner from "@/components/console/common/LoadingSpinner";
-import NoData from "@/components/console/common/Nodata";
+import LoadingSpinner from "@/components/console/common/LoadingSpinner";
+import NoData from "@/components/console/common/NoData";
 import ResizableSplit from "@/components/console/common/ResizableSplit";
-// import Tabs from "@/components/console/common/Tabs";
-// import AllCheckbox from "@/components/console/form/AllCheckbox";
-// import Checkbox from "@/components/console/form/Checkbox";
-// import SearchInput from "@/components/console/form/SearchInput";
-// import Toggle from "@/components/console/form/Toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CategoryListParams } from "@/constants/console/listParams";
-import useLangTypes from "@/hooks/console/useLangTypes";
-import useUrlParams from "@/hooks/console/useUrlParams";
-import { useGetCategoryList } from "@/service/console/menu/category";
-// import { usePopupStore } from "@/store/common/usePopupStore";
-// import { makeIntComma } from "@/utils/numberUtils";
+import { useLangTypes } from "@/hooks/console/useLangTypes";
+import { useUrlParams } from "@/hooks/console/useUrlParams";
+import { useToast } from "@/hooks/use-toast";
+import { useGetCategoryList, usePutCategoryOrder } from "@/service/console/menu/category";
+import { useBoardStore } from "@/store/common/useBoardStore";
+import { usePopupStore } from "@/store/common/usePopupStore";
 
-// import DraggableCategoryTree from "./-components/DraggableCategoryTree";
-// import CategoryForm from "./CategoryForm";
-
-export interface CategoryItem {
-    id: number;
-    c_depth: number;
-    c_depth_parent: number;
-    c_num: number;
-    c_name: string;
-    c_main_banner: string;
-    c_main_banner_file: string;
-    c_menu_ui: string | null;
-    c_menu_on_img: string | null;
-    c_menu_off_img: string | null;
-    c_content_type: string | null;
-    c_lang: string;
-    submenu: CategoryItem[];
-}
+import DraggableCategoryTree, {
+    CategoryData,
+    CategoryTreeItems,
+    ExtendedItemChangedReason,
+} from "./-components/DraggableCategoryTree";
+import CategoryForm from "./CategoryForm";
 
 export default function CategoryList() {
     const { langTypes, initialLang } = useLangTypes();
-    // const [items, setItems] = useState<CategoryItem[]>([]);
-    // const [totalCount, setTotalCount] = useState(0);
+    const [items, setItems] = useState<CategoryData[]>([]);
+    const [isSub, setIsSub] = useState(false);
+    const [expandAll, setExpandAll] = useState(false);
+    const [scrollPosition, setScrollPosition] = useState(0);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [depth, setDepth] = useState(1);
     const { urlParams, updateUrlParams } = useUrlParams<CategoryListParams>({
         lang: { defaultValue: initialLang, type: "string", validValues: langTypes },
         detail: { defaultValue: "", type: "string" },
         create: { defaultValue: "0", type: "string" },
+        isSub: { defaultValue: "0", type: "string" },
     });
     const [detailOn, setDetailOn] = useState("");
     const [createOn, setCreateOn] = useState(false);
-    // const [detailRefetch, setDetailRefetch] = useState(false);
-    const {
-        // data: configData,
-        // isLoading: isInitialLoading,
-        // refetch,
-    } = useGetCategoryList(urlParams.lang, {
-        enabled: !!urlParams.lang,
-    });
-    // const { setConfirmPop, setLoadingPop } = usePopupStore();
+    const { data: configData, isLoading: isInitialLoading, refetch } = useGetCategoryList(urlParams.lang);
+    const putCategoryOrderMutation = usePutCategoryOrder();
+    const { setConfirmPop } = usePopupStore();
+    const { setRefreshBoardMenu } = useBoardStore();
+    const { toast } = useToast();
 
     // detail 파라미터 동기화
     useEffect(() => {
@@ -69,102 +56,244 @@ export default function CategoryList() {
         setCreateOn(urlParams.create === "1");
     }, [urlParams.create]);
 
+    // isSub 파라미터 동기화
+    useEffect(() => {
+        setIsSub(urlParams.isSub === "1");
+    }, [urlParams.isSub]);
+
     // 언어탭 변경 시
     const handleChangeLangTab = (lang: string) => {
-        updateUrlParams({ lang: lang, detail: undefined, create: undefined });
+        updateUrlParams({ lang: lang, detail: undefined, create: undefined, isSub: undefined });
     };
 
-    // 팝업 목록 조회
-    // useEffect(() => {
-    //     if (configData) {
-    //         const data = configData.data;
-    //         setItems(data.data_list);
-    //         setTotalCount(data.total_count);
-    //     } else {
-    //         setItems([]);
-    //         setTotalCount(0);
-    //     }
-    // }, [configData]);
+    // 카테고리 목록 조회
+    useEffect(() => {
+        if (configData) {
+            const data = configData.data.filter((item: CategoryData) => typeof item.id === "number");
+            // 기존 데이터(1차 카테고리들)
+            const originItems = data;
 
-    // 팝업 상세 열기
-    // const handleOpenDetail = (idx: number) => {
-    //     if (detailOn === idx.toString()) {
-    //         updateUrlParams({
-    //             ...urlParams,
-    //             detail: undefined,
-    //             create: undefined,
-    //         });
-    //     } else {
-    //         updateUrlParams({
-    //             ...urlParams,
-    //             detail: idx.toString(),
-    //             create: undefined,
-    //         });
-    //     }
-    // };
+            // 최상위 더미 카테고리로 감싸기
+            const wrappedItems = [
+                {
+                    id: "root-0",
+                    c_depth: 0,
+                    c_name: "root",
+                    c_num: 1,
+                    submenu: originItems,
+                },
+            ];
 
-    // 팝업 등록 열기
-    // const handleOpenCreate = () => {
-    //     const create = createOn ? "0" : "1";
-    //     updateUrlParams({
-    //         ...urlParams,
-    //         detail: undefined,
-    //         create,
-    //     });
-    // };
+            // depth와 canHaveChildren을 자동 설정하는 함수
+            const updateDepthAndChildren = (items: CategoryData[], parentDepth = 0): CategoryData[] => {
+                return items.map(item => {
+                    // depth별 canHaveChildren 설정
+                    let canHaveChildren: ((dragItem: CategoryData) => boolean) | boolean = false;
 
-    // // 삭제 확인
-    // const handleConfirmDelete = () => {
-    //     if (checkedList.length > 0) {
-    //         setConfirmPop(true, "팝업을 삭제하시겠습니까?", 2, () => handleDelete());
-    //     } else {
-    //         setConfirmPop(true, "팝업을 선택해주세요.", 1);
-    //     }
-    // };
+                    if (parentDepth === 0) {
+                        canHaveChildren = dragItem => dragItem.c_depth === 1;
+                    } else if (parentDepth === 1) {
+                        canHaveChildren = dragItem => dragItem.c_depth === 2;
+                    } else if (parentDepth === 2) {
+                        canHaveChildren = dragItem => dragItem.c_depth === 3;
+                    } else if (parentDepth === 3) {
+                        canHaveChildren = false;
+                    }
 
-    // // 삭제하기
-    // const handleDelete = () => {
-    //     const body = { idx: checkedList };
-    //     delPopupMutation.mutate(body, {
-    //         onSuccess: () => {
-    //             setConfirmPop(true, "삭제되었습니다.", 1);
-    //             if (checkedList.includes(Number(detailOn))) {
-    //                 updateUrlParams({
-    //                     ...urlParams,
-    //                     detail: undefined,
-    //                 });
-    //             }
-    //             refetch();
-    //         },
-    //     });
-    // };
+                    return {
+                        ...item,
+                        c_depth: parentDepth,
+                        collapsed: false,
+                        canHaveChildren,
+                        children: item.submenu ? updateDepthAndChildren(item.submenu, parentDepth + 1) : undefined,
+                    };
+                });
+            };
 
-    // 팝업정보 수정 취소시
-    // const handleEditCancel = () => {
-    //     updateUrlParams({
-    //         ...urlParams,
-    //         detail: undefined,
-    //     });
-    // };
+            setItems(updateDepthAndChildren(wrappedItems));
+        } else {
+            setItems([]);
+        }
+    }, [configData]);
 
-    // 팝업 등록/수정 완료시
-    // const onEditComplete = () => {
-    //     updateUrlParams({
-    //         ...urlParams,
-    //         detail: detailOn ? detailOn : undefined,
-    //         create: undefined,
-    //     });
-    //     refetch();
-    // };
+    // 카테고리 상세 열기
+    const handleOpenDetail = (id: number | null, isSub: boolean) => {
+        if (!id) return;
 
-    // 팝업 삭제 완료시
-    // const onDeleteComplete = () => {
-    //     updateUrlParams({
-    //         ...urlParams,
-    //         detail: undefined,
-    //     });
-    //     refetch();
-    // };
+        if (detailOn === id.toString()) {
+            updateUrlParams({
+                ...urlParams,
+                detail: undefined,
+                create: undefined,
+                isSub: undefined,
+            });
+        } else {
+            updateUrlParams({
+                ...urlParams,
+                detail: id.toString(),
+                create: undefined,
+                isSub: isSub ? "1" : "0",
+            });
+        }
+    };
+
+    // 카테고리 전체 열기/닫기
+    const handleToggleExpandAll = () => {
+        const updatedItems = updateCollapsedState(items, !expandAll);
+        setItems(updatedItems);
+        setExpandAll(!expandAll);
+    };
+
+    // detailOn이 변경될 때 저장된 스크롤 위치로 복원
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollPosition;
+        }
+    }, [detailOn, depth, isSub, items]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // items가 변경될 때 카테고리 정보 업데이트
+    useEffect(() => {
+        if (detailOn && items.length > 0) {
+            const findCategoryRecursive = (items: CategoryData[]): CategoryData | null => {
+                for (const item of items) {
+                    if (item.id === Number(detailOn)) {
+                        return item;
+                    }
+                    if (item.submenu) {
+                        const found = findCategoryRecursive(item.submenu);
+                        if (found) return found;
+                    }
+                }
+                return null;
+            };
+
+            const findCategory = findCategoryRecursive(items);
+            if (findCategory) {
+                setIsSub(findCategory.c_depth > 1);
+                setDepth(findCategory.c_depth);
+            }
+        }
+    }, [detailOn, items]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // 카테고리 등록 버튼클릭시
+    const handleClickCreate = (isSubCategory?: boolean) => {
+        // 하위 카테고리 등록
+        if (isSubCategory) {
+            if (detailOn && depth < 4) {
+                updateUrlParams({
+                    ...urlParams,
+                    detail: createOn ? undefined : detailOn,
+                    create: !createOn || (createOn && !isSub) ? "1" : undefined,
+                    isSub: createOn && isSub ? undefined : "1",
+                });
+            }
+            if (detailOn && depth >= 4) {
+                setConfirmPop(true, "카테고리를 더이상 등록할 수 없습니다.", 1);
+            }
+            if (!detailOn) {
+                setConfirmPop(true, "카테고리를 선택해주세요.", 1);
+            }
+        }
+        // 1차 카테고리 등록
+        else {
+            updateUrlParams({
+                ...urlParams,
+                detail: undefined,
+                create: !createOn || (createOn && isSub) ? "1" : undefined,
+                isSub: undefined,
+            });
+        }
+    };
+
+    // 카테고리 collapsed 값 변경
+    const updateCollapsedState = (items: CategoryData[], collapsed: boolean): CategoryData[] => {
+        return items.map(item => {
+            // depth가 0(최상위 더미)은 collapsed 변경하지 않고, children만 재귀적으로 처리
+            if (item.c_depth === 0) {
+                return {
+                    ...item,
+                    children: item.submenu ? updateCollapsedState(item.submenu, collapsed) : undefined,
+                };
+            }
+            // 나머지는 기존대로 collapsed 변경
+            return {
+                ...item,
+                collapsed,
+                children: item.submenu ? updateCollapsedState(item.submenu, collapsed) : undefined,
+            };
+        });
+    };
+
+    // dnd 변경시
+    const handleItemsChanged = (items: CategoryTreeItems, reason: ExtendedItemChangedReason) => {
+        // 순서변경일때만 api 호출
+        if (reason.type === "dropped") {
+            // children 배열에서 변경한 순서찾기
+            const findNewPosition = (items: CategoryTreeItems, parentId: number | string): number => {
+                for (const item of items) {
+                    if (item.id === parentId && item.children) {
+                        return item.children.findIndex(child => child.id === reason.draggedItem.id);
+                    }
+                    if (item.children) {
+                        const found = findNewPosition(item.children, parentId);
+                        if (found !== -1) return found;
+                    }
+                }
+                return -1;
+            };
+            const newSort = findNewPosition(items, reason.droppedToParent.id);
+
+            const body = {
+                id: reason.draggedItem.id,
+                c_depth: reason.draggedItem.c_depth,
+                c_depth_parent: reason.droppedToParent.id === "root-0" ? 0 : reason.droppedToParent.id,
+                c_num: newSort + 1,
+            };
+            putCategoryOrderMutation.mutate(body, {
+                onSuccess: () => {
+                    toast({
+                        title: "순서가 변경되었습니다.",
+                    });
+                },
+            });
+        }
+
+        // 하위카테고리 열기닫기 일때는 그대로 상태 업데이트
+        setItems(items);
+    };
+
+    // 카테고리 수정 취소시
+    const handleEditCancel = () => {
+        updateUrlParams({
+            ...urlParams,
+            detail: undefined,
+            create: undefined,
+            isSub: undefined,
+        });
+    };
+
+    // 카테고리 등록/수정 완료시
+    const onEditComplete = (isSub?: boolean) => {
+        updateUrlParams({
+            ...urlParams,
+            detail: detailOn ? detailOn : undefined,
+            create: undefined,
+            isSub: isSub ? "1" : undefined,
+        });
+        refetch();
+        setRefreshBoardMenu(true);
+    };
+
+    // 카테고리 삭제 완료시
+    const onDeleteComplete = () => {
+        updateUrlParams({
+            ...urlParams,
+            detail: undefined,
+            create: undefined,
+            isSub: undefined,
+        });
+        refetch();
+    };
 
     return (
         <>
@@ -173,40 +302,86 @@ export default function CategoryList() {
             </div>
             <ResizableSplit
                 left={
-                    <div className="flex h-[calc(100vh-136px)] flex-col">
-                        <div className="min-h-0 flex-1">
-                            <ScrollArea className="h-full pr-[7px]">
-                                {/* <DraggableCategoryTree
-                                    items={items}
-                                    categoryOn={categoryOn}
-                                    setCategoryOn={setCategoryOn}
-                                    handleItemsChanged={handleItemsChanged}
-                                    setDepth={setDepth}
-                                /> */}
-                            </ScrollArea>
+                    <div className="mr-[7px] flex h-[calc(100vh-156px)] flex-col rounded-[12px] bg-white p-[16px_20px]">
+                        <div className="flex items-center gap-[12px]">
+                            <p className="text-[20px] font-[600]">전체 카테고리</p>
+                            {/* <ul className="flex items-center gap-[30px]">
+                                <li>
+                                    1차 카테고리 <span className="font-[500] text-[#0CB2AD]">10</span> 개
+                                </li>
+                                <li className="relative after:absolute after:-left-[18px] after:top-1/2 after:size-[6px] after:-translate-y-1/2 after:rounded-full after:bg-[#ddd] after:content-['']">
+                                    2차 카테고리 <span className="font-[500] text-[#0CB2AD]">10</span> 개
+                                </li>
+                                <li className="relative after:absolute after:-left-[18px] after:top-1/2 after:size-[6px] after:-translate-y-1/2 after:rounded-full after:bg-[#ddd] after:content-['']">
+                                    3차 카테고리 <span className="font-[500] text-[#0CB2AD]">10</span> 개
+                                </li>
+                                <li className="relative after:absolute after:-left-[18px] after:top-1/2 after:size-[6px] after:-translate-y-1/2 after:rounded-full after:bg-[#ddd] after:content-['']">
+                                    4차 카테고리 <span className="font-[500] text-[#0CB2AD]">10</span> 개
+                                </li>
+                            </ul> */}
                         </div>
+                        <div className="flex items-center justify-between p-[20px_0_12px]">
+                            <div className="flex items-center gap-[8px]">
+                                <AddButton txt="카테고리 추가" onClick={() => handleClickCreate()} />
+                                <AddSubButton txt="하위 카테고리 추가" onClick={() => handleClickCreate(true)} />
+                            </div>
+                            <button
+                                type="button"
+                                className="h-[34px] rounded-[8px] border border-[#DADEE4] bg-white px-[16px] font-[500] text-[#666]"
+                                onClick={handleToggleExpandAll}
+                            >
+                                전체 열기/닫기
+                            </button>
+                        </div>
+                        <div className="min-h-0 flex-1 border border-[#ddd]">
+                            {isInitialLoading ? (
+                                <div className="flex h-full items-center justify-center">
+                                    <LoadingSpinner console />
+                                </div>
+                            ) : items[0] && items[0].submenu && items[0].submenu.length > 0 ? (
+                                <ScrollArea
+                                    viewportRef={scrollRef}
+                                    className="h-full bg-white"
+                                    onScroll={e => {
+                                        setScrollPosition(e.currentTarget.scrollTop);
+                                        console.log(e.currentTarget.scrollTop);
+                                    }}
+                                >
+                                    <DraggableCategoryTree
+                                        items={items}
+                                        categoryOn={Number(detailOn)}
+                                        setCategoryOn={handleOpenDetail}
+                                        handleItemsChanged={handleItemsChanged}
+                                        setDepth={setDepth}
+                                    />
+                                </ScrollArea>
+                            ) : (
+                                <div className="flex h-full items-center justify-center">
+                                    <NoData txt="카테고리가 없습니다." />
+                                </div>
+                            )}
+                        </div>
+                        <p className="py-[8px] text-[14px] text-[#999]">
+                            * 드래그앤드랍으로 카테고리 순서를 변경할 수 있습니다.
+                        </p>
                     </div>
                 }
                 right={
                     <ScrollArea className="h-[calc(100vh-136px)]">
                         {detailOn || createOn ? (
-                            // <CategoryForm
-                            //     lang={urlParams.lang || initialLang}
-                            //     mode={detailOn ? "edit" : "create"}
-                            //     detailIdx={detailOn}
-                            //     onComplete={onEditComplete}
-                            //     handleCancel={handleEditCancel}
-                            //     refetch={detailRefetch}
-                            //     onRefetched={() => setDetailRefetch(false)}
-                            //     onDeleteComplete={onDeleteComplete}
-                            // />
-                            <div />
+                            <CategoryForm
+                                lang={urlParams.lang || initialLang}
+                                mode={createOn ? "create" : "edit"}
+                                isSub={urlParams.isSub === "1"}
+                                detailIdx={detailOn}
+                                depth={depth}
+                                onComplete={onEditComplete}
+                                handleCancel={handleEditCancel}
+                                onDeleteComplete={onDeleteComplete}
+                            />
                         ) : (
                             <div className="h-full p-[0_20px_20px_7px]">
-                                <NoData
-                                    txt="선택된 컨텐츠가 없습니다."
-                                    className="h-full rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]"
-                                />
+                                <NoData txt="선택된 컨텐츠가 없습니다." className="h-full rounded-[12px] bg-white" />
                             </div>
                         )}
                     </ScrollArea>

@@ -6,8 +6,12 @@ import consoleAxios from "@/service/axios/consoleAxios";
 interface body {
     id: number;
     c_name: string;
+    c_link_target: string;
+    c_link_url: string;
     c_main_banner: string;
     c_main_banner_file: File[];
+    c_use_yn: string;
+    c_main_banner_file_del: string;
 }
 
 // 카테고리 수정
@@ -16,7 +20,7 @@ export const usePutCategory = () => {
         mutationFn: async (body: body) => {
             const formData = new FormData();
 
-            // b_file을 제외한 나머지 데이터 추가
+            // c_main_banner_file 제외한 나머지 데이터 추가
             Object.entries(body).forEach(([key, value]) => {
                 if (key !== "c_main_banner_file") {
                     formData.append(key, value);

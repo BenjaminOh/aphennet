@@ -237,7 +237,7 @@ exports.getMaintenanceBoardCreate = async (req, res, next) => {
         if (!boardCreate) {
             return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
         }
-
+        console.log(boardCreate);
         return errorHandler.successThrow(res, '', boardCreate);
     } catch (err) {
         next(err);

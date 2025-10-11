@@ -9,8 +9,12 @@ const utilMiddleware = require('../middleware/util');
 // 2023.09.12 ash
 exports.getStatCnt = async (req, res, next) => {
     try {
+        const excludeKeywords = ['admin', 'mailGun', 'test'];
+        const notLikeCondition = buildNotLikeCondition(excludeKeywords, 'previousUrl');
+
         const logsTopUrl = await i_logs.findOne({
             attributes: [[mariaDBSequelize.fn('COUNT', mariaDBSequelize.col('id')), 'CNT'], 'previousUrl'],
+            where: notLikeCondition,
             group: ['previousUrl'],
             order: [[mariaDBSequelize.literal('CNT'), 'DESC']],
             limit: 1,
@@ -18,12 +22,13 @@ exports.getStatCnt = async (req, res, next) => {
 
         const logsTopAgent = await i_logs.findOne({
             attributes: [[mariaDBSequelize.fn('COUNT', mariaDBSequelize.col('id')), 'CNT'], 'userAgent'],
+            where: notLikeCondition,
             group: ['userAgent'],
             order: [[mariaDBSequelize.literal('CNT'), 'DESC']],
             limit: 1,
         });
 
-        const logsTotalCnt = await i_logs.count();
+        const logsTotalCnt = await i_logs.count({ where: notLikeCondition });
 
         const userTotalCnt = await i_member.count();
 
@@ -269,7 +274,14 @@ exports.getStatHistory = async (req, res, next) => {
         const limit = parseInt(getLimit);
         const offset = (page - 1) * limit;
 
-        const whereCondition = {};
+        const excludeKeywords = ['admin', 'mailGun', 'test'];
+        const notLikeCondition = buildNotLikeCondition(excludeKeywords, 'previousUrl');
+
+        // Sequelize where 조건
+        let whereCondition = {
+            ...notLikeCondition, // 바로 병합
+        };
+
         const searchTxtQuery = req.query.searchtxt ? req.query.searchtxt.trim() : '';
         if (searchTxtQuery) {
             whereCondition.user = {
@@ -298,9 +310,9 @@ exports.getStatHistory = async (req, res, next) => {
             clientIp: list.clientIp,
             previousUrl: list.previousUrl,
             userAgent: list.userAgent,
-            reg_date: moment(list.reg_date).format('YYYY.MM.DD'),
+            reg_date: moment(list.reg_date).format('YYYY.MM.DD HH:mm:ss'),
         }));
-
+        console.log(formattedResult);
         const logsTopUrl = await i_logs.findOne({
             where: whereCondition,
             attributes: [[mariaDBSequelize.fn('COUNT', mariaDBSequelize.col('id')), 'CNT'], 'previousUrl'],
@@ -369,3 +381,13 @@ exports.getStatAgent = async (req, res, next) => {
         next(err);
     }
 };
+
+function buildNotLikeCondition(keywords = [], column = 'previousUrl') {
+    if (!Array.isArray(keywords) || keywords.length === 0) return {};
+
+    const conditions = keywords.map(keyword => ({
+        [column]: { [Op.notLike]: `%/${keyword}%` },
+    }));
+
+    return { [Op.and]: conditions };
+}

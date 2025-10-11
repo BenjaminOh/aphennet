@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { notFound } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -10,6 +11,7 @@ import Checkbox from "@/components/console/form/Checkbox";
 import Input from "@/components/console/form/Input";
 import LevelSelect from "@/components/console/form/LevelSelect";
 import Radio from "@/components/console/form/Radio";
+import { useToast } from "@/hooks/use-toast";
 import { useDelMember, useGetMember, usePutMember } from "@/service/console/member";
 import { usePopupStore } from "@/store/common/usePopupStore";
 import { makeIntComma } from "@/utils/numberUtils";
@@ -49,7 +51,6 @@ export default function MemberForm({
     onDeleteComplete,
 }: MemberFormProps) {
     const {
-        // register,
         handleSubmit,
         formState: { errors },
         reset,
@@ -78,12 +79,14 @@ export default function MemberForm({
         data: configData,
         isLoading: isInitialLoading,
         refetch: refetchMember,
+        error: getMemberError,
     } = useGetMember(detailIdx, {
         enabled: Boolean(detailIdx),
     });
     const putMemberMutation = usePutMember();
     const delMemberMutation = useDelMember();
     const { setConfirmPop, setLoadingPop } = usePopupStore();
+    const { toast } = useToast();
 
     // 데이터 로딩 또는 저장,수정 중일 때 로딩 팝업 표시
     useEffect(() => {
@@ -116,6 +119,13 @@ export default function MemberForm({
             });
         }
     }, [configData, reset]);
+
+    // 404 에러 처리
+    useEffect(() => {
+        if (getMemberError) {
+            notFound();
+        }
+    }, [getMemberError]);
 
     useEffect(() => {
         if (refetch) {
@@ -158,6 +168,9 @@ export default function MemberForm({
 
         putMemberMutation.mutate(body, {
             onSuccess: () => {
+                toast({
+                    title: "수정되었습니다.",
+                });
                 onComplete();
             },
         });
@@ -178,7 +191,9 @@ export default function MemberForm({
         const body = { idx: [detailIdx] };
         delMemberMutation.mutate(body, {
             onSuccess: () => {
-                setConfirmPop(true, "탈퇴 처리되었습니다.", 1);
+                toast({
+                    title: "탈퇴 처리되었습니다.",
+                });
                 onDeleteComplete();
             },
         });
@@ -188,7 +203,7 @@ export default function MemberForm({
         <>
             {!isInitialLoading && (
                 <div className="p-[0_20px_20px_7px]">
-                    <div className="rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]">
+                    <div className="rounded-[12px] bg-white">
                         <form onSubmit={handleSubmit(handleConfirmSave)}>
                             <div className="flex items-center justify-between p-[16px_20px]">
                                 <p className="text-[20px] font-[700]">회원 관리</p>
@@ -300,7 +315,7 @@ export default function MemberForm({
                                                                     currentValue,
                                                                 );
                                                             }}
-                                                            txt="메뉴 관리"
+                                                            txt="게시판 관리"
                                                             className="justify-start"
                                                         />
                                                     </li>
@@ -315,7 +330,7 @@ export default function MemberForm({
                                                                     currentValue,
                                                                 );
                                                             }}
-                                                            txt="게시판 관리"
+                                                            txt="메뉴 관리"
                                                             className="justify-start"
                                                         />
                                                     </li>

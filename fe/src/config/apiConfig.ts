@@ -26,8 +26,6 @@ export const COMMON_API_ROUTES = {
 export const USER_API_ROUTES = {
     // 로그인 --------------------
     LOGIN: "/v1/auth/login",
-
-    GET_MAIN_BANNER: "/v1/main/banner",
 };
 
 // 관리자
@@ -43,6 +41,8 @@ export const CONSOLE_API_ROUTES = {
     MAIN_CONNECTOR_COUNT: "/v1/admin/first/connector-cnt",
     MAIN_BOARD_LIST: "/v1/admin/first/board-list/:limit",
     MAIN_CONNECTOR_LIST: "/v1/admin/first/connector-list/:limit",
+    GET_ALARM: "/v1/admin/first/alarm-cnt/:follow",
+    PUT_ALARM: "/v1/admin/first/alarm-read-delete",
 
     // 게시판 관리 ----------------------
     POST: {
@@ -60,6 +60,12 @@ export const CONSOLE_API_ROUTES = {
         CRUD: "/v1/admin/menu",
         GET_DETAIL: "/v1/admin/menu/:id",
         PUT_ORDER: "/v1/admin/menu/move",
+        CRUD_SUB: "/v1/admin/menu/sub",
+        GET_SUB: "/v1/admin/menu/sub/:id",
+        GET_BOARD_GROUP: "/v1/admin/menu/boardGroup/:parent_id",
+        CRUD_BOARD_GROUP: "/v1/admin/menu/boardGroup",
+        PUT_BOARD_GROUP_ORDER: "/v1/admin/menu/boardGroupMove",
+        PUT_BOARD_GROUP_GRADE: "/v1/admin/menu/boardGroupGrade",
     },
 
     // 회원 관리 ----------------------
@@ -95,7 +101,17 @@ export const CONSOLE_API_ROUTES = {
         POST_USE: "/v1/admin/config/policy/use",
     },
     LEVEL: {
-        GET: "/v1/admin/config/level",
+        BASE: "/v1/admin/config/level",
+    },
+
+    // 통계 관리 ----------------------
+    STATISTICS: {
+        GET_ALL: "/v1/admin/stat",
+        GET_CHART: "/v1/admin/stat/chart",
+        GET_DATA: "/v1/admin/stat/pre",
+        GET_URL: "/v1/admin/stat/url",
+        GET_AGENT: "/v1/admin/stat/agent",
+        GET_VISITOR: "/v1/admin/stat/history",
     },
 
     // 유지보수 관리 ----------------------

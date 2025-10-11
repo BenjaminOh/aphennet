@@ -10,8 +10,9 @@ import LanguageTabs from "@/components/console/common/LanguageTabs";
 import Input from "@/components/console/form/Input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LanguageParams } from "@/constants/console/listParams";
-import useLangTypes from "@/hooks/console/useLangTypes";
-import useUrlParams from "@/hooks/console/useUrlParams";
+import { useLangTypes } from "@/hooks/console/useLangTypes";
+import { useUrlParams } from "@/hooks/console/useUrlParams";
+import { useToast } from "@/hooks/use-toast";
 import { useGetSiteInfo, usePutSiteInfo } from "@/service/console/setting/site";
 import { usePopupStore } from "@/store/common/usePopupStore";
 import { useAuthStore } from "@/store/console/useAuthStore";
@@ -52,6 +53,7 @@ export default function SiteInfo() {
     });
     const putSiteInfoMutation = usePutSiteInfo();
     const { setConfirmPop, setLoadingPop } = usePopupStore();
+    const { toast } = useToast();
 
     // 데이터 조회,수정 중일 때 로딩 팝업 표시
     useEffect(() => {
@@ -102,7 +104,9 @@ export default function SiteInfo() {
 
         putSiteInfoMutation.mutate(body, {
             onSuccess: () => {
-                setConfirmPop(true, "저장되었습니다.", 1);
+                toast({
+                    title: "저장되었습니다.",
+                });
             },
         });
     };
@@ -178,12 +182,14 @@ export default function SiteInfo() {
                                     <label htmlFor="c_email" className="text-[#666]">
                                         이메일
                                     </label>
-                                    <Input
-                                        {...register("c_email")}
-                                        id="c_email"
-                                        className="w-full"
-                                        placeholder="이메일을 입력해주세요."
-                                    />
+                                    <div>
+                                        <Input
+                                            {...register("c_email")}
+                                            id="c_email"
+                                            placeholder="이메일을 입력해주세요."
+                                        />
+                                        <InputError message={errors.c_email?.message} />
+                                    </div>
                                 </li>
                                 <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
                                     <label htmlFor="c_address" className="text-[#666]">

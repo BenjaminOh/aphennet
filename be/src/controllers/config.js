@@ -5,6 +5,7 @@ const errorHandler = require('../middleware/error');
 const enumConfig = require('../middleware/enum');
 const utilMiddleware = require('../middleware/util');
 const db = require('../models');
+const xss = require('xss');
 
 exports.getConfigSite = async (req, res, next) => {
     const site_id = req.params.site_id;
@@ -147,6 +148,7 @@ exports.putConfigSiteUpdate = async (req, res, next) => {
                         c_lang: c_lang,
                     },
                     transaction,
+                    individualHooks: true,
                 },
             );
 

@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import { notFound } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -13,6 +14,7 @@ import Input from "@/components/console/form/Input";
 import InputBox from "@/components/console/form/InputBox";
 import Radio from "@/components/console/form/Radio";
 import Toggle from "@/components/console/form/Toggle";
+import { useToast } from "@/hooks/use-toast";
 import { useDelPopup, useGetPopup, usePostPopup, usePutPopup } from "@/service/console/design/popup";
 import { usePopupStore } from "@/store/common/usePopupStore";
 
@@ -112,6 +114,7 @@ export default function PopupForm({
         data: configData,
         isLoading: isInitialLoading,
         refetch: refetchBanner,
+        error: getPopupError,
     } = useGetPopup(detailIdx, {
         enabled: Boolean(detailIdx) && mode === "edit",
     });
@@ -119,6 +122,7 @@ export default function PopupForm({
     const putPopupMutation = usePutPopup();
     const delPopupMutation = useDelPopup();
     const { setConfirmPop, setLoadingPop } = usePopupStore();
+    const { toast } = useToast();
 
     // 데이터 로딩 또는 저장,수정 중일 때 로딩 팝업 표시
     useEffect(() => {
@@ -173,6 +177,13 @@ export default function PopupForm({
         }
     }, [configData, reset, mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    // 404 에러 처리
+    useEffect(() => {
+        if (getPopupError) {
+            notFound();
+        }
+    }, [getPopupError]);
+
     useEffect(() => {
         if (refetch) {
             refetchBanner();
@@ -221,7 +232,9 @@ export default function PopupForm({
             const body = { ...baseBody, idx: Number(detailIdx) };
             putPopupMutation.mutate(body, {
                 onSuccess: () => {
-                    setConfirmPop(true, "수정되었습니다.", 1);
+                    toast({
+                        title: "수정되었습니다.",
+                    });
                     onComplete();
                 },
             });
@@ -230,7 +243,9 @@ export default function PopupForm({
         else {
             postPopupMutation.mutate(baseBody, {
                 onSuccess: () => {
-                    setConfirmPop(true, "등록되었습니다.", 1);
+                    toast({
+                        title: "등록되었습니다.",
+                    });
                     onComplete();
                 },
             });
@@ -247,7 +262,9 @@ export default function PopupForm({
         const body = { idx: [detailIdx] };
         delPopupMutation.mutate(body, {
             onSuccess: () => {
-                setConfirmPop(true, "삭제되었습니다.", 1);
+                toast({
+                    title: "삭제되었습니다.",
+                });
                 onDeleteComplete();
             },
         });
@@ -257,7 +274,7 @@ export default function PopupForm({
         <>
             {!isInitialLoading && (
                 <div className="p-[0_20px_20px_7px]">
-                    <div className="rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]">
+                    <div className="rounded-[12px] bg-white">
                         <form onSubmit={handleSubmit(handleConfirmSave)}>
                             <div className="flex items-center justify-between p-[16px_20px]">
                                 <div className="flex items-center gap-[10px]">

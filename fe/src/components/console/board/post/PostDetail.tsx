@@ -1,5 +1,6 @@
 "use client";
 
+import { notFound } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import LoadingSpinner from "@/components/console/common/LoadingSpinner";
@@ -8,7 +9,8 @@ import CommentForm from "@/components/console/form/CommentForm";
 import { FileData } from "@/components/console/form/FileUpload";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { API_URL } from "@/config/apiConfig";
-import useCategoryType from "@/hooks/console/useCategoryType";
+import { useCategoryType } from "@/hooks/console/useCategoryType";
+import { useToast } from "@/hooks/use-toast";
 import {
     useDelPost,
     useDelPostComment,
@@ -46,7 +48,7 @@ interface PostDetailProps {
     detailIdx: string;
     handleEdit?: () => void;
     onDeleteComplete?: (reply: boolean) => void;
-    onCompleteComment: () => void;
+    onCompleteComment: (del?: boolean) => void;
     commentPage?: boolean; // 댓글관리 페이지인지 여부
     reply?: boolean; // 답글달기 인지 여부
     parentRefetchPost?: () => void;
@@ -75,6 +77,7 @@ export default function PostDetail({
         data: configData,
         isLoading: isInitialLoading,
         refetch: refetchPost,
+        error: getPostError,
     } = useGetPost(category || "", detailIdx || "", "T", {
         enabled: Boolean(detailIdx),
     });
@@ -87,6 +90,7 @@ export default function PostDetail({
         data: postComment,
         refetch: refetchPostComment,
         isLoading: isCommentLoading,
+        error: getPostCommentError,
     } = useGetPostComment(category || "", detailIdx || "", {
         enabled: Boolean(detailIdx),
     });
@@ -114,6 +118,7 @@ export default function PostDetail({
     );
     const [info, setInfo] = useState<InfoItem>(initialInfo);
     const { setConfirmPop } = usePopupStore();
+    const { toast } = useToast();
 
     // 상세 조회
     useEffect(() => {
@@ -153,6 +158,13 @@ export default function PostDetail({
         }
     }, [postComment]);
 
+    // 404 에러 처리
+    useEffect(() => {
+        if (getPostError || getPostCommentError) {
+            notFound();
+        }
+    }, [getPostError, getPostCommentError]);
+
     // 파일다운로드 데이터가 있을 때 실행
     useEffect(() => {
         if (downloadData && downloadFile) {
@@ -184,6 +196,9 @@ export default function PostDetail({
         const body = { idx: [detailIdx], category: Number(category), pass: "T" };
         delPostMutation.mutate(body, {
             onSuccess: () => {
+                toast({
+                    title: "삭제되었습니다.",
+                });
                 if (reply) {
                     parentRefetchPost?.(); // 최상위 refetch 실행
                 }
@@ -209,6 +224,9 @@ export default function PostDetail({
         };
         postPostCommentMutation.mutate(body, {
             onSuccess: () => {
+                toast({
+                    title: "댓글이 등록되었습니다.",
+                });
                 refetchPostComment();
                 onCompleteComment();
                 setCommentValue("");
@@ -229,6 +247,9 @@ export default function PostDetail({
         };
         putPostCommentMutation.mutate(body, {
             onSuccess: () => {
+                toast({
+                    title: "댓글이 수정되었습니다.",
+                });
                 refetchPostComment();
                 setCompletePost(true);
             },
@@ -245,7 +266,11 @@ export default function PostDetail({
         const body = { category: Number(category), idx };
         delPostCommentMutation.mutate(body, {
             onSuccess: () => {
+                toast({
+                    title: "댓글이 삭제되었습니다.",
+                });
                 refetchPostComment();
+                onCompleteComment(true);
             },
         });
     };
@@ -256,7 +281,7 @@ export default function PostDetail({
                 <LoadingSpinner console />
             ) : (
                 <div className={`flex min-h-full flex-col${info.reply_idx.length > 0 ? " gap-[20px] pb-[20px]" : ""}`}>
-                    <div className="flex flex-1 flex-col rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]">
+                    <div className="flex flex-1 flex-col rounded-[12px] bg-white">
                         <div className="flex flex-col gap-[20px] border-b border-[#D9D9D9] p-[16px_20px]">
                             <div className="flex items-center justify-between">
                                 <p className="flex-1 break-all text-[20px] font-[700]">{info.b_title}</p>

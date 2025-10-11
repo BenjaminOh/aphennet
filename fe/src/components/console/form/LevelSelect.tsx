@@ -1,5 +1,5 @@
 import SelectBox from "@/components/console/form/SelectBox";
-import useLevelSelectOptions from "@/hooks/console/useLevelSelectOptions";
+import { useLevelSelectOptions } from "@/hooks/console/useLevelSelectOptions";
 
 interface LevelSelectProps {
     value: number;

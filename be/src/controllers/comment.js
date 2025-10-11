@@ -5,6 +5,7 @@ const utilMiddleware = require('../middleware/util');
 const errorHandler = require('../middleware/error');
 const enumConfig = require('../middleware/enum');
 const db = require('../models');
+const { raw } = require('body-parser');
 
 // 관리자 댓글 리스트
 exports.getCommentListAdmin = async (req, res, next) => {
@@ -31,8 +32,17 @@ exports.getCommentListAdmin = async (req, res, next) => {
             }
         }
 
+        // whereCondition.board_idx = {
+        //     [Op.in]: Sequelize.literal(`(SELECT idx FROM i_board WHERE i_board.idx = i_board_comment.board_idx)`),
+        // };
+
         whereCondition.board_idx = {
-            [Op.in]: Sequelize.literal(`(SELECT idx FROM i_board WHERE i_board.idx = i_board_comment.board_idx)`),
+            [Op.in]: Sequelize.literal(`(
+                SELECT b.idx FROM i_board b JOIN i_category c 
+                    ON c.id = b.category
+                WHERE b.idx = i_board_comment.board_idx
+                AND c.c_use_yn = '${enumConfig.useType.Y[0]}'
+            )`),
         };
 
         let orderField;
@@ -40,7 +50,7 @@ exports.getCommentListAdmin = async (req, res, next) => {
         orderField = [['idx', 'DESC']];
 
         const subQuery = `(SELECT b_title FROM i_board WHERE i_board.idx = i_board_comment.board_idx)`;
-        const subQuery2 = `(SELECT c_name FROM i_category WHERE id = (SELECT category FROM i_board WHERE i_board.idx = i_board_comment.board_idx))`;
+        const subQuery2 = `(SELECT c_name FROM i_category WHERE id = (SELECT category FROM i_board WHERE i_board.idx = i_board_comment.board_idx) and i_category.c_use_yn = '${enumConfig.useType.Y[0]}')`;
         const subQuery3 = `(SELECT category FROM i_board WHERE i_board.idx = i_board_comment.board_idx)`;
 
         const limit = parseInt(getLimit);
@@ -258,54 +268,65 @@ exports.putCommentUpdate = async (req, res, next) => {
 // 댓글 삭제
 exports.deleteCommentDestroy = async (req, res, next) => {
     const { idx, pass } = req.body;
-    let transaction;
 
     try {
-        transaction = await db.mariaDBSequelize.transaction();
+        let commentDelete;
 
-        const whereCondition = {
-            idx: Array.isArray(idx) ? { [Op.in]: idx } : idx,
-        };
+        await db.mariaDBSequelize.transaction(async transaction => {
+            const whereCondition = {
+                idx: Array.isArray(idx) ? { [Op.in]: idx } : idx,
+            };
 
-        const result = await i_board_comment.findAll({
-            where: whereCondition,
-            attributes: ['m_email'],
-            transaction,
-        });
+            const result = await i_board_comment.findAll({
+                where: whereCondition,
+                attributes: ['idx', 'm_email'],
+                raw: true,
+                transaction,
+            });
 
-        if (!result || result.length === 0) {
-            return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
-        }
-        if (pass !== enumConfig.passTrueFalse.T[0]) {
-            for (const commentView of result) {
-                if (req.user !== commentView.m_email && req.level !== enumConfig.userLevel.USER_LV9) {
-                    return errorHandler.errorThrow(enumConfig.statusErrorCode._403_ERROR[0], '삭제 권한이 없습니다.');
+            if (!result || result.length === 0) {
+                return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
+            }
+
+            // 권한 체크
+            if (pass !== enumConfig.passTrueFalse.T[0]) {
+                for (const commentView of result) {
+                    if (req.user !== commentView.m_email && req.level !== enumConfig.userLevel.USER_LV9) {
+                        return errorHandler.errorThrow(
+                            enumConfig.statusErrorCode._403_ERROR[0],
+                            '삭제 권한이 없습니다.',
+                        );
+                    }
                 }
             }
-        }
 
-        const commentDelete = await i_board_comment.destroy({
-            where: whereCondition,
-            transaction,
+            // 댓글별로 하위 댓글 여부 확인
+            for (const comment of result) {
+                const childCount = await i_board_comment.count({
+                    where: { parent_idx: comment.idx },
+                    transaction,
+                });
+
+                if (childCount > 0) {
+                    // 하위 댓글이 있으면 실제 삭제 대신 내용 수정
+                    await i_board_comment.update(
+                        { c_contents: '삭제된 댓글입니다.' },
+                        { where: { idx: comment.idx }, transaction },
+                    );
+                } else {
+                    // 하위 댓글이 없으면 실제 삭제
+                    await i_board_comment.destroy({
+                        where: { idx: comment.idx },
+                        transaction,
+                    });
+                }
+            }
+
+            commentDelete = true; // 처리 완료 표시
         });
-
-        if (!commentDelete) {
-            return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
-        }
-
-        await transaction.commit();
 
         return errorHandler.successThrow(res, '', commentDelete);
     } catch (err) {
-        if (transaction) {
-            try {
-                if (transaction.finished !== 'rollback' && transaction.finished !== 'commit') {
-                    await transaction.rollback();
-                }
-            } catch (rollbackError) {
-                console.error('Error rolling back transaction:', rollbackError);
-            }
-        }
         next(err);
     }
 };

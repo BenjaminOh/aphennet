@@ -13,6 +13,7 @@ const enumConfig = require('../middleware/enum');
 const multerMiddleware = require('../middleware/multer');
 const utilMiddleware = require('../middleware/util');
 const db = require('../models');
+const e = require('express');
 const fs = require('fs').promises;
 
 // Get SubMenu Create
@@ -65,164 +66,161 @@ exports.postSubCategoryCreate = async (req, res, next) => {
         b_template,
         b_template_text,
         c_lang,
+        c_link_target,
+        c_link_url,
+        c_kind_use,
     } = req.body;
-    let transaction;
 
     try {
-        transaction = await db.mariaDBSequelize.transaction();
+        await db.mariaDBSequelize.transaction(async transaction => {
+            let calculatedCNum = c_num;
 
-        let calculatedCNum = c_num;
+            if (!c_num) {
+                const categoryCount = await i_category.count({
+                    attributes: [[Sequelize.literal('count(*) + 1'), 'count']],
+                    where: {
+                        c_depth: c_depth,
+                        c_depth_parent: c_depth_parent,
+                        c_use_yn: c_use_yn || enumConfig.useType.Y[0],
+                    },
+                    transaction,
+                });
 
-        if (!c_num) {
-            const categoryCount = await i_category.count({
-                attributes: [[Sequelize.literal('count(*) + 1'), 'count']],
-                where: {
+                calculatedCNum = categoryCount;
+            }
+
+            const mainBannerFile = req.files['c_main_banner_file'];
+            const menuOnImg = req.files['c_menu_on_img'];
+            const menuOffImg = req.files['c_menu_off_img'];
+
+            const mainBannerFilePath = mainBannerFile && mainBannerFile[0] ? mainBannerFile[0].path : null;
+            const menuOnImgPath = menuOnImg && menuOnImg[0] ? menuOnImg[0].path : null;
+            const menuOffImgPath = menuOffImg && menuOffImg[0] ? menuOffImg[0].path : null;
+
+            const newCategory = await i_category.create(
+                {
                     c_depth: c_depth,
                     c_depth_parent: c_depth_parent,
+                    c_num: calculatedCNum || 0,
+                    c_name: c_name,
+                    c_main_banner: c_main_banner,
+                    c_main_banner_file: mainBannerFilePath,
+                    c_menu_ui: c_menu_ui,
+                    c_menu_on_img: menuOnImgPath,
+                    c_menu_off_img: menuOffImgPath,
+                    c_content_type: c_content_type,
                     c_use_yn: c_use_yn || enumConfig.useType.Y[0],
+                    c_lang: c_lang || enumConfig.langType.KR[0],
+                    c_link_target: c_link_target,
+                    c_link_url: c_link_url,
+                    c_kind_use: c_kind_use,
                 },
-                transaction,
-            });
+                { transaction },
+            );
 
-            calculatedCNum = categoryCount;
-        }
+            let subCategory;
 
-        const mainBannerFile = req.files['c_main_banner_file'];
-        const menuOnImg = req.files['c_menu_on_img'];
-        const menuOffImg = req.files['c_menu_off_img'];
+            switch (parseInt(c_content_type)) {
+                case enumConfig.contentType.HTML[0]:
+                    const processedHtmlContents = await utilMiddleware.base64ToImagesPath(content);
+                    subCategory = await i_category_html.findOrCreate({
+                        where: {
+                            parent_id: newCategory.id,
+                            use_yn: enumConfig.useType.Y[0],
+                        },
+                        defaults: {
+                            parent_id: newCategory.id,
+                            content: processedHtmlContents.temp_contents,
+                        },
+                        transaction,
+                    });
+                    break;
+                case enumConfig.contentType.EMPTY[0]:
+                    subCategory = await i_category_empty.findOrCreate({
+                        where: {
+                            parent_id: newCategory.id,
+                            use_yn: enumConfig.useType.Y[0],
+                        },
+                        defaults: {
+                            parent_id: newCategory.id,
+                        },
+                        transaction,
+                    });
+                    break;
+                case enumConfig.contentType.CUSTOM[0]:
+                    subCategory = await i_category_custom.findOrCreate({
+                        where: {
+                            parent_id: newCategory.id,
+                            use_yn: enumConfig.useType.Y[0],
+                        },
+                        defaults: {
+                            parent_id: newCategory.id,
+                            c_type: c_type,
+                            file_path: file_path,
+                            admin_file_path: admin_file_path,
+                            sms: sms,
+                            email: email,
+                        },
+                        transaction,
+                    });
+                    break;
+                case enumConfig.contentType.BOARD[0]:
+                case enumConfig.contentType.GALLERY[0]:
+                case enumConfig.contentType.FAQ[0]:
+                case enumConfig.contentType.QNA[0]:
+                    const processedTopHtmlContents = await utilMiddleware.base64ToImagesPath(b_top_html);
+                    const processedTemplateContents = await utilMiddleware.base64ToImagesPath(b_template_text);
 
-        const mainBannerFilePath = mainBannerFile && mainBannerFile[0] ? mainBannerFile[0].path : null;
-        const menuOnImgPath = menuOnImg && menuOnImg[0] ? menuOnImg[0].path : null;
-        const menuOffImgPath = menuOffImg && menuOffImg[0] ? menuOffImg[0].path : null;
+                    subCategory = await i_category_board.findOrCreate({
+                        where: {
+                            parent_id: newCategory.id,
+                            use_yn: enumConfig.useType.Y[0],
+                        },
+                        defaults: {
+                            parent_id: newCategory.id,
+                            b_list_cnt: b_list_cnt,
+                            b_column_title: b_column_title,
+                            b_column_date: b_column_date,
+                            b_column_view: b_column_view,
+                            b_column_recom: b_column_recom,
+                            b_column_file: b_column_file,
+                            b_thumbnail_with: b_thumbnail_with,
+                            b_thumbnail_height: b_thumbnail_height,
+                            b_thumbnail: b_thumbnail,
+                            b_read_lv: b_read_lv,
+                            b_write_lv: b_write_lv,
+                            b_group: b_group,
+                            b_secret: b_secret,
+                            b_reply: b_reply,
+                            b_reply_lv: b_reply_lv,
+                            b_comment: b_comment,
+                            b_comment_lv: b_comment_lv,
+                            b_write_alarm: b_write_alarm,
+                            b_write_send: b_write_send,
+                            b_write_sms: b_write_sms,
+                            b_alarm: b_alarm,
+                            b_alarm_phone: b_alarm_phone,
+                            b_top_html: processedTopHtmlContents.temp_contents,
+                            b_template: b_template,
+                            b_template_text: processedTemplateContents.temp_contents,
+                        },
+                        transaction,
+                    });
+                    break;
+                default:
+                    return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], 'Invalid c_contents_type');
+            }
 
-        const newCategory = await i_category.create(
-            {
-                c_depth: c_depth,
-                c_depth_parent: c_depth_parent,
-                c_num: calculatedCNum || 0,
-                c_name: c_name,
-                c_main_banner: c_main_banner,
-                c_main_banner_file: mainBannerFilePath,
-                c_menu_ui: c_menu_ui,
-                c_menu_on_img: menuOnImgPath,
-                c_menu_off_img: menuOffImgPath,
-                c_content_type: c_content_type,
-                c_use_yn: c_use_yn || enumConfig.useType.Y[0],
-                c_lang: c_lang || enumConfig.langType.KR[0],
-            },
-            { transaction },
-        );
-
-        let subCategory;
-
-        switch (parseInt(c_content_type)) {
-            case enumConfig.contentType.HTML[0]:
-                const processedHtmlContents = await utilMiddleware.base64ToImagesPath(content);
-                subCategory = await i_category_html.findOrCreate({
-                    where: {
-                        parent_id: newCategory.id,
-                        use_yn: enumConfig.useType.Y[0],
-                    },
-                    defaults: {
-                        parent_id: newCategory.id,
-                        content: processedHtmlContents.temp_contents,
-                    },
-                    transaction,
-                });
-                break;
-            case enumConfig.contentType.EMPTY[0]:
-                subCategory = await i_category_empty.findOrCreate({
-                    where: {
-                        parent_id: newCategory.id,
-                        use_yn: enumConfig.useType.Y[0],
-                    },
-                    defaults: {
-                        parent_id: newCategory.id,
-                    },
-                    transaction,
-                });
-                break;
-            case enumConfig.contentType.CUSTOM[0]:
-                subCategory = await i_category_custom.findOrCreate({
-                    where: {
-                        parent_id: newCategory.id,
-                        use_yn: enumConfig.useType.Y[0],
-                    },
-                    defaults: {
-                        parent_id: newCategory.id,
-                        c_type: c_type,
-                        file_path: file_path,
-                        admin_file_path: admin_file_path,
-                        sms: sms,
-                        email: email,
-                    },
-                    transaction,
-                });
-                break;
-            case enumConfig.contentType.BOARD[0]:
-            case enumConfig.contentType.GALLERY[0]:
-            case enumConfig.contentType.FAQ[0]:
-            case enumConfig.contentType.QNA[0]:
-                const processedTopHtmlContents = await utilMiddleware.base64ToImagesPath(b_top_html);
-                const processedTemplateContents = await utilMiddleware.base64ToImagesPath(b_template_text);
-
-                subCategory = await i_category_board.findOrCreate({
-                    where: {
-                        parent_id: newCategory.id,
-                        use_yn: enumConfig.useType.Y[0],
-                    },
-                    defaults: {
-                        parent_id: newCategory.id,
-                        b_list_cnt: b_list_cnt,
-                        b_column_title: b_column_title,
-                        b_column_date: b_column_date,
-                        b_column_view: b_column_view,
-                        b_column_recom: b_column_recom,
-                        b_column_file: b_column_file,
-                        b_thumbnail_with: b_thumbnail_with,
-                        b_thumbnail_height: b_thumbnail_height,
-                        b_thumbnail: b_thumbnail,
-                        b_read_lv: b_read_lv,
-                        b_write_lv: b_write_lv,
-                        b_group: b_group,
-                        b_secret: b_secret,
-                        b_reply: b_reply,
-                        b_reply_lv: b_reply_lv,
-                        b_comment: b_comment,
-                        b_comment_lv: b_comment_lv,
-                        b_write_alarm: b_write_alarm,
-                        b_write_send: b_write_send,
-                        b_write_sms: b_write_sms,
-                        b_alarm: b_alarm,
-                        b_alarm_phone: b_alarm_phone,
-                        b_top_html: processedTopHtmlContents.temp_contents,
-                        b_template: b_template,
-                        b_template_text: processedTemplateContents.temp_contents,
-                    },
-                    transaction,
-                });
-                break;
-            default:
-                return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], 'Invalid c_contents_type');
-        }
-
-        if (!subCategory) {
-            return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '이미 지정된 메뉴가 있습니다.');
-        }
-
-        await transaction.commit();
+            if (!subCategory) {
+                return errorHandler.errorThrow(
+                    enumConfig.statusErrorCode._404_ERROR[0],
+                    '이미 지정된 메뉴가 있습니다.',
+                );
+            }
+        });
 
         return errorHandler.successThrow(res, '', '');
     } catch (err) {
-        if (transaction) {
-            try {
-                if (transaction.finished !== 'rollback' && transaction.finished !== 'commit') {
-                    await transaction.rollback();
-                }
-            } catch (rollbackError) {
-                console.error('Error rolling back transaction:', rollbackError);
-            }
-        }
         next(err);
     }
 };
@@ -253,13 +251,21 @@ exports.getSubCategoryView = async (req, res, next) => {
                 result.c_menu_ui === enumConfig.menuUiType.TXT[0]
                     ? enumConfig.menuUiType.TXT
                     : result.c_menu_ui === enumConfig.menuUiType.IMG[0]
-                        ? enumConfig.menuUiType.IMG
-                        : null,
+                    ? enumConfig.menuUiType.IMG
+                    : null,
             c_menu_on_img: result.c_menu_on_img,
             c_menu_off_img: result.c_menu_off_img,
             c_content_type: utilMiddleware.mapContentType(result.c_content_type),
             c_use_yn: result.c_use_yn,
             c_lang: result.c_lang,
+            c_link_target:
+                result.c_link_target === enumConfig.bannerLinkType.PARENT[0]
+                    ? enumConfig.bannerLinkType.PARENT
+                    : result.c_link_target === enumConfig.bannerLinkType.BLANK[0]
+                    ? enumConfig.bannerLinkType.BLANK
+                    : null,
+            c_link_url: result.c_link_url,
+            c_kind_use: result.c_kind_use,
         };
 
         let subView;
@@ -446,218 +452,189 @@ exports.putSubCategoryUpdate = async (req, res, next) => {
         c_main_banner_file_del,
         c_menu_on_img_del,
         c_menu_off_img_del,
+        c_link_target,
+        c_link_url,
+        c_kind_use,
     } = req.body;
-    let transaction;
 
     try {
         utilMiddleware.validateIdx(id, 'id');
 
-        transaction = await db.mariaDBSequelize.transaction();
+        await db.mariaDBSequelize.transaction(async transaction => {
+            const menuView = await i_category.findByPk(id, { transaction });
 
-        const menuView = await i_category.findByPk(id, { transaction });
-
-        if (!menuView) {
-            return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
-        }
-
-        const getFile = async (fieldName, currentPath) => {
-            const file = req.files[fieldName];
-            return file && file[0]
-                ? currentPath !== file[0].path && currentPath !== null
-                    ? (await multerMiddleware.clearFile(currentPath), file[0].path)
-                    : file[0].path
-                : currentPath;
-        };
-
-        const mainBannerFilePath = await getFile('c_main_banner_file', menuView.c_main_banner_file);
-        const menuOnImgPath = await getFile('c_menu_on_img', menuView.c_menu_on_img);
-        const menuOffImgPath = await getFile('c_menu_off_img', menuView.c_menu_off_img);
-
-        if (c_main_banner_file_del === 'Y') {
-            try {
-                await fs.access(menuView.c_main_banner_file, fs.constants.F_OK);
-                await multerMiddleware.clearFile(menuView.c_main_banner_file);
-            } catch (err) {
-                console.log('파일이 존재하지 않습니다.');
+            if (!menuView) {
+                return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
             }
-        }
 
-        if (c_menu_on_img_del === 'Y') {
-            await multerMiddleware.clearFile(menuView.c_menu_on_img);
-        }
+            const getFile = async (fieldName, currentPath) => {
+                const file = req.files[fieldName];
+                return file && file[0]
+                    ? currentPath !== file[0].path && currentPath !== null
+                        ? (await multerMiddleware.clearFile(currentPath), file[0].path)
+                        : file[0].path
+                    : currentPath;
+            };
 
-        if (c_menu_off_img_del === 'Y') {
-            await multerMiddleware.clearFile(menuView.c_menu_off_img);
-        }
+            const mainBannerFilePath = await getFile('c_main_banner_file', menuView.c_main_banner_file);
+            const menuOnImgPath = await getFile('c_menu_on_img', menuView.c_menu_on_img);
+            const menuOffImgPath = await getFile('c_menu_off_img', menuView.c_menu_off_img);
 
-        await i_category.update(
-            {
-                c_depth: c_depth,
-                c_depth_parent: c_depth_parent,
-                c_num: c_num,
-                c_name: c_name,
-                c_main_banner: c_main_banner,
-                c_main_banner_file: c_main_banner_file_del === 'Y' ? '' : mainBannerFilePath,
-                c_menu_ui: c_menu_ui,
-                c_menu_on_img: c_menu_on_img_del === 'Y' ? '' : menuOnImgPath,
-                c_menu_off_img: c_menu_off_img_del === 'Y' ? '' : menuOffImgPath,
-                c_content_type: c_content_type,
-                c_use_yn: c_use_yn || enumConfig.useType.Y[0],
-            },
-            {
-                where: {
-                    id: id,
+            if (c_main_banner_file_del === 'Y') {
+                try {
+                    await fs.access(menuView.c_main_banner_file, fs.constants.F_OK);
+                    await multerMiddleware.clearFile(menuView.c_main_banner_file);
+                } catch (err) {
+                    console.log('파일이 존재하지 않습니다.');
+                }
+            }
+
+            if (c_menu_on_img_del === 'Y') {
+                await multerMiddleware.clearFile(menuView.c_menu_on_img);
+            }
+
+            if (c_menu_off_img_del === 'Y') {
+                await multerMiddleware.clearFile(menuView.c_menu_off_img);
+            }
+
+            await i_category.update(
+                {
+                    c_depth: c_depth,
+                    c_depth_parent: c_depth_parent,
+                    c_num: c_num,
+                    c_name: c_name,
+                    c_main_banner: c_main_banner,
+                    c_main_banner_file: c_main_banner_file_del === 'Y' ? '' : mainBannerFilePath,
+                    c_menu_ui: c_menu_ui,
+                    c_menu_on_img: c_menu_on_img_del === 'Y' ? '' : menuOnImgPath,
+                    c_menu_off_img: c_menu_off_img_del === 'Y' ? '' : menuOffImgPath,
+                    c_content_type: c_content_type,
+                    c_use_yn: c_use_yn || enumConfig.useType.Y[0],
+                    c_link_target: c_link_target,
+                    c_link_url: c_link_url,
+                    c_kind_use: c_kind_use,
                 },
-                transaction,
-            },
-        );
-
-        let subCategory;
-
-        switch (parseInt(c_content_type)) {
-            case enumConfig.contentType.HTML[0]:
-                const processedHtmlContents = await utilMiddleware.base64ToImagesPath(content);
-
-                const htmlView = await i_category_html.findOrCreate({
+                {
                     where: {
-                        parent_id: id,
-                        use_yn: enumConfig.useType.Y[0],
-                    },
-                    defaults: {
-                        parent_id: id,
-                        content: processedHtmlContents.temp_contents,
-                        use_yn: enumConfig.useType.Y[0],
+                        id: id,
                     },
                     transaction,
-                });
+                },
+            );
 
-                if (htmlView[1] === false) {
-                    subCategory = await i_category_html.update(
-                        {
-                            content: content,
-                        },
-                        {
-                            where: {
-                                parent_id: id,
-                            },
-                            transaction,
-                        },
-                    );
-                }
+            let subCategory;
 
-                break;
-            case enumConfig.contentType.EMPTY[0]:
-                const emptyView = await i_category_empty.findOrCreate({
-                    where: {
-                        parent_id: id,
-                        use_yn: enumConfig.useType.Y[0],
-                    },
-                    defaults: {
-                        parent_id: id,
-                        use_yn: enumConfig.useType.Y[0],
-                    },
-                    transaction,
-                });
+            switch (parseInt(c_content_type)) {
+                case enumConfig.contentType.HTML[0]:
+                    const processedHtmlContents = await utilMiddleware.base64ToImagesPath(content);
 
-                if (emptyView[1] === false) {
-                    subCategory = await i_category_empty.update(
-                        {
+                    const htmlView = await i_category_html.findOrCreate({
+                        where: {
                             parent_id: id,
+                            use_yn: enumConfig.useType.Y[0],
                         },
-                        {
-                            where: {
+                        defaults: {
+                            parent_id: id,
+                            content: processedHtmlContents.temp_contents,
+                            use_yn: enumConfig.useType.Y[0],
+                        },
+                        transaction,
+                    });
+
+                    if (htmlView[1] === false) {
+                        subCategory = await i_category_html.update(
+                            {
+                                content: content,
+                            },
+                            {
+                                where: {
+                                    parent_id: id,
+                                },
+                                transaction,
+                            },
+                        );
+                    }
+
+                    break;
+                case enumConfig.contentType.EMPTY[0]:
+                    const emptyView = await i_category_empty.findOrCreate({
+                        where: {
+                            parent_id: id,
+                            use_yn: enumConfig.useType.Y[0],
+                        },
+                        defaults: {
+                            parent_id: id,
+                            use_yn: enumConfig.useType.Y[0],
+                        },
+                        transaction,
+                    });
+
+                    if (emptyView[1] === false) {
+                        subCategory = await i_category_empty.update(
+                            {
                                 parent_id: id,
                             },
-                            transaction,
+                            {
+                                where: {
+                                    parent_id: id,
+                                },
+                                transaction,
+                            },
+                        );
+                    }
+
+                    break;
+                case enumConfig.contentType.CUSTOM[0]:
+                    const customView = await i_category_custom.findOrCreate({
+                        where: {
+                            parent_id: id,
+                            use_yn: enumConfig.useType.Y[0],
                         },
-                    );
-                }
-
-                break;
-            case enumConfig.contentType.CUSTOM[0]:
-                const customView = await i_category_custom.findOrCreate({
-                    where: {
-                        parent_id: id,
-                        use_yn: enumConfig.useType.Y[0],
-                    },
-                    defaults: {
-                        parent_id: id,
-                        c_type: c_type,
-                        file_path: file_path,
-                        admin_file_path: admin_file_path,
-                        sms: sms,
-                        email: email,
-                        use_yn: enumConfig.useType.Y[0],
-                    },
-                    transaction,
-                });
-
-                if (customView[1] === false) {
-                    subCategory = await i_category_custom.update(
-                        {
+                        defaults: {
+                            parent_id: id,
                             c_type: c_type,
                             file_path: file_path,
                             admin_file_path: admin_file_path,
                             sms: sms,
                             email: email,
+                            use_yn: enumConfig.useType.Y[0],
                         },
-                        {
-                            where: {
-                                parent_id: id,
+                        transaction,
+                    });
+
+                    if (customView[1] === false) {
+                        subCategory = await i_category_custom.update(
+                            {
+                                c_type: c_type,
+                                file_path: file_path,
+                                admin_file_path: admin_file_path,
+                                sms: sms,
+                                email: email,
                             },
-                            transaction,
+                            {
+                                where: {
+                                    parent_id: id,
+                                },
+                                transaction,
+                            },
+                        );
+                    }
+
+                    break;
+                case enumConfig.contentType.BOARD[0]:
+                case enumConfig.contentType.GALLERY[0]:
+                case enumConfig.contentType.FAQ[0]:
+                case enumConfig.contentType.QNA[0]:
+                    const processedTopHtmlContents = await utilMiddleware.base64ToImagesPath(b_top_html);
+                    const processedTemplateContents = await utilMiddleware.base64ToImagesPath(b_template_text);
+
+                    const boardView = await i_category_board.findOrCreate({
+                        where: {
+                            parent_id: id,
+                            use_yn: enumConfig.useType.Y[0],
                         },
-                    );
-                }
-
-                break;
-            case enumConfig.contentType.BOARD[0]:
-            case enumConfig.contentType.GALLERY[0]:
-            case enumConfig.contentType.FAQ[0]:
-            case enumConfig.contentType.QNA[0]:
-                const processedTopHtmlContents = await utilMiddleware.base64ToImagesPath(b_top_html);
-                const processedTemplateContents = await utilMiddleware.base64ToImagesPath(b_template_text);
-
-                const boardView = await i_category_board.findOrCreate({
-                    where: {
-                        parent_id: id,
-                        use_yn: enumConfig.useType.Y[0],
-                    },
-                    defaults: {
-                        parent_id: id,
-                        b_list_cnt: b_list_cnt,
-                        b_column_title: b_column_title,
-                        b_column_date: b_column_date,
-                        b_column_view: b_column_view,
-                        b_column_recom: b_column_recom,
-                        b_column_file: b_column_file,
-                        b_thumbnail_with: b_thumbnail_with,
-                        b_thumbnail_height: b_thumbnail_height,
-                        b_thumbnail: b_thumbnail,
-                        b_read_lv: b_read_lv,
-                        b_write_lv: b_write_lv,
-                        b_group: b_group,
-                        b_secret: b_secret,
-                        b_reply: b_reply,
-                        b_reply_lv: b_reply_lv,
-                        b_comment: b_comment,
-                        b_comment_lv: b_comment_lv,
-                        b_write_alarm: b_write_alarm,
-                        b_write_send: b_write_send,
-                        b_write_sms: b_write_sms,
-                        b_alarm: b_alarm,
-                        b_alarm_phone: b_alarm_phone,
-                        b_top_html: processedTopHtmlContents.temp_contents,
-                        b_template: b_template,
-                        b_template_text: b_template_text,
-                        use_yn: enumConfig.useType.Y[0],
-                    },
-                    transaction,
-                });
-
-                if (boardView[1] === false) {
-                    subCategory = await i_category_board.update(
-                        {
+                        defaults: {
+                            parent_id: id,
                             b_list_cnt: b_list_cnt,
                             b_column_title: b_column_title,
                             b_column_date: b_column_date,
@@ -680,40 +657,63 @@ exports.putSubCategoryUpdate = async (req, res, next) => {
                             b_write_sms: b_write_sms,
                             b_alarm: b_alarm,
                             b_alarm_phone: b_alarm_phone,
-                            b_top_html: b_top_html,
+                            b_top_html: processedTopHtmlContents.temp_contents,
                             b_template: b_template,
-                            b_template_text: processedTemplateContents.temp_contents,
+                            b_template_text: b_template_text,
+                            use_yn: enumConfig.useType.Y[0],
                         },
-                        {
-                            where: {
-                                parent_id: id,
+                        transaction,
+                    });
+
+                    if (boardView[1] === false) {
+                        subCategory = await i_category_board.update(
+                            {
+                                b_list_cnt: b_list_cnt,
+                                b_column_title: b_column_title,
+                                b_column_date: b_column_date,
+                                b_column_view: b_column_view,
+                                b_column_recom: b_column_recom,
+                                b_column_file: b_column_file,
+                                b_thumbnail_with: b_thumbnail_with,
+                                b_thumbnail_height: b_thumbnail_height,
+                                b_thumbnail: b_thumbnail,
+                                b_read_lv: b_read_lv,
+                                b_write_lv: b_write_lv,
+                                b_group: b_group,
+                                b_secret: b_secret,
+                                b_reply: b_reply,
+                                b_reply_lv: b_reply_lv,
+                                b_comment: b_comment,
+                                b_comment_lv: b_comment_lv,
+                                b_write_alarm: b_write_alarm,
+                                b_write_send: b_write_send,
+                                b_write_sms: b_write_sms,
+                                b_alarm: b_alarm,
+                                b_alarm_phone: b_alarm_phone,
+                                b_top_html: b_top_html,
+                                b_template: b_template,
+                                b_template_text: processedTemplateContents.temp_contents,
                             },
-                            transaction,
-                        },
-                    );
-                }
-                break;
-            default:
-                return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], 'Invalid c_contents_type');
-        }
+                            {
+                                where: {
+                                    parent_id: id,
+                                },
+                                transaction,
+                            },
+                        );
+                    }
+                    break;
+                default:
+                    return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], 'Invalid c_contents_type');
+            }
 
-        //if (!subCategory) {
-        //   return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
-        //}
-
-        await transaction.commit();
+            //if (!subCategory) {
+            //   return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
+            //}
+        });
 
         return errorHandler.successThrow(res, '', '');
     } catch (err) {
-        if (transaction) {
-            try {
-                if (transaction.finished !== 'rollback' && transaction.finished !== 'commit') {
-                    await transaction.rollback();
-                }
-            } catch (rollbackError) {
-                console.error('Error rolling back transaction:', rollbackError);
-            }
-        }
         next(err);
     }
 };
@@ -722,77 +722,88 @@ exports.putSubCategoryUpdate = async (req, res, next) => {
 // 2023.09.04 ash
 exports.deleteSubCategoryDestroy = async (req, res, next) => {
     const { id } = req.body;
-    let transaction;
 
     try {
         utilMiddleware.validateIdx(id, 'id');
 
-        transaction = await db.mariaDBSequelize.transaction();
+        await db.mariaDBSequelize.transaction(async transaction => {
+            const result = await i_category.findByPk(id, { transaction });
 
-        const result = await i_category.findByPk(id, { transaction });
+            if (!result) {
+                return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
+            }
 
-        if (!result) {
-            return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
-        }
-
-        switch (result.dataValues.c_content_type) {
-            case enumConfig.contentType.HTML[0]:
-                await i_category_html.update(
-                    {
-                        use_yn: enumConfig.useType.D[0],
+            await i_category.update(
+                {
+                    c_use_yn: enumConfig.useType.D[0],
+                },
+                {
+                    where: {
+                        id: id,
                     },
-                    {
+                },
+            );
+
+            switch (result.dataValues.c_content_type) {
+                case enumConfig.contentType.HTML[0]:
+                    await i_category_html.destroy({
                         where: {
                             parent_id: id,
                         },
                         transaction,
-                    },
-                );
-                break;
-            case enumConfig.contentType.EMPTY[0]:
-                await i_category_empty.destroy({
-                    where: {
-                        parent_id: id,
-                    },
-                    transaction,
-                });
-                break;
-            case enumConfig.contentType.CUSTOM[0]:
-                await i_category_custom.destroy({
-                    where: {
-                        parent_id: id,
-                    },
-                    transaction,
-                });
-                break;
-            case enumConfig.contentType.BOARD[0]:
-            case enumConfig.contentType.GALLERY[0]:
-            case enumConfig.contentType.FAQ[0]:
-            case enumConfig.contentType.QNA[0]:
-                await i_category_board.destroy({
-                    where: {
-                        parent_id: id,
-                    },
-                    transaction,
-                });
-                break;
-            default:
-                return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], 'Invalid c_contents_type');
-        }
+                    });
+                    break;
+                case enumConfig.contentType.EMPTY[0]:
+                    await i_category_empty.destroy({
+                        where: {
+                            parent_id: id,
+                        },
+                        transaction,
+                    });
+                    break;
+                case enumConfig.contentType.CUSTOM[0]:
+                    await i_category_custom.destroy({
+                        where: {
+                            parent_id: id,
+                        },
+                        transaction,
+                    });
+                    break;
+                case enumConfig.contentType.BOARD[0]:
+                case enumConfig.contentType.GALLERY[0]:
+                case enumConfig.contentType.FAQ[0]:
+                case enumConfig.contentType.QNA[0]:
+                    await i_category_board.destroy({
+                        where: {
+                            parent_id: id,
+                        },
+                        transaction,
+                    });
+                    break;
+                default:
+                    return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], 'Invalid c_contents_type');
+            }
 
-        await transaction.commit();
+            // 🔹 c_num 재정렬 (동일 parent_id 내에서만)
+            const siblings = await i_category.findAll({
+                where: {
+                    c_depth_parent: result.dataValues.c_depth_parent,
+                    c_use_yn: { [Op.ne]: enumConfig.useType.D[0] }, // D 제외
+                },
+                order: [['c_num', 'ASC']],
+                transaction,
+            });
+
+            for (let i = 0; i < siblings.length; i++) {
+                await siblings[i].update(
+                    { c_num: i + 1 }, // 1부터 다시 부여
+                    { transaction },
+                );
+            }
+        });
 
         return errorHandler.successThrow(res, '', '');
     } catch (err) {
-        if (transaction) {
-            try {
-                if (transaction.finished !== 'rollback' && transaction.finished !== 'commit') {
-                    await transaction.rollback();
-                }
-            } catch (rollbackError) {
-                console.error('Error rolling back transaction:', rollbackError);
-            }
-        }
         next(err);
     }
 };

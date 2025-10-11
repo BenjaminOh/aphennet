@@ -6,20 +6,22 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import LoadingSpinner from "@/components/console/common/LoadingSpinner";
-import NoData from "@/components/console/common/Nodata";
+import NoData from "@/components/console/common/NoData";
 import Pagination from "@/components/console/common/Pagination";
 import ResizableSplit from "@/components/console/common/ResizableSplit";
 import AllCheckbox from "@/components/console/form/AllCheckbox";
 import Checkbox from "@/components/console/form/Checkbox";
 import SearchInput from "@/components/console/form/SearchInput";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CommentListParams, initialListSize, listSearchTypes } from "@/constants/console/listParams";
-import useCheckboxList from "@/hooks/console/useCheckboxList";
-import usePagination from "@/hooks/console/usePagination";
-import useUrlParams from "@/hooks/console/useUrlParams";
+import { CommentListParams, initialListSize, initialPage, listSearchTypes } from "@/constants/console/listParams";
+import { useCheckboxList } from "@/hooks/console/useCheckboxList";
+import { usePagination } from "@/hooks/console/usePagination";
+import { useUrlParams } from "@/hooks/console/useUrlParams";
+import { useToast } from "@/hooks/use-toast";
 import { useDelComment, useGetComment } from "@/service/console/board/comment";
 import { usePopupStore } from "@/store/common/usePopupStore";
 import { makeIntComma } from "@/utils/numberUtils";
+import { calculatePrevPage } from "@/utils/paginationUtils";
 
 import PostDetail from "../post/PostDetail";
 
@@ -46,7 +48,7 @@ export default function CommentList() {
     const [totalCount, setTotalCount] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const { urlParams, updateUrlParams } = useUrlParams<CommentListParams>({
-        page: { defaultValue: 1, type: "number" },
+        page: { defaultValue: initialPage, type: "number" },
         search: { defaultValue: "titlecontents", type: "string", validValues: listSearchTypes.map(type => type.value) },
         searchtxt: { defaultValue: "", type: "string" },
         idx: { defaultValue: "", type: "string" },
@@ -75,6 +77,7 @@ export default function CommentList() {
     } = useGetComment(initialListSize.toString(), urlParams.page.toString(), urlParams.search, urlParams.searchtxt);
     const delCommentMutation = useDelComment();
     const { setConfirmPop } = usePopupStore();
+    const { toast } = useToast();
 
     // urlParams.search, urlParams.searchtxt 변경 시만 동기화
     useEffect(() => {
@@ -161,10 +164,44 @@ export default function CommentList() {
         const body = { idx: checkedList };
         delCommentMutation.mutate(body, {
             onSuccess: () => {
-                setConfirmPop(true, "삭제되었습니다.", 1);
+                toast({
+                    title: "삭제되었습니다.",
+                });
+                // 삭제 후 refetch 전에 페이지 이동 처리
+                const prevPage = calculatePrevPage(urlParams.page, items.length);
+
+                updateUrlParams({
+                    ...urlParams,
+                    page: prevPage,
+                    idx: undefined,
+                    category: undefined,
+                    boardIdx: undefined,
+                });
                 refetch();
+                setCurrentPage(prevPage);
             },
         });
+    };
+
+    // 상세에서 댓글 등록,수정,삭제 완료시
+    const onCompleteComment = (del?: boolean) => {
+        // 삭제일때
+        if (del) {
+            // 삭제 후 refetch 전에 페이지 이동 처리
+            const prevPage = calculatePrevPage(urlParams.page, items.length);
+
+            updateUrlParams({
+                ...urlParams,
+                page: prevPage,
+                idx: undefined,
+                category: undefined,
+                boardIdx: undefined,
+            });
+            refetch();
+            setCurrentPage(prevPage);
+        } else {
+            refetch();
+        }
     };
 
     return (
@@ -269,16 +306,13 @@ export default function CommentList() {
                                 <PostDetail
                                     category={detailOn.category}
                                     detailIdx={detailOn.boardIdx}
-                                    onCompleteComment={() => refetch()}
+                                    onCompleteComment={onCompleteComment}
                                     commentPage={true}
                                 />
                             </div>
                         ) : (
                             <div className="h-full p-[0_20px_20px_7px]">
-                                <NoData
-                                    txt="선택된 컨텐츠가 없습니다."
-                                    className="h-full rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]"
-                                />
+                                <NoData txt="선택된 컨텐츠가 없습니다." className="h-full rounded-[12px] bg-white" />
                             </div>
                         )}
                     </ScrollArea>

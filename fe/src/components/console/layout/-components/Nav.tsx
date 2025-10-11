@@ -24,6 +24,7 @@ import icProfile from "@/assets/images/console/icProfile.svg";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGetBoardMenu } from "@/service/console/common";
 import { useBoardStore } from "@/store/common/useBoardStore";
+import { usePopupStore } from "@/store/common/usePopupStore";
 import { useAuthStore } from "@/store/console/useAuthStore";
 
 interface SubItems {
@@ -49,91 +50,134 @@ export default function Nav() {
     const pathname = usePathname();
     const router = useRouter();
     const { loginUser, clearUser } = useAuthStore();
+    const { setBoardMenuList, refreshBoardMenu, setRefreshBoardMenu } = useBoardStore();
+    const { setLoadingPop } = usePopupStore();
     const [menuOn, setMenuOn] = useState<string | null>(null);
-    const [menuList, setMenuList] = useState<MenuList[]>([
-        {
-            title: "대시보드",
-            menuId: "home",
-            urlPrefix: "/console/main",
-        },
-        {
-            title: "게시판 관리",
-            menuId: "board",
-            urlPrefix: "/console/board/",
-            subItems: [
-                { path: "post", label: "게시글 관리", id: "board1", subItems: [] },
-                { path: "comment", label: "댓글 관리", id: "board2" },
-            ],
-        },
-        {
-            title: "메뉴 관리",
-            menuId: "menu",
-            urlPrefix: "/console/menu/",
-            subItems: [{ path: "category", label: "카테고리 관리", id: "menu1" }],
-        },
-        {
-            title: "회원 관리",
-            menuId: "member",
-            urlPrefix: "/console/member/",
-        },
-        {
-            title: "디자인 관리",
-            menuId: "design",
-            urlPrefix: "/console/design/",
-            subItems: [
-                { path: "banner", label: "메인 배너 관리", id: "design1" },
-                { path: "popup", label: "팝업 관리", id: "design2" },
-            ],
-        },
-        {
-            title: "환경설정",
-            menuId: "setting",
-            urlPrefix: "/console/setting/",
-            subItems: [
-                { path: "site", label: "사이트정보", id: "setting1" },
-                { path: "policy", label: "시스템 운영정책", id: "setting2" },
-                { path: "level", label: "회원 등급 관리", id: "setting3" },
-            ],
-        },
-        {
-            title: "통계관리",
-            menuId: "stats",
-            urlPrefix: "/console/stats/",
-            subItems: [
-                { path: "chart", label: "전체 통계", id: "stats1" },
-                { path: "visitor", label: "접속자 이력 통계", id: "stats2" },
-            ],
-        },
-        {
-            title: "유지보수 게시판",
-            menuId: "maintenance",
-            urlPrefix: "/console/maintenance/",
-        },
-    ]);
-    const { data: boardMenu } = useGetBoardMenu();
-    const { setBoardMenuList } = useBoardStore();
+    const [menuList, setMenuList] = useState<MenuList[]>([]);
+    const { data: boardMenu } = useGetBoardMenu({ enabled: refreshBoardMenu });
 
-    // 게시판메뉴 가져오기
+    // 메뉴 권한에 따른 필터링
     useEffect(() => {
-        if (boardMenu) {
-            const newMenuList = boardMenu.data.map((menu: BoardMenu, i: number) => ({
-                path: menu.category,
-                label: menu.c_name,
-                id: `board1-${i + 1}`,
-            }));
+        const baseMenuList = [
+            {
+                title: "대시보드",
+                menuId: "home",
+                urlPrefix: "/console/main",
+            },
+            {
+                title: "게시판 관리",
+                menuId: "board",
+                urlPrefix: "/console/board/",
+                subItems: [
+                    { path: "post", label: "게시글 관리", id: "board1", subItems: [] },
+                    { path: "comment", label: "댓글 관리", id: "board2" },
+                ],
+            },
+            {
+                title: "메뉴 관리",
+                menuId: "menu",
+                urlPrefix: "/console/menu/",
+                subItems: [{ path: "category", label: "카테고리 관리", id: "menu1" }],
+            },
+            {
+                title: "회원 관리",
+                menuId: "member",
+                urlPrefix: "/console/member/",
+            },
+            {
+                title: "디자인 관리",
+                menuId: "design",
+                urlPrefix: "/console/design/",
+                subItems: [
+                    { path: "banner", label: "메인 배너 관리", id: "design1" },
+                    { path: "popup", label: "팝업 관리", id: "design2" },
+                ],
+            },
+            {
+                title: "환경설정",
+                menuId: "setting",
+                urlPrefix: "/console/setting/",
+                subItems: [
+                    { path: "site", label: "사이트정보", id: "setting1" },
+                    { path: "policy", label: "시스템 운영정책", id: "setting2" },
+                    { path: "level", label: "회원 등급 관리", id: "setting3" },
+                ],
+            },
+            {
+                title: "통계관리",
+                menuId: "statistics",
+                urlPrefix: "/console/statistics/",
+                subItems: [
+                    { path: "chart", label: "전체 통계", id: "statistics1" },
+                    { path: "visitor", label: "접속자 이력 통계", id: "statistics2" },
+                ],
+            },
+            {
+                title: "유지보수 게시판",
+                menuId: "maintenance",
+                urlPrefix: "/console/maintenance/",
+            },
+        ];
 
-            setMenuList(prev => {
-                if (prev.length === 0 || !prev[1].subItems || prev[1].subItems.length === 0) return prev;
-                const updated = [...prev];
-                const firstMenu = { ...updated[1] };
-                const subItems = firstMenu.subItems ?? [];
-                const firstSubItem = { ...(subItems[0] ?? {}), subItems: newMenuList };
-                firstMenu.subItems = [firstSubItem, ...subItems.slice(1)];
-                updated[1] = firstMenu;
-                return updated;
-            });
-            setBoardMenuList(boardMenu.data);
+        if (!loginUser?.m_menu_auth) {
+            // 권한이 null이면 모든 메뉴 표시
+            setMenuList(baseMenuList);
+            return;
         }
+
+        const authArray = loginUser.m_menu_auth.split(",").map(auth => parseInt(auth.trim()));
+        const filteredMenus = baseMenuList.filter((_, index) => {
+            if (index === 0) return true; // 대시보드는 항상 표시
+            return authArray.includes(index);
+        });
+        setMenuList(filteredMenus);
+        if (authArray.includes(1)) {
+            setRefreshBoardMenu(true);
+        }
+    }, [loginUser?.m_menu_auth]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // 게시판메뉴 가져오기 (게시판 관리가 있을 때만)
+    useEffect(() => {
+        // boardMenu가 없으면 실행하지 않음
+        if (!boardMenu) {
+            setBoardMenuList([]);
+            return;
+        }
+        setMenuList(prev => {
+            // menuList가 비어있거나 게시판 관리가 없으면 그대로 반환
+            if (prev.length === 0) return prev;
+
+            const boardMenuIndex = prev.findIndex(menu => menu.menuId === "board");
+            if (boardMenuIndex === -1) return prev; // 게시판 관리가 없으면 그대로 반환
+
+            const updated = [...prev];
+            const boardMenuItem = { ...updated[boardMenuIndex] };
+
+            if (boardMenu.data && boardMenu.data.length > 0) {
+                // boardMenu가 있고 데이터가 있으면 게시글 관리에 동적 메뉴 추가
+                const newMenuList = boardMenu.data.map((menu: BoardMenu, i: number) => ({
+                    path: menu.category,
+                    label: menu.c_name,
+                    id: `board1-${i + 1}`,
+                }));
+
+                if (boardMenuItem.subItems && boardMenuItem.subItems.length > 0) {
+                    const subItems = boardMenuItem.subItems ?? [];
+                    const firstSubItem = { ...(subItems[0] ?? {}), subItems: newMenuList };
+                    boardMenuItem.subItems = [firstSubItem, ...subItems.slice(1)];
+                }
+            } else {
+                // boardMenu가 없거나 데이터가 없으면 게시글 관리 제거 (댓글 관리만 남김)
+                if (boardMenuItem.subItems && boardMenuItem.subItems.length > 1) {
+                    boardMenuItem.subItems = boardMenuItem.subItems.slice(1); // 게시글 관리 제거, 댓글 관리만 유지
+                }
+            }
+
+            updated[boardMenuIndex] = boardMenuItem;
+            return updated;
+        });
+        setBoardMenuList(boardMenu.data);
+        setRefreshBoardMenu(false);
     }, [boardMenu]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // 메뉴 활성화
@@ -149,25 +193,53 @@ export default function Nav() {
             "/console/setting/site": "setting1",
             "/console/setting/policy": "setting2",
             "/console/setting/level": "setting3",
+            "/console/statistics/chart": "statistics1",
+            "/console/statistics/visitor": "statistics2",
             "/console/maintenance": "maintenance",
         };
 
-        // 정확한 경로 일치를 우선으로 검사
-        const newMenuOn =
-            Object.keys(menuMapping).find(key => pathname === key) ||
-            Object.keys(menuMapping).find(key => pathname.startsWith(key));
+        // 동적 게시판 메뉴 매핑 추가
+        let newMenuOn = "";
 
-        if (newMenuOn) {
-            setMenuOn(menuMapping[newMenuOn]);
+        // 정확한 경로 일치를 우선으로 검사
+        const exactMatch = Object.keys(menuMapping).find(key => pathname === key);
+        if (exactMatch) {
+            newMenuOn = menuMapping[exactMatch];
         } else {
-            setMenuOn("");
+            // 동적 게시판 메뉴 확인 (/console/board/post/{category} 형태)
+            const boardPostMatch = pathname.match(/^\/console\/board\/post\/(\d+)$/);
+            if (boardPostMatch) {
+                const categoryId = parseInt(boardPostMatch[1]);
+                // boardMenu에서 해당 category의 인덱스 찾기
+                const boardMenuIndex = boardMenu?.data?.findIndex((menu: BoardMenu) => menu.category === categoryId);
+                if (boardMenuIndex !== undefined && boardMenuIndex >= 0) {
+                    newMenuOn = `board1-${boardMenuIndex + 1}`;
+                } else {
+                    newMenuOn = "board1"; // 기본값
+                }
+            } else {
+                // 기존 로직으로 fallback
+                const partialMatch = Object.keys(menuMapping).find(key => pathname.startsWith(key));
+                if (partialMatch) {
+                    newMenuOn = menuMapping[partialMatch];
+                }
+            }
         }
-    }, [pathname]);
+
+        setMenuOn(newMenuOn);
+    }, [pathname, boardMenu]);
 
     // 로그아웃
     const handleLogout = () => {
+        setLoadingPop(true, true);
+
         clearUser();
-        router.push("/console/login");
+
+        // 로딩 팝업 제거 후 페이지 이동
+        setTimeout(() => {
+            setLoadingPop(false);
+            router.push("/console/login");
+        }, 500);
     };
 
     return (
@@ -264,7 +336,7 @@ export default function Nav() {
                                             <li key={`sub_menu_${j}`}>
                                                 <button
                                                     type="button"
-                                                    className={`flex w-full items-center justify-between p-[6px_0_6px_60px] text-left text-[#666] ${
+                                                    className={`flex w-full items-center justify-between p-[6px_0_6px_60px] text-left text-[#666]${
                                                         menuOn === subMenu.id ? " underline" : ""
                                                     }`}
                                                     onClick={() => {
@@ -293,8 +365,10 @@ export default function Nav() {
                                                             <li key={`sub_menu2_${k}`}>
                                                                 <Link
                                                                     href={`${menu.urlPrefix}${subMenu.path}/${subMenu2.path}`}
-                                                                    className={`block truncate p-[6px_6px_6px_60px] text-[14px] font-[500] text-[#878b93] ${
-                                                                        menuOn === subMenu2.id ? " text-white" : ""
+                                                                    className={`block truncate p-[6px_6px_6px_60px] text-[14px] font-[500] text-[#878b93]${
+                                                                        menuOn?.includes(subMenu2.id)
+                                                                            ? " underline"
+                                                                            : ""
                                                                     }`}
                                                                 >
                                                                     {subMenu2.label}

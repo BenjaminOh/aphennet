@@ -23,7 +23,7 @@ exports.getBoardMain = async (req, res, next) => {
             limit: parseInt(limit),
             where: {
                 category: category,
-                b_depth: 0
+                b_depth: 0,
             },
             order: [['idx', 'DESC']],
             attributes: ['idx', 'category', 'b_depth', 'b_title', 'b_reg_date', 'b_notice', 'b_contents', 'b_file'],
@@ -61,7 +61,7 @@ exports.getBoardList = async (req, res, next) => {
 
         const whereCondition = {
             category: category,
-            b_depth: 0
+            b_depth: 0,
         };
 
         if (searchQuery && searchTxtQuery) {
@@ -208,7 +208,8 @@ exports.getBoardList = async (req, res, next) => {
             c_content_type: list.getDataValue('c_content_type'),
             g_name: list.getDataValue('g_name'),
             // g_status: list.b_reply !== null ? '답변완료' : '답변대기',
-            g_status: list.getDataValue('reply_count') > 0 ? '답변완료' : (list.b_reply !== null ? '답변완료' : '답변대기'),
+            g_status:
+                list.getDataValue('reply_count') > 0 ? '답변완료' : list.b_reply !== null ? '답변완료' : '답변대기',
             c_name: list.icategory.c_name,
             b_num: list.b_num,
         }));
@@ -286,7 +287,7 @@ exports.postMyBoardList = async (req, res, next) => {
         const searchTxtQuery = req.query.searchtxt ? req.query.searchtxt.trim() : '';
         const whereCondition = {
             category: category,
-            b_depth: 0
+            b_depth: 0,
         };
 
         if (searchQuery && searchTxtQuery) {
@@ -438,7 +439,8 @@ exports.postMyBoardList = async (req, res, next) => {
             reply_count: list.getDataValue('reply_count'),
             c_content_type: list.getDataValue('c_content_type'),
             g_name: list.getDataValue('g_name'),
-            g_status: list.getDataValue('reply_count') > 0 ? '답변완료' : (list.b_reply !== null ? '답변완료' : '답변대기'),
+            g_status:
+                list.getDataValue('reply_count') > 0 ? '답변완료' : list.b_reply !== null ? '답변완료' : '답변대기',
             c_name: list.icategory.c_name,
             b_num: list.b_num, // 게시글 순서
         }));
@@ -616,7 +618,7 @@ exports.getBoardView = async (req, res, next) => {
                 kind: enumConfig.boardFileType.B[0],
             },
             attributes: ['idx', 'parent_idx', 'file_name', 'original_name'],
-            raw: true
+            raw: true,
         });
 
         let childBoard = [];
@@ -624,13 +626,13 @@ exports.getBoardView = async (req, res, next) => {
             const child = await i_board.findAll({
                 where: {
                     parent_id: result.idx,
-                    b_depth: { [Op.gt]: result.b_depth }
+                    b_depth: { [Op.gt]: result.b_depth },
                 },
                 order: [['idx', 'ASC']],
                 attributes: ['idx'],
-                raw: true
+                raw: true,
             });
-            childBoard = child.map((item) => item.idx)
+            childBoard = child.map(item => item.idx);
         }
 
         const resultObj = {
@@ -664,15 +666,15 @@ exports.getBoardView = async (req, res, next) => {
             // next_board: nextBoard !== null ? nextBoard : false,
             prev_board: prevBoard
                 ? {
-                    idx: prevBoard.idx,
-                    b_title: prevBoard.b_title,
-                }
+                      idx: prevBoard.idx,
+                      b_title: prevBoard.b_title,
+                  }
                 : null,
             next_board: nextBoard
                 ? {
-                    idx: nextBoard.idx,
-                    b_title: nextBoard.b_title,
-                }
+                      idx: nextBoard.idx,
+                      b_title: nextBoard.b_title,
+                  }
                 : null,
         };
 
@@ -703,7 +705,6 @@ exports.postBoardCreate = async (req, res, next) => {
         b_secret,
         group_id,
     } = req.body;
-    let transaction;
 
     try {
         utilMiddleware.validateIdx(category, 'category');
@@ -720,81 +721,82 @@ exports.postBoardCreate = async (req, res, next) => {
 
         const processedContents = await utilMiddleware.base64ToImagesPath(b_contents);
 
-        transaction = await db.mariaDBSequelize.transaction();
+        let boardCreate;
+        await db.mariaDBSequelize.transaction(async transaction => {
+            const maxBNumResult = await i_board.findOne({
+                where: {
+                    category: category,
+                    b_depth: 0,
+                    parent_id: null,
+                },
+                attributes: [[Sequelize.fn('MAX', Sequelize.col('b_num')), 'max_b_num']],
+                raw: true,
+                transaction,
+            });
 
-        const maxBNumResult = await i_board.findOne({
-            where: {
-                category: category,
-                b_depth: 0,
-                parent_id: null,
-            },
-            attributes: [[Sequelize.fn('MAX', Sequelize.col('b_num')), 'max_b_num']],
-            raw: true,
-            transaction,
-        });
+            const newBNum = (maxBNumResult?.max_b_num || 0) + 1;
 
-        const newBNum = (maxBNumResult?.max_b_num || 0) + 1;
+            boardCreate = await i_board.create(
+                {
+                    category: category,
+                    m_email: m_email ? m_email : req.user,
+                    m_name: m_name,
+                    m_pwd: hashedPw,
+                    b_title: b_title,
+                    b_contents: processedContents.temp_contents,
+                    parent_id: parent_id ? parent_id : null,
+                    b_depth: b_depth ? b_depth : 0,
+                    b_notice: b_notice ? b_notice : '0',
+                    b_img: board_b_img ? board_b_img[0].path : null,
+                    b_sms_yn: b_sms_yn,
+                    b_sms_phone: b_sms_phone,
+                    b_email_yn: b_email_yn,
+                    b_secret: b_secret,
+                    group_id: group_id ? group_id : null,
+                    b_num: newBNum,
+                },
+                { transaction },
+            );
 
-        const boardCreate = await i_board.create(
-            {
-                category: category,
-                m_email: m_email ? m_email : req.user,
-                m_name: m_name,
-                m_pwd: hashedPw,
-                b_title: b_title,
-                b_contents: processedContents.temp_contents,
-                parent_id: parent_id ? parent_id : null,
-                b_depth: b_depth ? b_depth : 0,
-                b_notice: b_notice ? b_notice : '0',
-                b_img: board_b_img ? board_b_img[0].path : null,
-                b_sms_yn: b_sms_yn,
-                b_sms_phone: b_sms_phone,
-                b_email_yn: b_email_yn,
-                b_secret: b_secret,
-                group_id: group_id ? group_id : null,
-                b_num: newBNum,
-            },
-            { transaction },
-        );
+            if (!boardCreate) {
+                return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
+            }
 
-        if (!boardCreate) {
-            return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
-        }
-
-        if (board_b_file) {
-            for (let index = 0; index < board_b_file.length; index++) {
-                const boardFileCreate = await i_board_file.create(
-                    {
-                        parent_idx: boardCreate.getDataValue('idx'),
-                        file_name: board_b_file[index].path,
-                        // original_name: Buffer.from(
-                        //    board_b_file[index].originalname,
-                        //    'latin1'
-                        // ).toString('utf8'),
-                        original_name: board_b_file[index].originalname,
-                        kind: enumConfig.boardFileType.B[0],
-                    },
-                    { transaction },
-                );
-                if (!boardFileCreate) {
-                    return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
+            if (board_b_file) {
+                for (let index = 0; index < board_b_file.length; index++) {
+                    const boardFileCreate = await i_board_file.create(
+                        {
+                            parent_idx: boardCreate.getDataValue('idx'),
+                            file_name: board_b_file[index].path,
+                            // original_name: Buffer.from(
+                            //    board_b_file[index].originalname,
+                            //    'latin1'
+                            // ).toString('utf8'),
+                            original_name: board_b_file[index].originalname,
+                            kind: enumConfig.boardFileType.B[0],
+                        },
+                        { transaction },
+                    );
+                    if (!boardFileCreate) {
+                        return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
+                    }
                 }
             }
-        }
 
-        //에디터 이미지 경로 저장
-        if (processedContents.imagePaths) {
-            for (const editFile of processedContents.imagePaths) {
-                const editFileCreate = await i_board_file.create(
-                    {
-                        parent_idx: boardCreate.getDataValue('idx'),
-                        file_name: editFile,
-                        kind: enumConfig.boardFileType.E[0],
-                    },
-                    { transaction },
-                );
+            //에디터 이미지 경로 저장
+            if (processedContents.imagePaths) {
+                for (const editFile of processedContents.imagePaths) {
+                    const editFileCreate = await i_board_file.create(
+                        {
+                            parent_idx: boardCreate.getDataValue('idx'),
+                            file_name: editFile,
+                            kind: enumConfig.boardFileType.E[0],
+                        },
+                        { transaction },
+                    );
+                }
             }
-        }
+        });
 
         // 게시판 설정 땡겨유~
         const boardItem = await boardAuth.boardListItem(category);
@@ -820,19 +822,8 @@ exports.postBoardCreate = async (req, res, next) => {
             }
         }
 
-        await transaction.commit();
-
-        return errorHandler.successThrow(res, '', boardCreate);
+        return errorHandler.successThrow(res, '', '');
     } catch (err) {
-        if (transaction) {
-            try {
-                if (transaction.finished !== 'rollback' && transaction.finished !== 'commit') {
-                    await transaction.rollback();
-                }
-            } catch (rollbackError) {
-                console.error('Error rolling back transaction:', rollbackError);
-            }
-        }
         next(err);
     }
 };
@@ -901,132 +892,121 @@ exports.putBoardUpdate = async (req, res, next) => {
         group_id,
         pass,
     } = req.body;
-    let transaction;
 
     try {
         utilMiddleware.validateIdx(category, 'category');
         utilMiddleware.validateIdx(idx, 'idx');
 
-        transaction = await db.mariaDBSequelize.transaction();
-
-        const result = await i_board.findOne({
-            where: {
-                category: category,
-                idx: idx,
-            },
-            attributes: ['idx', 'category', 'm_email', 'b_file', 'b_img'],
-            transaction,
-        });
-
-        if (!result) {
-            return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
-        }
-
-        if (pass !== enumConfig.passTrueFalse.T[0]) {
-            if (req.user !== undefined) {
-                if (req.user !== result.m_email && req.level !== enumConfig.userLevel.USER_LV9) {
-                    return errorHandler.errorThrow(enumConfig.statusErrorCode._403_ERROR[0], '');
-                }
-            }
-        }
-
-        const board_b_file = req.files['b_file'];
-        const board_b_img = req.files['b_img'];
-
-        // if (board_b_file) {
-        //    if (
-        //       result.b_file !== null &&
-        //       result.b_file !== board_b_file[0].path
-        //    ) {
-        //       await multerMiddleware.clearFile(result.b_file);
-        //    }
-        // }
-
-        if (board_b_file) {
-            for (let index = 0; index < board_b_file.length; index++) {
-                const boardFileCreate = await i_board_file.create(
-                    {
-                        parent_idx: idx,
-                        file_name: board_b_file[index].path,
-                        //original_name: Buffer.from(
-                        //   board_b_file[index].originalname,
-                        //   'latin1'
-                        //).toString('utf8'),
-                        original_name: board_b_file[index].originalname,
-                        kind: enumConfig.boardFileType.B[0],
-                    },
-                    { transaction },
-                );
-                if (!boardFileCreate) {
-                    return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
-                }
-            }
-        }
-
-        if (board_b_img) {
-            if (result.b_img !== null && result.b_img !== board_b_img[0].path) {
-                await multerMiddleware.clearFile(result.b_img);
-            }
-        }
-
-        const processedContents = await utilMiddleware.base64ToImagesPath(b_contents);
-
-        //에디터 이미지 경로 저장
-        if (processedContents.imagePaths) {
-            for (const editFile of processedContents.imagePaths) {
-                const editFileCreate = await i_board_file.create(
-                    {
-                        parent_idx: idx,
-                        file_name: editFile,
-                        kind: enumConfig.boardFileType.E[0],
-                    },
-                    { transaction },
-                );
-            }
-        }
-
-        const boardUpdate = await i_board.update(
-            {
-                m_email: m_email,
-                m_name: m_name,
-                m_pwd: m_pwd,
-                b_title: b_title,
-                b_contents: processedContents.temp_contents,
-                b_depth: b_depth ? b_depth : 0,
-                b_notice: b_notice ? b_notice : '0',
-                b_img: board_b_img ? board_b_img[0].path : result.b_img ? result.b_img : null,
-                b_secret: b_secret,
-                b_sms_yn: b_sms_yn,
-                b_sms_phone: b_sms_phone,
-                b_email_yn: b_email_yn,
-                group_id: group_id,
-            },
-            {
+        let boardUpdate;
+        await db.mariaDBSequelize.transaction(async transaction => {
+            const result = await i_board.findOne({
                 where: {
                     category: category,
                     idx: idx,
                 },
+                attributes: ['idx', 'category', 'm_email', 'b_file', 'b_img'],
                 transaction,
-            },
-        );
+            });
 
-        if (!boardUpdate) {
-            return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
-        }
+            if (!result) {
+                return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
+            }
 
-        await transaction.commit();
+            if (pass !== enumConfig.passTrueFalse.T[0]) {
+                if (req.user !== undefined) {
+                    if (req.user !== result.m_email && req.level !== enumConfig.userLevel.USER_LV9) {
+                        return errorHandler.errorThrow(enumConfig.statusErrorCode._403_ERROR[0], '');
+                    }
+                }
+            }
+
+            const board_b_file = req.files['b_file'];
+            const board_b_img = req.files['b_img'];
+
+            // if (board_b_file) {
+            //    if (
+            //       result.b_file !== null &&
+            //       result.b_file !== board_b_file[0].path
+            //    ) {
+            //       await multerMiddleware.clearFile(result.b_file);
+            //    }
+            // }
+
+            if (board_b_file) {
+                for (let index = 0; index < board_b_file.length; index++) {
+                    const boardFileCreate = await i_board_file.create(
+                        {
+                            parent_idx: idx,
+                            file_name: board_b_file[index].path,
+                            //original_name: Buffer.from(
+                            //   board_b_file[index].originalname,
+                            //   'latin1'
+                            //).toString('utf8'),
+                            original_name: board_b_file[index].originalname,
+                            kind: enumConfig.boardFileType.B[0],
+                        },
+                        { transaction },
+                    );
+                    if (!boardFileCreate) {
+                        return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
+                    }
+                }
+            }
+
+            if (board_b_img) {
+                if (result.b_img !== null && result.b_img !== board_b_img[0].path) {
+                    await multerMiddleware.clearFile(result.b_img);
+                }
+            }
+
+            const processedContents = await utilMiddleware.base64ToImagesPath(b_contents);
+
+            //에디터 이미지 경로 저장
+            if (processedContents.imagePaths) {
+                for (const editFile of processedContents.imagePaths) {
+                    const editFileCreate = await i_board_file.create(
+                        {
+                            parent_idx: idx,
+                            file_name: editFile,
+                            kind: enumConfig.boardFileType.E[0],
+                        },
+                        { transaction },
+                    );
+                }
+            }
+
+            boardUpdate = await i_board.update(
+                {
+                    m_email: m_email,
+                    m_name: m_name,
+                    m_pwd: m_pwd,
+                    b_title: b_title,
+                    b_contents: processedContents.temp_contents,
+                    b_depth: b_depth ? b_depth : 0,
+                    b_notice: b_notice ? b_notice : '0',
+                    b_img: board_b_img ? board_b_img[0].path : result.b_img ? result.b_img : null,
+                    b_secret: b_secret,
+                    b_sms_yn: b_sms_yn,
+                    b_sms_phone: b_sms_phone,
+                    b_email_yn: b_email_yn,
+                    group_id: group_id,
+                },
+                {
+                    where: {
+                        category: category,
+                        idx: idx,
+                    },
+                    transaction,
+                },
+            );
+
+            if (!boardUpdate) {
+                return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
+            }
+        });
 
         return errorHandler.successThrow(res, '', boardUpdate);
     } catch (err) {
-        if (transaction) {
-            try {
-                if (transaction.finished !== 'rollback' && transaction.finished !== 'commit') {
-                    await transaction.rollback();
-                }
-            } catch (rollbackError) {
-                console.error('Error rolling back transaction:', rollbackError);
-            }
-        }
         next(err);
     }
 };
@@ -1201,7 +1181,7 @@ exports.putBoardMove = async (req, res, next) => {
         const boardMoves = await i_board.update(
             {
                 category: category,
-                b_depth: 0
+                b_depth: 0,
             },
             {
                 where: whereCondition,

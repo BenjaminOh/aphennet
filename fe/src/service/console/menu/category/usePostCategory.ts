@@ -4,11 +4,14 @@ import { CONSOLE_API_ROUTES } from "@/config/apiConfig";
 import consoleAxios from "@/service/axios/consoleAxios";
 
 interface body {
-    c_name: string;
-    c_main_banner: string;
-    c_main_banner_file: File[];
     c_depth: number;
     c_depth_parent: number;
+    c_num: string;
+    c_name: string;
+    c_link_target: string;
+    c_link_url: string;
+    c_main_banner: string;
+    c_main_banner_file: File[];
     c_use_yn: string;
     c_lang: string;
 }
@@ -19,7 +22,7 @@ export const usePostCategory = () => {
         mutationFn: async (body: body) => {
             const formData = new FormData();
 
-            // b_file을 제외한 나머지 데이터 추가
+            // c_main_banner_file 제외한 나머지 데이터 추가
             Object.entries(body).forEach(([key, value]) => {
                 if (key !== "c_main_banner_file") {
                     formData.append(key, value);

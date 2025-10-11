@@ -6,16 +6,16 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import LoadingSpinner from "@/components/console/common/LoadingSpinner";
-import NoData from "@/components/console/common/Nodata";
+import NoData from "@/components/console/common/NoData";
 import Pagination from "@/components/console/common/Pagination";
 import AllCheckbox from "@/components/console/form/AllCheckbox";
 import Checkbox from "@/components/console/form/Checkbox";
 import SearchInput from "@/components/console/form/SearchInput";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { initialListSize, listSearchTypes, MemberListParams } from "@/constants/console/listParams";
-import useCheckboxList from "@/hooks/console/useCheckboxList";
-import usePagination from "@/hooks/console/usePagination";
-import useUrlParams from "@/hooks/console/useUrlParams";
+import { initialListSize, initialPage, listSearchTypes, MemberListParams } from "@/constants/console/listParams";
+import { useCheckboxList } from "@/hooks/console/useCheckboxList";
+import { usePagination } from "@/hooks/console/usePagination";
+import { useUrlParams } from "@/hooks/console/useUrlParams";
 import { useGetWithdrawnList, usePostWithdrawn } from "@/service/console/member";
 import { usePopupStore } from "@/store/common/usePopupStore";
 import { makeIntComma } from "@/utils/numberUtils";
@@ -38,7 +38,7 @@ export default function WithdrawnList() {
     const [totalCount, setTotalCount] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const { urlParams, updateUrlParams } = useUrlParams<MemberListParams>({
-        page: { defaultValue: 1, type: "number" },
+        page: { defaultValue: initialPage, type: "number" },
         search: { defaultValue: "m_email", type: "string", validValues: listSearchTypes.map(type => type.value) },
         searchtxt: { defaultValue: "", type: "string" },
     });
@@ -142,48 +142,51 @@ export default function WithdrawnList() {
         <div className="flex h-[calc(100vh-90px)] flex-col">
             <div className="min-h-0 flex-1">
                 <ScrollArea className="h-full pr-[7px]">
-                    <div className="border-b border-[#D9D9D9] py-[8px]">
-                        <p className="font-[500]">
-                            <span className="text-console">{makeIntComma(totalCount)} </span>명
-                        </p>
-                    </div>
-                    <div className="flex items-center justify-between py-[8px]">
-                        <div className="flex items-center gap-[8px]">
-                            <AllCheckbox checked={allCheck} onChange={e => handleAllCheck(e.currentTarget.checked)} />
-                            <button
-                                type="button"
-                                className="h-[34px] rounded-[8px] bg-[#FEE2E2] px-[16px] font-[500] text-[#E5313D]"
-                                onClick={handleConfirmDelete}
-                            >
-                                회원정보 영구삭제
-                            </button>
+                    <div className="flex min-h-full flex-col">
+                        <div className="border-b border-[#D9D9D9] py-[8px]">
+                            <p className="font-[500]">
+                                <span className="text-console">{makeIntComma(totalCount)} </span>명
+                            </p>
                         </div>
-                        <SearchInput {...register("searchtxt")} handleClick={handleSearch} placeholder="이메일" />
-                    </div>
-                    {isInitialLoading ? (
-                        <div className="py-[50px]">
-                            <LoadingSpinner console />
-                        </div>
-                    ) : items && items.length > 0 ? (
-                        <ul className="flex flex-col gap-[10px]">
-                            {items.map((item, i) => (
-                                <li
-                                    key={`comment_${i}`}
-                                    className="group flex cursor-pointer items-center rounded-[12px] border bg-white p-[8px] transition-all hover:border-console"
+                        <div className="flex items-center justify-between py-[8px]">
+                            <div className="flex items-center gap-[8px]">
+                                <AllCheckbox
+                                    checked={allCheck}
+                                    onChange={e => handleAllCheck(e.currentTarget.checked)}
+                                />
+                                <button
+                                    type="button"
+                                    className="h-[34px] rounded-[8px] bg-[#FEE2E2] px-[16px] font-[500] text-[#E5313D]"
+                                    onClick={handleConfirmDelete}
                                 >
-                                    <Checkbox
-                                        checked={checkedList.includes(item.id)}
-                                        onChange={e => handleCheck(e.currentTarget.checked, item.id)}
-                                    />
-                                    <p className="flex-1 p-[0_16px_0_28px] text-left font-[500] text-[#222] transition-all group-hover:underline">
-                                        {item.m_email}
-                                    </p>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <NoData />
-                    )}
+                                    회원정보 영구삭제
+                                </button>
+                            </div>
+                            <SearchInput {...register("searchtxt")} handleClick={handleSearch} placeholder="이메일" />
+                        </div>
+                        {isInitialLoading ? (
+                            <LoadingSpinner console />
+                        ) : items && items.length > 0 ? (
+                            <ul className="flex flex-col gap-[10px]">
+                                {items.map((item, i) => (
+                                    <li
+                                        key={`comment_${i}`}
+                                        className="group flex cursor-pointer items-center rounded-[12px] border bg-white p-[8px] transition-all hover:border-console"
+                                    >
+                                        <Checkbox
+                                            checked={checkedList.includes(item.id)}
+                                            onChange={e => handleCheck(e.currentTarget.checked, item.id)}
+                                        />
+                                        <p className="flex-1 p-[0_16px_0_28px] text-left font-[500] text-[#222] transition-all group-hover:underline">
+                                            {item.m_email}
+                                        </p>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <NoData className="flex-1" txt="데이터가 없습니다." subTxt={false} />
+                        )}
+                    </div>
                 </ScrollArea>
             </div>
             {totalCount > 0 && (

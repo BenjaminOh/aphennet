@@ -13,7 +13,7 @@ const AddButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes
         <button
             ref={ref}
             type="button"
-            className="flex h-[32px] items-center justify-center gap-[4px] rounded-[5px] border border-[#D9D9D9] bg-white px-[10px] text-[14px] font-[500] text-[#666]"
+            className="flex h-[34px] items-center justify-center gap-[8px] rounded-[8px] border border-[#DADEE4] bg-white px-[16px] font-[500] text-[#666]"
             onClick={handleClick}
             {...props}
         >

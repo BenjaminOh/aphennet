@@ -1,52 +1,133 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
-import { useEffect, useMemo } from "react";
+import { notFound } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
+import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
 import InputError from "@/components/console/common/InputError";
-import DateRangePicker from "@/components/console/form/DateRangePicker";
+import Tabs from "@/components/console/common/Tabs";
+import Checkbox from "@/components/console/form/Checkbox";
 import EditorWithHtml from "@/components/console/form/EditorWithHtml";
+import FileUpload, { FileData } from "@/components/console/form/FileUpload";
 import Input from "@/components/console/form/Input";
-import InputBox from "@/components/console/form/InputBox";
+import LevelSelect from "@/components/console/form/LevelSelect";
+import ListSizeSelect from "@/components/console/form/ListSizeSelect";
 import Radio from "@/components/console/form/Radio";
+import Textarea from "@/components/console/form/Textarea";
 import Toggle from "@/components/console/form/Toggle";
-import { useDelPopup, useGetPopup, usePostPopup, usePutPopup } from "@/service/console/design/popup";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { API_URL } from "@/config/apiConfig";
+import { useToast } from "@/hooks/use-toast";
+import {
+    useDelCategory,
+    useDelSubCategory,
+    useGetCategory,
+    useGetSubCategory,
+    usePostCategory,
+    usePostSubCategory,
+    usePutCategory,
+    usePutSubCategory,
+} from "@/service/console/menu/category";
 import { usePopupStore } from "@/store/common/usePopupStore";
+
+import BoardGroupPop from "./-components/BoardGroupPop";
 
 const schema = z
     .object({
-        isType: z.enum(["P", "M"]),
-        p_open: z.enum(["Y", "N"]),
-        p_title: z.string().min(1, "팝업명을 입력해주세요."),
-        p_width_size: z.string().min(1, "가로 사이즈를 입력해주세요."),
-        p_height_size: z.string().min(1, "세로 사이즈를 입력해주세요."),
-        p_left_point: z.string().optional(),
-        p_top_point: z.string().optional(),
-        p_one_day: z.enum(["Y", "N"]),
-        p_layer_pop: z.enum(["1", "2"]),
-        p_link_target: z.enum(["1", "2"]),
-        p_link_url: z.string().optional(),
-        isDate: z.enum(["Y", "N"]),
-        p_s_date: z.date().optional(),
-        p_e_date: z.date().optional(),
-        p_content: z.string().optional(),
+        c_use_yn: z.enum(["Y", "N"]),
+        c_name: z.string().min(1, "카테고리명을 입력해주세요."),
+        c_link_target: z.enum(["1", "2"]),
+        c_link_url: z.string().optional(),
+        c_main_banner: z.enum(["1", "2"]),
+        c_content_type: z.number(),
+        content: z.string().optional(),
+        c_type: z.enum(["1", "2"]),
+        file_path: z.string().optional(),
+        admin_file_path: z.string().optional(),
+        sms: z.string().optional(),
+        email: z.string().optional(),
+        b_column_title: z.enum(["Y", "N"]),
+        b_column_date: z.enum(["Y", "N"]),
+        b_column_view: z.enum(["Y", "N"]),
+        b_column_file: z.enum(["Y", "N"]),
+        b_list_cnt: z.number(),
+        b_read_lv: z.number(),
+        b_write_lv: z.number(),
+        b_secret: z.enum(["Y", "N"]),
+        b_reply: z.enum(["Y", "N"]),
+        b_reply_lv: z.number(),
+        b_comment: z.enum(["Y", "N"]),
+        b_comment_lv: z.number(),
+        b_alarm: z.enum(["Y", "N"]),
+        b_alarm_phone: z.string().optional(),
+        b_top_html: z.string().optional(),
+        b_template: z.enum(["Y", "N"]),
+        b_template_text: z.string().optional(),
+        b_write_alarm: z.enum(["Y", "N"]),
+        b_write_send: z.enum(["Y", "N"]),
+        b_write_sms: z.enum(["Y", "N"]),
+        b_group: z.enum(["Y", "N"]),
+        c_kind_use: z.enum(["Y", "N"]),
     })
     .superRefine((data, ctx) => {
-        if (data.isType === "P" && (!data.p_left_point || !data.p_top_point)) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "팝업 위치를 설정해주세요.",
-                path: ["p_left_point"],
-            });
+        if (data.c_content_type === 3) {
+            if (!data.file_path || !data.admin_file_path) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "파일 경로를 입력해주세요.",
+                    path: ["file_path"],
+                });
+            }
+            if (!data.sms) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "휴대폰번호를 입력해주세요.",
+                    path: ["sms"],
+                });
+            } else if (!/^01[016789]-\d{3,4}-\d{4}$/.test(data.sms)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "올바른 휴대폰번호 형식을 입력해주세요.",
+                    path: ["sms"],
+                });
+            }
+            if (!data.email) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "이메일을 입력해주세요.",
+                    path: ["email"],
+                });
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "올바른 이메일 형식을 입력해주세요.",
+                    path: ["email"],
+                });
+            }
         }
-        if (data.isDate === "Y" && (!data.p_s_date || !data.p_e_date)) {
+        if (data.b_alarm === "Y") {
+            if (!data.b_alarm_phone) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "휴대폰번호를 입력해주세요.",
+                    path: ["b_alarm_phone"],
+                });
+            } else if (!/^01[016789]-\d{3,4}-\d{4}$/.test(data.b_alarm_phone)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "올바른 휴대폰번호 형식을 입력해주세요.",
+                    path: ["b_alarm_phone"],
+                });
+            }
+        }
+        if (data.b_write_alarm === "Y" && data.b_write_send === "N" && data.b_write_sms === "N") {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: "기간을 설정해주세요.",
-                path: ["p_s_date"],
+                message: "이메일 또는 문자 중 선택해주세요.",
+                path: ["b_write_alarm"],
             });
         }
     });
@@ -56,41 +137,83 @@ type FormValues = z.infer<typeof schema>;
 interface CategoryFormProps {
     lang: string;
     mode: "create" | "edit";
+    isSub: boolean; // 서브카테고리 여부
     detailIdx: string;
-    onComplete: () => void;
+    depth: number;
+    onComplete: (isSub?: boolean) => void;
     handleCancel: () => void;
-    refetch: boolean;
-    onRefetched: () => void;
     onDeleteComplete: () => void;
+}
+
+interface Info {
+    id: number;
+    c_depth: number;
+    c_depth_parent: number;
+    c_num: number;
+    c_content_type: number;
+    b_column_title: string;
+    b_column_date: string;
+    b_column_view: string;
+    b_column_file: string;
+    b_list_cnt: number;
+    b_read_lv: number;
+    b_write_lv: number;
+    b_secret: string;
+    b_reply: string;
+    b_reply_lv: number;
+    b_comment: string;
+    b_comment_lv: number;
+    b_alarm: string;
+    b_alarm_phone: string;
+    b_top_html: string;
+    b_template: string;
+    b_template_text: string;
+    b_group: string;
+    c_kind_use: string;
 }
 
 export default function CategoryForm({
     lang,
     mode = "create",
+    isSub = false,
     detailIdx,
+    depth,
     onComplete,
     handleCancel,
-    refetch,
-    onRefetched,
     onDeleteComplete,
 }: CategoryFormProps) {
+    const tabList = ["HTML", "빈메뉴", "맞춤", "일반게시판", "갤러리", "FAQ", "문의게시판"];
+    const [tabOn, setTabOn] = useState(0);
     const initialValues = useMemo<FormValues>(
         () => ({
-            isType: "P",
-            p_open: "Y",
-            p_title: "",
-            p_width_size: "",
-            p_height_size: "",
-            p_left_point: "",
-            p_top_point: "",
-            p_one_day: "Y",
-            p_layer_pop: "1",
-            p_link_target: "1",
-            p_link_url: "",
-            isDate: "N",
-            p_s_date: undefined,
-            p_e_date: undefined,
-            p_content: "",
+            c_use_yn: "Y",
+            c_name: "",
+            c_link_target: "1",
+            c_link_url: "",
+            c_main_banner: "1",
+            c_content_type: 1,
+            content: "",
+            c_type: "1",
+            b_column_title: "N",
+            b_column_date: "N",
+            b_column_view: "N",
+            b_column_file: "N",
+            b_list_cnt: 10,
+            b_read_lv: 0,
+            b_write_lv: 0,
+            b_secret: "N",
+            b_reply: "N",
+            b_reply_lv: 0,
+            b_comment: "N",
+            b_comment_lv: 0,
+            b_alarm: "N",
+            b_alarm_phone: "",
+            b_template: "N",
+            b_write_alarm: "N",
+            b_write_send: "N",
+            b_write_sms: "N",
+            b_group: "N",
+            c_kind_use: "N",
         }),
         [],
     );
@@ -106,77 +229,234 @@ export default function CategoryForm({
         defaultValues: initialValues,
     });
     const values = useWatch({ control });
+    const [info, setInfo] = useState<Info | null>(null);
+    const [getCategory, setGetCategory] = useState(false);
+    const [getSubCategory, setGetSubCategory] = useState(false);
+    const [files, setFiles] = useState<FileData[]>([]);
+    const [filesData, setFilesData] = useState<File[]>([]);
+    const [boardGroupPop, setBoardGroupPop] = useState(false);
     const {
-        data: configData,
-        isLoading: isInitialLoading,
-        refetch: refetchBanner,
-    } = useGetPopup(detailIdx, {
-        enabled: Boolean(detailIdx) && mode === "edit",
+        data: categoryData,
+        isLoading: isCategoryLoading,
+        error: getCategoryError,
+        refetch: refetchCategory,
+    } = useGetCategory(detailIdx, {
+        enabled: getCategory && Boolean(detailIdx) && mode === "edit",
     });
-    const postPopupMutation = usePostPopup();
-    const putPopupMutation = usePutPopup();
-    const delPopupMutation = useDelPopup();
-    const { setConfirmPop, setLoadingPop } = usePopupStore();
+    const {
+        data: subCategoryData,
+        isLoading: isSubCategoryLoading,
+        error: getSubCategoryError,
+        refetch: refetchSubCategory,
+    } = useGetSubCategory(detailIdx, {
+        enabled: getSubCategory && Boolean(detailIdx) && mode === "edit",
+    });
+    const postCategoryMutation = usePostCategory();
+    const postSubCategoryMutation = usePostSubCategory();
+    const putCategoryMutation = usePutCategory();
+    const putSubCategoryMutation = usePutSubCategory();
+    const delCategoryMutation = useDelCategory();
+    const delSubCategoryMutation = useDelSubCategory();
+    const { setConfirmPop } = usePopupStore();
+    const { toast } = useToast();
 
-    // 데이터 로딩 또는 저장,수정 중일 때 로딩 팝업 표시
+    // 카테고리 또는 서브카테고리 조회 여부 설정
     useEffect(() => {
-        const isLoading = postPopupMutation.isPending || putPopupMutation.isPending;
-        setLoadingPop(isLoading, true);
-        return () => setLoadingPop(false);
-    }, [postPopupMutation.isPending, putPopupMutation.isPending, setLoadingPop]);
+        if (detailIdx && !isSub && mode === "edit") {
+            setGetCategory(true);
+        } else {
+            setGetCategory(false);
+        }
+        if (detailIdx && isSub && mode === "edit") {
+            setGetSubCategory(true);
+        } else {
+            setGetSubCategory(false);
+        }
+    }, [detailIdx, isSub, mode]);
 
-    // 팝업 상세 조회
+    // 상세 조회
     useEffect(() => {
-        // 팝업 등록 시 초기화
+        // 등록 시 초기화
         if (mode === "create") {
             reset(initialValues);
+            setFiles([]);
+            setFilesData([]);
             return;
         }
         if (mode === "edit") {
-            if (configData) {
-                const {
-                    p_type,
-                    p_open,
-                    p_title,
-                    p_width_size,
-                    p_height_size,
-                    p_left_point,
-                    p_top_point,
-                    p_one_day,
-                    p_layer_pop,
-                    p_link_target,
-                    p_link_url,
-                    p_s_date,
-                    p_e_date,
-                    p_content,
-                } = configData.data;
+            // 1차 카테고리 수정
+            if (categoryData) {
+                const { c_use_yn, c_name, c_link_target, c_link_url, c_main_banner, c_main_banner_file } =
+                    categoryData.data;
                 reset({
-                    isType: p_type[0],
-                    p_open: p_open[0],
-                    p_title,
-                    p_width_size: p_width_size.toLocaleString(),
-                    p_height_size: p_height_size.toLocaleString(),
-                    p_left_point: p_left_point != null ? p_left_point.toLocaleString() : "",
-                    p_top_point: p_top_point != null ? p_top_point.toLocaleString() : "",
-                    p_one_day: p_one_day[0],
-                    p_layer_pop: p_layer_pop[0],
-                    p_link_target: p_link_target[0],
-                    p_link_url: p_link_url ?? "",
-                    isDate: p_s_date || p_e_date ? "Y" : "N",
-                    p_s_date: p_s_date && p_s_date !== "" ? new Date(p_s_date) : undefined,
-                    p_e_date: p_e_date && p_e_date !== "" ? new Date(p_e_date) : undefined,
-                    p_content: p_content ?? "",
+                    ...initialValues,
+                    c_use_yn,
+                    c_name,
+                    c_link_target: c_link_target ? c_link_target[0] : "1",
+                    c_link_url: c_link_url || "",
+                    c_main_banner: c_main_banner[0],
                 });
+                if (c_main_banner_file) {
+                    setFiles([
+                        {
+                            idx: uuidv4(),
+                            original_name: c_main_banner_file,
+                            url: `${API_URL}/${c_main_banner_file}`,
+                        },
+                    ]);
+                } else {
+                    setFiles([]);
+                }
+            }
+            // 하위 카테고리 수정
+            if (subCategoryData) {
+                const {
+                    c_use_yn,
+                    c_name,
+                    c_link_target,
+                    c_link_url,
+                    c_content_type,
+                    content,
+                    c_type,
+                    file_path,
+                    admin_file_path,
+                    sms,
+                    email,
+                    b_column_title,
+                    b_column_date,
+                    b_column_view,
+                    b_column_file,
+                    b_list_cnt,
+                    b_read_lv,
+                    b_write_lv,
+                    b_secret,
+                    b_reply,
+                    b_reply_lv,
+                    b_comment,
+                    b_comment_lv,
+                    b_alarm,
+                    b_alarm_phone,
+                    b_top_html,
+                    b_template,
+                    b_template_text,
+                    b_write_alarm,
+                    b_write_send,
+                    b_write_sms,
+                    b_group,
+                    c_kind_use,
+                } = subCategoryData.data;
+                reset({
+                    ...initialValues,
+                    c_use_yn,
+                    c_name,
+                    c_link_target: c_link_target ? c_link_target[0] : "1",
+                    c_link_url: c_link_url || "",
+                    c_content_type: c_content_type[0],
+                    content,
+                    c_type: c_type ? c_type.toString() : "1",
+                    file_path,
+                    admin_file_path,
+                    sms,
+                    email,
+                    b_column_title: b_column_title ?? "N",
+                    b_column_date: b_column_date ?? "N",
+                    b_column_view: b_column_view ?? "N",
+                    b_column_file: b_column_file ?? "N",
+                    b_list_cnt: b_list_cnt ?? 10,
+                    b_read_lv: b_read_lv ?? 0,
+                    b_write_lv: b_write_lv ?? 0,
+                    b_secret: b_secret ?? "N",
+                    b_reply: b_reply ?? "N",
+                    b_reply_lv: b_reply_lv ?? 0,
+                    b_comment: b_comment ?? "N",
+                    b_comment_lv: b_comment_lv ?? 0,
+                    b_alarm: b_alarm ?? "N",
+                    b_alarm_phone: b_alarm_phone ?? "",
+                    b_top_html: b_top_html ?? "",
+                    b_template: b_template ?? "N",
+                    b_template_text: b_template_text ?? "",
+                    b_write_alarm: b_write_alarm ?? "N",
+                    b_write_send: b_write_send ?? "N",
+                    b_write_sms: b_write_sms ?? "N",
+                    b_group: b_group ?? "N",
+                    c_kind_use: c_kind_use ?? "N",
+                });
+                setInfo({ ...subCategoryData.data, c_content_type: c_content_type[0] });
+                setTabOn(c_content_type[0] - 1);
+            } else {
+                setInfo(null);
+                setTabOn(0);
             }
         }
-    }, [configData, reset, mode]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [categoryData, subCategoryData, mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    // 404 에러 처리
     useEffect(() => {
-        if (refetch) {
-            refetchBanner();
-            onRefetched();
+        if (getCategoryError || getSubCategoryError) {
+            notFound();
         }
-    }, [refetch]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [getCategoryError, getSubCategoryError]);
+
+    // 카테고리 종류 변경
+    const handleChangeTab = (idx: number) => {
+        const index = idx + 1;
+        setValue("c_content_type", index);
+    };
+
+    // 카테고리 종류 변경 시 탭 변경
+    useEffect(() => {
+        if (values.c_content_type) {
+            setTabOn(values.c_content_type - 1);
+        }
+    }, [values.c_content_type]);
+
+    // 하위카테고리 수정일때 카테고리 종류 변경 시 중복값 초기화
+    useEffect(() => {
+        if (mode === "edit" && isSub && info) {
+            if (tabOn + 1 !== info.c_content_type) {
+                setValue("b_column_title", "N");
+                setValue("b_column_date", "N");
+                setValue("b_column_view", "N");
+                setValue("b_column_file", "N");
+                setValue("b_list_cnt", 10);
+                setValue("b_read_lv", 0);
+                setValue("b_write_lv", 0);
+                setValue("b_secret", "N");
+                setValue("b_reply", "N");
+                setValue("b_reply_lv", 0);
+                setValue("b_comment", "N");
+                setValue("b_comment_lv", 0);
+                setValue("b_alarm", "N");
+                setValue("b_alarm_phone", "");
+                setValue("b_top_html", "");
+                setValue("b_template", "N");
+                setValue("b_template_text", "");
+                setValue("b_write_alarm", "N");
+                setValue("b_group", "N");
+                setValue("c_kind_use", "N");
+            } else {
+                setValue("b_column_title", (info.b_column_title as "Y" | "N") || "N");
+                setValue("b_column_date", (info.b_column_date as "Y" | "N") || "N");
+                setValue("b_column_view", (info.b_column_view as "Y" | "N") || "N");
+                setValue("b_column_file", (info.b_column_file as "Y" | "N") || "N");
+                setValue("b_list_cnt", info.b_list_cnt || 10);
+                setValue("b_read_lv", info.b_read_lv || 0);
+                setValue("b_write_lv", info.b_write_lv || 0);
+                setValue("b_secret", (info.b_secret as "Y" | "N") || "N");
+                setValue("b_reply", (info.b_reply as "Y" | "N") || "N");
+                setValue("b_reply_lv", info.b_reply_lv || 0);
+                setValue("b_comment", (info.b_comment as "Y" | "N") || "N");
+                setValue("b_comment_lv", info.b_comment_lv || 0);
+                setValue("b_alarm", (info.b_alarm as "Y" | "N") || "N");
+                setValue("b_alarm_phone", info.b_alarm_phone || "");
+                setValue("b_top_html", info.b_top_html || "");
+                setValue("b_template", (info.b_template as "Y" | "N") || "N");
+                setValue("b_template_text", info.b_template_text || "");
+                setValue("b_group", (info.b_group as "Y" | "N") || "N");
+                setValue("c_kind_use", (info.c_kind_use as "Y" | "N") || "N");
+            }
+        }
+    }, [tabOn, info, mode, isSub]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // 저장 확인
     const handleConfirmSave = (data: FormValues) => {
@@ -185,85 +465,168 @@ export default function CategoryForm({
 
     // 저장하기
     const onSubmit = (data: FormValues) => {
-        const {
-            isType,
-            p_width_size,
-            p_height_size,
-            p_left_point,
-            p_top_point,
-            isDate,
-            p_s_date,
-            p_e_date,
-            p_link_url,
-            p_content,
-            ...formData
-        } = data;
+        const { ...formData } = data;
         const baseBody = {
             ...formData,
-            // p_type: type,
-            p_width_size: Number(p_width_size.replace(/,/g, "")),
-            p_height_size: Number(p_height_size.replace(/,/g, "")),
-            p_left_point: p_left_point ? Number(p_left_point.replace(/,/g, "")) : null,
-            p_top_point: p_top_point ? Number(p_top_point.replace(/,/g, "")) : null,
-            p_s_date: isDate === "Y" && p_s_date ? format(p_s_date, "yyyy.MM.dd") : "",
-            p_e_date: isDate === "Y" && p_e_date ? format(p_e_date, "yyyy.MM.dd") : "",
-            p_link_url: p_link_url ?? "",
-            p_lang: lang,
-            p_content: p_content ?? "",
         };
-        void isType;
-        void isDate;
-        console.log(baseBody);
-        onComplete();
 
-        // 팝업 수정
+        // 카테고리 수정
         if (mode === "edit") {
-            // const body = { ...baseBody, idx: Number(detailIdx) };
-            // putPopupMutation.mutate(body, {
-            //     onSuccess: () => {
-            //         setConfirmPop(true, "수정되었습니다.", 1);
-            //         onComplete();
-            //     },
-            // });
+            // 하위 카테고리 수정
+            if (isSub) {
+                if (!info) return;
+                const body = {
+                    ...baseBody,
+                    c_link_url: baseBody.c_link_url || "",
+                    id: info?.id,
+                    c_content_type: tabOn + 1,
+                    content: baseBody.content || "",
+                    file_path: baseBody.file_path || "",
+                    admin_file_path: baseBody.admin_file_path || "",
+                    sms: baseBody.sms || "",
+                    email: baseBody.email || "",
+                    b_alarm_phone: baseBody.b_alarm_phone || "",
+                    b_top_html: baseBody.b_top_html || "",
+                    b_template_text: baseBody.b_template_text || "",
+                    c_depth: info?.c_depth,
+                    c_depth_parent: info?.c_depth_parent,
+                    c_num: info?.c_num,
+                    c_lang: lang,
+                    c_main_banner_file: [],
+                };
+
+                putSubCategoryMutation.mutate(body, {
+                    onSuccess: () => {
+                        toast({
+                            title: "수정되었습니다.",
+                        });
+                        onComplete(true);
+                        refetchSubCategory();
+                    },
+                });
+            }
+            // 1차 카테고리 수정
+            else {
+                const body = {
+                    id: Number(detailIdx),
+                    c_name: baseBody.c_name,
+                    c_link_target: baseBody.c_link_target,
+                    c_link_url: baseBody.c_link_url || "",
+                    c_main_banner: baseBody.c_main_banner,
+                    c_main_banner_file: filesData,
+                    c_use_yn: baseBody.c_use_yn,
+                    c_main_banner_file_del: files.length > 0 ? "N" : "Y",
+                };
+
+                putCategoryMutation.mutate(body, {
+                    onSuccess: () => {
+                        toast({
+                            title: "수정되었습니다.",
+                        });
+                        onComplete();
+                        refetchCategory();
+                    },
+                });
+            }
         }
-        // 팝업 등록
+        // 카테고리 등록
         else {
-            // postPopupMutation.mutate(baseBody, {
-            //     onSuccess: () => {
-            //         setConfirmPop(true, "등록되었습니다.", 1);
-            //         onComplete();
-            //     },
-            // });
+            // 하위 카테고리 등록
+            if (isSub) {
+                const body = {
+                    ...baseBody,
+                    c_link_url: baseBody.c_link_url || "",
+                    content: baseBody.content || "",
+                    file_path: baseBody.file_path || "",
+                    admin_file_path: baseBody.admin_file_path || "",
+                    sms: baseBody.sms || "",
+                    email: baseBody.email || "",
+                    b_alarm_phone: baseBody.b_alarm_phone || "",
+                    b_top_html: baseBody.b_top_html || "",
+                    b_template_text: baseBody.b_template_text || "",
+                    c_depth: depth + 1,
+                    c_depth_parent: Number(detailIdx),
+                    c_num: "", // 고정값
+                    c_lang: lang,
+                    c_main_banner_file: [],
+                };
+
+                postSubCategoryMutation.mutate(body, {
+                    onSuccess: () => {
+                        toast({
+                            title: "등록되었습니다.",
+                        });
+                        onComplete(depth > 1);
+                    },
+                });
+            }
+            // 1차 카테고리 등록
+            else {
+                const body = {
+                    c_depth: 1, // 고정값
+                    c_depth_parent: 0, // 고정값
+                    c_num: "", // 고정값
+                    c_name: baseBody.c_name,
+                    c_link_target: baseBody.c_link_target,
+                    c_link_url: baseBody.c_link_url || "",
+                    c_main_banner: baseBody.c_main_banner,
+                    c_main_banner_file: filesData,
+                    c_use_yn: baseBody.c_use_yn,
+                    c_lang: lang,
+                };
+
+                postCategoryMutation.mutate(body, {
+                    onSuccess: () => {
+                        toast({
+                            title: "등록되었습니다.",
+                        });
+                        onComplete();
+                    },
+                });
+            }
         }
     };
 
     // 삭제 확인
     const handleConfirmDelete = () => {
-        setConfirmPop(true, "팝업를 삭제하시겠습니까?", 2, () => handleDelete());
+        setConfirmPop(true, "삭제하시겠습니까?", 2, () => handleDelete());
     };
 
     // 삭제하기
     const handleDelete = () => {
-        const body = { idx: [detailIdx] };
-        delPopupMutation.mutate(body, {
-            onSuccess: () => {
-                setConfirmPop(true, "삭제되었습니다.", 1);
-                onDeleteComplete();
-            },
-        });
+        const body = { id: Number(detailIdx) };
+        if (isSub) {
+            delSubCategoryMutation.mutate(body, {
+                onSuccess: () => {
+                    toast({
+                        title: "삭제되었습니다.",
+                    });
+                    onDeleteComplete();
+                },
+            });
+        } else {
+            delCategoryMutation.mutate(body, {
+                onSuccess: () => {
+                    toast({
+                        title: "삭제되었습니다.",
+                    });
+                    onDeleteComplete();
+                },
+            });
+        }
     };
 
     return (
         <>
-            {!isInitialLoading && (
+            {!isCategoryLoading && !isSubCategoryLoading && (
                 <div className="p-[0_20px_20px_7px]">
-                    <div className="rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]">
+                    <div className="rounded-[12px] bg-white">
                         <form onSubmit={handleSubmit(handleConfirmSave)}>
                             <div className="flex items-center justify-between p-[16px_20px]">
                                 <div className="flex items-center gap-[10px]">
-                                    <p className="text-[20px] font-[700]">팝업 관리</p>
+                                    <p className="text-[20px] font-[700]">{isSub && "하위 "}카테고리</p>
                                     <Controller
-                                        name="p_open"
+                                        name="c_use_yn"
                                         control={control}
                                         render={({ field }) => (
                                             <Toggle
@@ -272,182 +635,46 @@ export default function CategoryForm({
                                                 txt="노출"
                                                 className="justify-start"
                                                 handleChange={checked => {
-                                                    setValue("p_open", checked ? "Y" : "N");
+                                                    setValue("c_use_yn", checked ? "Y" : "N");
                                                 }}
                                             />
                                         )}
                                     />
                                 </div>
-                                <button
-                                    type="button"
-                                    className="h-[34px] rounded-[8px] bg-[#FEE2E2] px-[16px] font-[500] text-[#E5313D]"
-                                    onClick={handleConfirmDelete}
-                                >
-                                    삭제
-                                </button>
+                                <div className="flex items-center gap-[8px]">
+                                    <button
+                                        type="button"
+                                        className="h-[34px] rounded-[8px] bg-[#FEE2E2] px-[16px] font-[500] text-[#E5313D]"
+                                        onClick={handleConfirmDelete}
+                                    >
+                                        삭제
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="h-[34px] rounded-[8px] bg-console-2 px-[16px] font-[500] text-white"
+                                    >
+                                        저장
+                                    </button>
+                                </div>
                             </div>
                             <ul className="flex flex-wrap gap-[20px] border-t border-[#D9D9D9] p-[20px_40px]">
                                 <li className="flex w-full flex-col gap-[8px]">
-                                    <label htmlFor="p_title" className="text-[#666]">
-                                        팝업명<span className="pl-[5px] font-[700] text-console-2">*</span>
+                                    <label htmlFor="c_name" className="text-[#666]">
+                                        카테고리명<span className="pl-[5px] font-[700] text-console-2">*</span>
                                     </label>
                                     <div>
                                         <Input
-                                            {...register("p_title")}
-                                            id="p_title"
-                                            className="w-full"
-                                            placeholder="제목을 입력해주세요."
+                                            {...register("c_name")}
+                                            id="c_name"
+                                            placeholder="카테고리명을 입력해주세요."
                                         />
-                                        <InputError message={errors.p_title?.message} />
-                                    </div>
-                                </li>
-                                <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
-                                    <div className="flex items-center justify-between">
-                                        <label htmlFor="p_width_size" className="text-[#666]">
-                                            노출 사이즈 <span className="pl-[5px] font-[700] text-console-2">*</span>
-                                        </label>
-                                        <p className="text-[14px] text-console-2">팝업창 가로 세로 픽셀 단위</p>
-                                    </div>
-                                    <div>
-                                        <ul className="flex gap-[4px]">
-                                            <li className="flex-1">
-                                                <InputBox
-                                                    {...register("p_width_size")}
-                                                    id="p_width_size"
-                                                    className="pl-[40px] text-right"
-                                                    numberInput
-                                                    thousandSeparator
-                                                    value={values.p_width_size}
-                                                >
-                                                    <p className="absolute left-[12px] top-1/2 -translate-y-1/2 text-[#9F9FA5]">
-                                                        가로
-                                                    </p>
-                                                </InputBox>
-                                            </li>
-                                            <li className="flex-1">
-                                                <InputBox
-                                                    {...register("p_height_size")}
-                                                    className="pl-[40px] text-right"
-                                                    numberInput
-                                                    thousandSeparator
-                                                    value={values.p_height_size}
-                                                >
-                                                    <p className="absolute left-[12px] top-1/2 -translate-y-1/2 text-[#9F9FA5]">
-                                                        세로
-                                                    </p>
-                                                </InputBox>
-                                            </li>
-                                        </ul>
-                                        <InputError
-                                            message={errors.p_width_size?.message || errors.p_height_size?.message}
-                                        />
-                                    </div>
-                                </li>
-                                <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
-                                    <p className="text-[#666]">
-                                        팝업창 닫기 1일 유효 여부
-                                        <span className="pl-[5px] font-[700] text-console-2">*</span>
-                                    </p>
-                                    <Controller
-                                        name="p_one_day"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <ul className="flex justify-between py-[14px]">
-                                                <li className="flex-1">
-                                                    <Radio
-                                                        {...field}
-                                                        value="Y"
-                                                        checked={field.value === "Y"}
-                                                        txt="사용"
-                                                    />
-                                                </li>
-                                                <li className="flex-1">
-                                                    <Radio
-                                                        {...field}
-                                                        value="N"
-                                                        checked={field.value === "N"}
-                                                        txt="사용안함"
-                                                    />
-                                                </li>
-                                            </ul>
-                                        )}
-                                    />
-                                </li>
-                                <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
-                                    <p className="text-[#666]">
-                                        팝업/레이어 선택<span className="pl-[5px] font-[700] text-console-2">*</span>
-                                    </p>
-                                    <Controller
-                                        name="p_layer_pop"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <ul className="flex justify-between py-[14px]">
-                                                <li className="flex-1">
-                                                    <Radio
-                                                        {...field}
-                                                        value="1"
-                                                        checked={field.value === "1"}
-                                                        txt="레이어"
-                                                    />
-                                                </li>
-                                                <li className="flex-1">
-                                                    <Radio
-                                                        {...field}
-                                                        value="2"
-                                                        checked={field.value === "2"}
-                                                        txt="팝업창"
-                                                    />
-                                                </li>
-                                            </ul>
-                                        )}
-                                    />
-                                </li>
-                                <li className="flex w-full flex-col gap-[8px]">
-                                    <p className="text-[#666]">
-                                        노출기간 설정<span className="pl-[5px] font-[700] text-console-2">*</span>
-                                    </p>
-                                    <div className="flex justify-between">
-                                        <Controller
-                                            name="isDate"
-                                            control={control}
-                                            render={({ field }) => (
-                                                <ul className="flex w-[calc(50%-10px)] justify-between py-[14px]">
-                                                    <li className="flex-1">
-                                                        <Radio
-                                                            {...field}
-                                                            value="N"
-                                                            checked={field.value === "N"}
-                                                            txt="상시노출"
-                                                        />
-                                                    </li>
-                                                    <li className="flex-1">
-                                                        <Radio
-                                                            {...field}
-                                                            value="Y"
-                                                            checked={field.value === "Y"}
-                                                            txt="기간노출"
-                                                        />
-                                                    </li>
-                                                </ul>
-                                            )}
-                                        />
-                                        {values.isDate === "Y" && (
-                                            <div className="w-[calc(50%-10px)]">
-                                                <DateRangePicker
-                                                    startDate={values.p_s_date ?? null}
-                                                    endDate={values.p_e_date ?? null}
-                                                    setStartDate={date => date && setValue("p_s_date", date)}
-                                                    setEndDate={date => date && setValue("p_e_date", date)}
-                                                />
-                                                <InputError message={errors.p_s_date?.message} />
-                                            </div>
-                                        )}
+                                        <InputError message={errors.c_name?.message} />
                                     </div>
                                 </li>
                                 <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
                                     <p className="text-[#666]">링크 열림창</p>
                                     <Controller
-                                        name="p_link_target"
+                                        name="c_link_target"
                                         control={control}
                                         render={({ field }) => (
                                             <ul className="flex justify-between py-[14px]">
@@ -472,22 +699,683 @@ export default function CategoryForm({
                                     />
                                 </li>
                                 <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
-                                    <label htmlFor="p_link_url" className="text-[#666]">
+                                    <label htmlFor="c_link_url" className="text-[#666]">
                                         링크
                                     </label>
                                     <Input
-                                        {...register("p_link_url")}
-                                        id="p_link_url"
+                                        {...register("c_link_url")}
+                                        id="c_link_url"
                                         className="w-full"
                                         placeholder="URL을 입력해주세요."
                                     />
                                 </li>
-                                <li className="w-full">
-                                    <EditorWithHtml
-                                        value={values.p_content || ""}
-                                        onChange={cont => setValue("p_content", cont)}
-                                    />
-                                </li>
+                                {!isSub && ( // 1차 카테고리일때만 노출
+                                    <>
+                                        <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                            <p className="text-[#666]">서브 메인 배너</p>
+                                            <Controller
+                                                name="c_main_banner"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <ul className="flex justify-between py-[14px]">
+                                                        <li className="flex-1">
+                                                            <Radio
+                                                                {...field}
+                                                                value="1"
+                                                                checked={field.value === "1"}
+                                                                txt="커버"
+                                                            />
+                                                        </li>
+                                                        <li className="flex-1">
+                                                            <Radio
+                                                                {...field}
+                                                                value="2"
+                                                                checked={field.value === "2"}
+                                                                txt="원본 사이즈 고정"
+                                                            />
+                                                        </li>
+                                                    </ul>
+                                                )}
+                                            />
+                                        </li>
+                                        <li className="flex w-full flex-col gap-[8px]">
+                                            <p className="text-[#666]">배너 등록</p>
+                                            <FileUpload
+                                                uploadFiles={files}
+                                                setFiles={setFiles}
+                                                setFilesData={setFilesData}
+                                                handleDelt={() => {
+                                                    setFiles([]);
+                                                    setFilesData([]);
+                                                }}
+                                                showPreview
+                                                accept="image/*"
+                                            />
+                                        </li>
+                                    </>
+                                )}
+                                {isSub && ( // 하위 카테고리일때만 노출
+                                    <li className="flex w-full flex-col gap-[8px]">
+                                        <p className="text-[#666]">카테고리 종류</p>
+                                        <Tabs list={tabList} activeIdx={tabOn} handleClick={handleChangeTab} />
+                                        <div className="overflow-hidden rounded-[8px] border border-[#D9D9D9]">
+                                            <div className="bg-[#F2F3F8] p-[16px_20px] text-[20px] font-[700]">
+                                                {tabList[tabOn]}
+                                            </div>
+                                            <ul className="flex flex-wrap gap-[20px] border-t border-[#D9D9D9] p-[20px]">
+                                                {tabOn === 0 && ( // HTML 카테고리일때만 노출
+                                                    <li className="w-full">
+                                                        <EditorWithHtml
+                                                            value={values.content || ""}
+                                                            onChange={cont => setValue("content", cont)}
+                                                        />
+                                                    </li>
+                                                )}
+                                                {tabOn === 1 && ( // 빈 메뉴 카테고리일때만 노출
+                                                    <li className="flex w-full items-center justify-center py-[40px]">
+                                                        <p className="text-[18px]">빈 메뉴 카테고를 선택하였습니다.</p>
+                                                    </li>
+                                                )}
+                                                {tabOn === 2 && ( // 맞춤 카테고리일때만 노출
+                                                    <>
+                                                        <li className="flex w-full flex-col gap-[8px]">
+                                                            <p className="text-[#666]">
+                                                                유형
+                                                                <span className="pl-[5px] font-[700] text-console-2">
+                                                                    *
+                                                                </span>
+                                                            </p>
+                                                            <Controller
+                                                                name="c_type"
+                                                                control={control}
+                                                                render={({ field }) => (
+                                                                    <ul className="flex w-[calc(50%-10px)] justify-between py-[14px]">
+                                                                        <li className="flex-1">
+                                                                            <Radio
+                                                                                {...field}
+                                                                                value="1"
+                                                                                checked={field.value === "1"}
+                                                                                txt="폼메일(게시판)"
+                                                                            />
+                                                                        </li>
+                                                                        <li className="flex-1">
+                                                                            <Radio
+                                                                                {...field}
+                                                                                value="2"
+                                                                                checked={field.value === "2"}
+                                                                                txt="일반"
+                                                                            />
+                                                                        </li>
+                                                                    </ul>
+                                                                )}
+                                                            />
+                                                        </li>
+                                                        <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                            <label htmlFor="file_path" className="text-[#666]">
+                                                                파일경로
+                                                                <span className="pl-[5px] font-[700] text-console-2">
+                                                                    *
+                                                                </span>
+                                                            </label>
+                                                            <div>
+                                                                <Input
+                                                                    {...register("file_path")}
+                                                                    id="file_path"
+                                                                    placeholder="파일 경로를 입력해주세요."
+                                                                />
+                                                                <InputError message={errors.file_path?.message} />
+                                                            </div>
+                                                        </li>
+                                                        <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                            <label htmlFor="admin_file_path" className="text-[#666]">
+                                                                관리자 파일경로
+                                                                <span className="pl-[5px] font-[700] text-console-2">
+                                                                    *
+                                                                </span>
+                                                            </label>
+                                                            <div>
+                                                                <Input
+                                                                    {...register("admin_file_path")}
+                                                                    id="admin_file_path"
+                                                                    placeholder="파일 경로를 입력해주세요."
+                                                                />
+                                                                <InputError message={errors.file_path?.message} />
+                                                            </div>
+                                                        </li>
+                                                        <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                            <label htmlFor="sms" className="text-[#666]">
+                                                                수신 문자
+                                                                <span className="pl-[5px] font-[700] text-console-2">
+                                                                    *
+                                                                </span>
+                                                            </label>
+                                                            <div>
+                                                                <Controller
+                                                                    name="sms"
+                                                                    control={control}
+                                                                    render={({ field }) => (
+                                                                        <Input
+                                                                            {...field}
+                                                                            id="sms"
+                                                                            placeholder="숫자만 입력해주세요."
+                                                                            formattedInput
+                                                                        />
+                                                                    )}
+                                                                />
+                                                                <InputError message={errors.sms?.message} />
+                                                            </div>
+                                                        </li>
+                                                        <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                            <label htmlFor="email" className="text-[#666]">
+                                                                수신 메일
+                                                                <span className="pl-[5px] font-[700] text-console-2">
+                                                                    *
+                                                                </span>
+                                                            </label>
+                                                            <div>
+                                                                <Input
+                                                                    {...register("email")}
+                                                                    id="email"
+                                                                    placeholder="ID@example.com"
+                                                                />
+                                                                <InputError message={errors.email?.message} />
+                                                            </div>
+                                                        </li>
+                                                    </>
+                                                )}
+                                                {tabOn > 2 && (
+                                                    <>
+                                                        {tabOn !== 5 && ( // FAQ 아닐때만 노출
+                                                            <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                                <p className="text-[#666]">목록 요소</p>
+                                                                <ul className="flex flex-wrap justify-between py-[16px]">
+                                                                    <Controller
+                                                                        name="b_column_title"
+                                                                        control={control}
+                                                                        render={({ field }) => (
+                                                                            <li>
+                                                                                <Checkbox
+                                                                                    {...field}
+                                                                                    checked={field.value === "Y"}
+                                                                                    txt="제목"
+                                                                                    className="justify-start"
+                                                                                    onChange={e => {
+                                                                                        const check =
+                                                                                            e.currentTarget.checked;
+                                                                                        setValue(
+                                                                                            "b_column_title",
+                                                                                            check ? "Y" : "N",
+                                                                                        );
+                                                                                    }}
+                                                                                />
+                                                                            </li>
+                                                                        )}
+                                                                    />
+                                                                    <Controller
+                                                                        name="b_column_date"
+                                                                        control={control}
+                                                                        render={({ field }) => (
+                                                                            <li>
+                                                                                <Checkbox
+                                                                                    {...field}
+                                                                                    checked={field.value === "Y"}
+                                                                                    txt="등록 일자"
+                                                                                    className="justify-start"
+                                                                                    onChange={e => {
+                                                                                        const check =
+                                                                                            e.currentTarget.checked;
+                                                                                        setValue(
+                                                                                            "b_column_date",
+                                                                                            check ? "Y" : "N",
+                                                                                        );
+                                                                                    }}
+                                                                                />
+                                                                            </li>
+                                                                        )}
+                                                                    />
+                                                                    <Controller
+                                                                        name="b_column_view"
+                                                                        control={control}
+                                                                        render={({ field }) => (
+                                                                            <li>
+                                                                                <Checkbox
+                                                                                    {...field}
+                                                                                    checked={field.value === "Y"}
+                                                                                    txt="조회수"
+                                                                                    className="justify-start"
+                                                                                    onChange={e => {
+                                                                                        const check =
+                                                                                            e.currentTarget.checked;
+                                                                                        setValue(
+                                                                                            "b_column_view",
+                                                                                            check ? "Y" : "N",
+                                                                                        );
+                                                                                    }}
+                                                                                />
+                                                                            </li>
+                                                                        )}
+                                                                    />
+                                                                    <Controller
+                                                                        name="b_column_file"
+                                                                        control={control}
+                                                                        render={({ field }) => (
+                                                                            <li>
+                                                                                <Checkbox
+                                                                                    {...field}
+                                                                                    checked={field.value === "Y"}
+                                                                                    txt="파일"
+                                                                                    className="justify-start"
+                                                                                    onChange={e => {
+                                                                                        const check =
+                                                                                            e.currentTarget.checked;
+                                                                                        setValue(
+                                                                                            "b_column_file",
+                                                                                            check ? "Y" : "N",
+                                                                                        );
+                                                                                    }}
+                                                                                />
+                                                                            </li>
+                                                                        )}
+                                                                    />
+                                                                </ul>
+                                                            </li>
+                                                        )}
+                                                        <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                            <p className="text-[#666]">목록 개수</p>
+                                                            <Controller
+                                                                name="b_list_cnt"
+                                                                control={control}
+                                                                render={({ field }) => <ListSizeSelect {...field} />}
+                                                            />
+                                                        </li>
+                                                        {tabOn > 4 && ( // FAQ, 문의게시판일때만 노출
+                                                            <li className="flex w-full flex-col gap-[8px]">
+                                                                <p className="text-[#666]">게시판 분류 사용여부</p>
+                                                                {mode === "create" && (
+                                                                    <p className="py-[5px] text-[14px] text-console-2">
+                                                                        * 카테고리를 등록 후 수정 시에 설정 가능합니다.
+                                                                    </p>
+                                                                )}
+                                                                {mode === "edit" && (
+                                                                    <div className="flex items-center gap-[20px]">
+                                                                        <div className="flex items-center justify-start">
+                                                                            <Controller
+                                                                                name="b_group"
+                                                                                control={control}
+                                                                                render={({ field }) => (
+                                                                                    <Checkbox
+                                                                                        {...field}
+                                                                                        checked={field.value === "Y"}
+                                                                                        txt="체크시 게시판 분류를 사용합니다."
+                                                                                        onChange={e => {
+                                                                                            const check =
+                                                                                                e.currentTarget.checked;
+                                                                                            setValue(
+                                                                                                "b_group",
+                                                                                                check ? "Y" : "N",
+                                                                                            );
+                                                                                        }}
+                                                                                    />
+                                                                                )}
+                                                                            />
+                                                                        </div>
+                                                                        <Dialog
+                                                                            open={boardGroupPop}
+                                                                            onOpenChange={setBoardGroupPop}
+                                                                        >
+                                                                            <DialogTrigger asChild>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="h-[34px] rounded-[8px] border border-[#181818] px-[16px] font-[500]"
+                                                                                >
+                                                                                    분류 설정
+                                                                                </button>
+                                                                            </DialogTrigger>
+                                                                            {boardGroupPop && (
+                                                                                <BoardGroupPop
+                                                                                    parentId={detailIdx}
+                                                                                    allUseCheck={
+                                                                                        values.c_kind_use === "Y"
+                                                                                    }
+                                                                                    handleAllUseCheck={checked => {
+                                                                                        setValue(
+                                                                                            "c_kind_use",
+                                                                                            checked ? "Y" : "N",
+                                                                                        );
+                                                                                    }}
+                                                                                />
+                                                                            )}
+                                                                        </Dialog>
+                                                                    </div>
+                                                                )}
+                                                            </li>
+                                                        )}
+                                                        {tabOn !== 5 && ( // FAQ 아닐때만 노출
+                                                            <>
+                                                                <li className="flex w-[calc(50%-10px)] gap-[8px]">
+                                                                    <div className="flex w-[calc(50%-4px)] flex-col gap-[8px]">
+                                                                        <p className="text-[#666]">읽기 권한</p>
+                                                                        <Controller
+                                                                            name="b_read_lv"
+                                                                            control={control}
+                                                                            render={({ field }) => (
+                                                                                <LevelSelect
+                                                                                    value={field.value}
+                                                                                    onChange={field.onChange}
+                                                                                    className="min-w-full"
+                                                                                />
+                                                                            )}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="flex w-[calc(50%-4px)] flex-col gap-[8px]">
+                                                                        <p className="text-[#666]">쓰기 권한</p>
+                                                                        <Controller
+                                                                            name="b_write_lv"
+                                                                            control={control}
+                                                                            render={({ field }) => (
+                                                                                <LevelSelect
+                                                                                    value={field.value}
+                                                                                    onChange={field.onChange}
+                                                                                    className="min-w-full"
+                                                                                />
+                                                                            )}
+                                                                        />
+                                                                    </div>
+                                                                </li>
+                                                                <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                                    <p className="text-[#666]">
+                                                                        작성 시 비밀글 설정 여부
+                                                                    </p>
+                                                                    <div className="flex h-[48px] items-center justify-start">
+                                                                        <Controller
+                                                                            name="b_secret"
+                                                                            control={control}
+                                                                            render={({ field }) => (
+                                                                                <Checkbox
+                                                                                    {...field}
+                                                                                    checked={field.value === "Y"}
+                                                                                    txt="체크 시 비밀글 설정 가능"
+                                                                                    onChange={e => {
+                                                                                        const check =
+                                                                                            e.currentTarget.checked;
+                                                                                        setValue(
+                                                                                            "b_secret",
+                                                                                            check ? "Y" : "N",
+                                                                                        );
+                                                                                    }}
+                                                                                />
+                                                                            )}
+                                                                        />
+                                                                    </div>
+                                                                </li>
+                                                                <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                                    <p className="text-[#666]">답변 사용 및 권한</p>
+                                                                    <div className="flex gap-[8px]">
+                                                                        <Controller
+                                                                            name="b_reply"
+                                                                            control={control}
+                                                                            render={({ field }) => (
+                                                                                <div className="w-[calc(50%-4px)] py-[16px]">
+                                                                                    <Checkbox
+                                                                                        {...field}
+                                                                                        checked={field.value === "Y"}
+                                                                                        txt="체크시 답변 작성 가능"
+                                                                                        className="justify-start"
+                                                                                        onChange={e => {
+                                                                                            const check =
+                                                                                                e.currentTarget.checked;
+                                                                                            setValue(
+                                                                                                "b_reply",
+                                                                                                check ? "Y" : "N",
+                                                                                            );
+                                                                                        }}
+                                                                                    />
+                                                                                </div>
+                                                                            )}
+                                                                        />
+                                                                        <Controller
+                                                                            name="b_reply_lv"
+                                                                            control={control}
+                                                                            render={({ field }) => (
+                                                                                <div className="w-[calc(50%-4px)]">
+                                                                                    <LevelSelect
+                                                                                        value={field.value}
+                                                                                        onChange={field.onChange}
+                                                                                        className="min-w-full"
+                                                                                    />
+                                                                                </div>
+                                                                            )}
+                                                                        />
+                                                                    </div>
+                                                                </li>
+                                                                <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                                    <p className="text-[#666]">댓글 사용 및 권한</p>
+                                                                    <div className="flex gap-[8px]">
+                                                                        <Controller
+                                                                            name="b_comment"
+                                                                            control={control}
+                                                                            render={({ field }) => (
+                                                                                <div className="w-[calc(50%-4px)] py-[16px]">
+                                                                                    <Checkbox
+                                                                                        {...field}
+                                                                                        checked={field.value === "Y"}
+                                                                                        txt="체크시 댓글 작성 가능"
+                                                                                        className="justify-start"
+                                                                                        onChange={e => {
+                                                                                            const check =
+                                                                                                e.currentTarget.checked;
+                                                                                            setValue(
+                                                                                                "b_comment",
+                                                                                                check ? "Y" : "N",
+                                                                                            );
+                                                                                        }}
+                                                                                    />
+                                                                                </div>
+                                                                            )}
+                                                                        />
+                                                                        <Controller
+                                                                            name="b_comment_lv"
+                                                                            control={control}
+                                                                            render={({ field }) => (
+                                                                                <div className="w-[calc(50%-4px)]">
+                                                                                    <LevelSelect
+                                                                                        value={field.value}
+                                                                                        onChange={field.onChange}
+                                                                                        className="min-w-full"
+                                                                                    />
+                                                                                </div>
+                                                                            )}
+                                                                        />
+                                                                    </div>
+                                                                </li>
+                                                                <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                                    <p className="text-[#666]">게시 알림 사용</p>
+                                                                    <div className="flex h-[48px] items-center justify-start">
+                                                                        <Controller
+                                                                            name="b_alarm"
+                                                                            control={control}
+                                                                            render={({ field }) => (
+                                                                                <Checkbox
+                                                                                    {...field}
+                                                                                    checked={field.value === "Y"}
+                                                                                    txt="체크시 휴대폰 문자 전송"
+                                                                                    onChange={e => {
+                                                                                        const check =
+                                                                                            e.currentTarget.checked;
+                                                                                        setValue(
+                                                                                            "b_alarm",
+                                                                                            check ? "Y" : "N",
+                                                                                        );
+                                                                                    }}
+                                                                                />
+                                                                            )}
+                                                                        />
+                                                                    </div>
+                                                                </li>
+                                                                <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                                    <label
+                                                                        htmlFor="b_alarm_phone"
+                                                                        className="text-[#666]"
+                                                                    >
+                                                                        게시 알림 전송 휴대폰 번호
+                                                                    </label>
+                                                                    <div>
+                                                                        <Controller
+                                                                            name="b_alarm_phone"
+                                                                            control={control}
+                                                                            render={({ field }) => (
+                                                                                <Input
+                                                                                    {...field}
+                                                                                    id="b_alarm_phone"
+                                                                                    placeholder="숫자만 입력해주세요."
+                                                                                    formattedInput
+                                                                                />
+                                                                            )}
+                                                                        />
+                                                                        <InputError
+                                                                            message={errors.b_alarm_phone?.message}
+                                                                        />
+                                                                    </div>
+                                                                </li>
+                                                            </>
+                                                        )}
+                                                        {tabOn === 6 && ( // 문의게시판일때만 노출
+                                                            <>
+                                                                <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                                    <p className="text-[#666]">
+                                                                        작성자 답변 알림 수신 여부
+                                                                    </p>
+                                                                    <div className="flex h-[48px] items-center justify-start">
+                                                                        <Controller
+                                                                            name="b_write_alarm"
+                                                                            control={control}
+                                                                            render={({ field }) => (
+                                                                                <Checkbox
+                                                                                    {...field}
+                                                                                    checked={field.value === "Y"}
+                                                                                    txt="체크 시 답변 알림 수신"
+                                                                                    onChange={e => {
+                                                                                        const check =
+                                                                                            e.currentTarget.checked;
+                                                                                        setValue(
+                                                                                            "b_write_alarm",
+                                                                                            check ? "Y" : "N",
+                                                                                        );
+                                                                                    }}
+                                                                                />
+                                                                            )}
+                                                                        />
+                                                                    </div>
+                                                                </li>
+                                                                <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                                    <p className="text-[#666]">알림 수신 정보</p>
+                                                                    <div>
+                                                                        <div className="flex">
+                                                                            <div className="w-1/2 py-[16px]">
+                                                                                <Controller
+                                                                                    name="b_write_send"
+                                                                                    control={control}
+                                                                                    render={({ field }) => (
+                                                                                        <Checkbox
+                                                                                            {...field}
+                                                                                            checked={
+                                                                                                field.value === "Y"
+                                                                                            }
+                                                                                            txt="이메일"
+                                                                                            className="justify-start"
+                                                                                            onChange={e => {
+                                                                                                const check =
+                                                                                                    e.currentTarget
+                                                                                                        .checked;
+                                                                                                setValue(
+                                                                                                    "b_write_send",
+                                                                                                    check ? "Y" : "N",
+                                                                                                );
+                                                                                            }}
+                                                                                        />
+                                                                                    )}
+                                                                                />
+                                                                            </div>
+                                                                            <div className="w-1/2 py-[16px]">
+                                                                                <Controller
+                                                                                    name="b_write_sms"
+                                                                                    control={control}
+                                                                                    render={({ field }) => (
+                                                                                        <Checkbox
+                                                                                            {...field}
+                                                                                            checked={
+                                                                                                field.value === "Y"
+                                                                                            }
+                                                                                            txt="문자"
+                                                                                            className="justify-start"
+                                                                                            onChange={e => {
+                                                                                                const check =
+                                                                                                    e.currentTarget
+                                                                                                        .checked;
+                                                                                                setValue(
+                                                                                                    "b_write_sms",
+                                                                                                    check ? "Y" : "N",
+                                                                                                );
+                                                                                            }}
+                                                                                        />
+                                                                                    )}
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+                                                                        <InputError
+                                                                            message={errors.b_write_alarm?.message}
+                                                                        />
+                                                                    </div>
+                                                                </li>
+                                                            </>
+                                                        )}
+                                                        <li className="flex w-full flex-col gap-[8px]">
+                                                            <label htmlFor="b_top_html" className="text-[#666]">
+                                                                게시판 상단 HTML
+                                                            </label>
+                                                            <Textarea
+                                                                {...register("b_top_html")}
+                                                                id="b_top_html"
+                                                                placeholder="HTML을 입력해주세요."
+                                                            />
+                                                        </li>
+                                                        <li className="flex w-full flex-col gap-[8px]">
+                                                            <p className="text-[#666]">게시글 템플릿 적용</p>
+                                                            <div className="flex h-[48px] items-center justify-start">
+                                                                <Controller
+                                                                    name="b_template"
+                                                                    control={control}
+                                                                    render={({ field }) => (
+                                                                        <Checkbox
+                                                                            {...field}
+                                                                            checked={field.value === "Y"}
+                                                                            txt="게시글 작성시 템플릿 적용 가능"
+                                                                            onChange={e => {
+                                                                                const check = e.currentTarget.checked;
+                                                                                setValue(
+                                                                                    "b_template",
+                                                                                    check ? "Y" : "N",
+                                                                                );
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                />
+                                                            </div>
+                                                        </li>
+                                                        {values.b_template === "Y" && (
+                                                            <li className="w-full">
+                                                                <EditorWithHtml
+                                                                    value={values.b_template_text || ""}
+                                                                    onChange={cont => setValue("b_template_text", cont)}
+                                                                />
+                                                            </li>
+                                                        )}
+                                                    </>
+                                                )}
+                                            </ul>
+                                        </div>
+                                    </li>
+                                )}
                             </ul>
                             <div className="flex justify-end gap-[10px] border-t border-[#D9D9D9] p-[12px_20px]">
                                 <button

@@ -1,6 +1,7 @@
 import { Control, Controller, FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
 
 import InputError from "@/components/console/common/InputError";
+import TooltipBox from "@/components/console/common/TooltipBox";
 import Checkbox from "@/components/console/form/Checkbox";
 import Editor from "@/components/console/form/Editor";
 import FileUpload, { FileData } from "@/components/console/form/FileUpload";
@@ -58,7 +59,6 @@ export default function PostFormBody({
                                     {...field}
                                     checked={field.value === "1"}
                                     txt="체크 시 목록 최상단 노출"
-                                    className=""
                                     onChange={e => {
                                         const check = e.currentTarget.checked;
                                         setValue("b_notice", check ? "1" : "0");
@@ -89,11 +89,15 @@ export default function PostFormBody({
                     <p className="text-[#666]">
                         유형<span className="pl-[5px] font-[700] text-console-2">*</span>
                     </p>
-                    <SelectBox
-                        list={boardGroupList}
-                        value={values.group_id}
-                        onChange={value => setValue("group_id", value)}
-                    />
+                    <div>
+                        <SelectBox
+                            list={boardGroupList}
+                            value={values.group_id}
+                            onChange={value => setValue("group_id", value)}
+                            triggerClassName="w-full"
+                        />
+                        <InputError message={errors.group_id?.message} />
+                    </div>
                 </li>
             )}
             {/* 갤러리 게시판일때만 노출 */}
@@ -117,7 +121,12 @@ export default function PostFormBody({
                 <InputError message={errors.b_contents?.message} />
             </li>
             <li className="flex w-full flex-col gap-[8px]">
-                <p className="text-[#666]">파일 첨부</p>
+                <div className="flex items-center gap-[8px]">
+                    <p className="text-[#666]">파일 첨부</p>
+                    <TooltipBox
+                        text={`&middot; 최대 10개의 파일만 첨부 가능합니다.<br/> &middot; 개별 파일 크기: 5MB 이하<br/> &middot; 총 용량: 50MB 이하`}
+                    />
+                </div>
                 <FileUpload
                     uploadFiles={files}
                     setFiles={setFiles}
@@ -131,8 +140,8 @@ export default function PostFormBody({
                 <label htmlFor="m_pwd" className="text-[#666]">
                     비밀번호
                 </label>
-                <div className="flex items-center gap-[8px]">
-                    <div>
+                <div className="flex items-start gap-[8px]">
+                    <div className="pt-[16px]">
                         <Controller
                             name="b_secret"
                             control={control}

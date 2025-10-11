@@ -4,9 +4,9 @@ import { CONSOLE_API_ROUTES } from "@/config/apiConfig";
 import consoleAxios from "@/service/axios/consoleAxios";
 
 interface body {
-    id: number;
+    id: number | string;
     c_depth: number;
-    c_depth_parent: number;
+    c_depth_parent: number | string;
     c_num: number;
 }
 

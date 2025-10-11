@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import { notFound } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
@@ -18,6 +19,7 @@ import InputBox from "@/components/console/form/InputBox";
 import Radio from "@/components/console/form/Radio";
 import Toggle from "@/components/console/form/Toggle";
 import { API_URL } from "@/config/apiConfig";
+import { useToast } from "@/hooks/use-toast";
 import { useDelBanner, useGetBanner, usePostBanner, usePutBanner } from "@/service/console/design/banner";
 import { usePopupStore } from "@/store/common/usePopupStore";
 
@@ -133,6 +135,7 @@ export default function BannerForm({
         data: configData,
         isLoading: isInitialLoading,
         refetch: refetchBanner,
+        error: getBannerError,
     } = useGetBanner(detailIdx, {
         enabled: Boolean(detailIdx) && mode === "edit",
     });
@@ -140,6 +143,7 @@ export default function BannerForm({
     const putBannerMutation = usePutBanner();
     const delBannerMutation = useDelBanner();
     const { setConfirmPop, setLoadingPop } = usePopupStore();
+    const { toast } = useToast();
 
     // 데이터 로딩 또는 저장,수정 중일 때 로딩 팝업 표시
     useEffect(() => {
@@ -202,10 +206,20 @@ export default function BannerForm({
                     if (b_c_type[0] === "2") {
                         setVideoFiles([{ idx: uuidv4(), original_name: b_file, url: `${API_URL}/${b_file}` }]);
                     }
+                } else {
+                    setFiles([]);
+                    setVideoFiles([]);
                 }
             }
         }
     }, [configData, reset, mode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // 404 에러 처리
+    useEffect(() => {
+        if (getBannerError) {
+            notFound();
+        }
+    }, [getBannerError]);
 
     useEffect(() => {
         if (refetch) {
@@ -239,7 +253,21 @@ export default function BannerForm({
         } else if (values.b_c_type === "3") {
             setTabOn(2);
         }
-    }, [values.b_c_type, setValue]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [values.b_c_type]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // 수정일때 배너종류 변경 시 중복값 초기화
+    useEffect(() => {
+        if (mode === "edit" && configData?.data?.b_c_type) {
+            const currentType = Number(configData.data.b_c_type[0]);
+            if (tabOn + 1 !== currentType) {
+                setValue("b_url", "");
+                setValue("b_url_target", "1");
+            } else {
+                setValue("b_url", configData.data.b_url ?? "");
+                setValue("b_url_target", configData.data.b_url_target?.[0] ?? "1");
+            }
+        }
+    }, [tabOn, mode, configData]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (files.length > 0 || videoFiles.length > 0) {
@@ -286,7 +314,9 @@ export default function BannerForm({
             const body = { ...baseBody, idx: Number(detailIdx) };
             putBannerMutation.mutate(body, {
                 onSuccess: () => {
-                    setConfirmPop(true, "수정되었습니다.", 1);
+                    toast({
+                        title: "수정되었습니다.",
+                    });
                     onComplete();
                 },
             });
@@ -295,7 +325,9 @@ export default function BannerForm({
         else {
             postBannerMutation.mutate(baseBody, {
                 onSuccess: () => {
-                    setConfirmPop(true, "등록되었습니다.", 1);
+                    toast({
+                        title: "등록되었습니다.",
+                    });
                     onComplete();
                 },
             });
@@ -312,7 +344,9 @@ export default function BannerForm({
         const body = { idx: [detailIdx] };
         delBannerMutation.mutate(body, {
             onSuccess: () => {
-                setConfirmPop(true, "삭제되었습니다.", 1);
+                toast({
+                    title: "삭제되었습니다.",
+                });
                 onDeleteComplete();
             },
         });
@@ -322,7 +356,7 @@ export default function BannerForm({
         <>
             {!isInitialLoading && (
                 <div className="p-[0_20px_20px_7px]">
-                    <div className="rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]">
+                    <div className="rounded-[12px] bg-white">
                         <form onSubmit={handleSubmit(handleConfirmSave)}>
                             <div className="flex items-center justify-between p-[16px_20px]">
                                 <div className="flex items-center gap-[10px]">
@@ -519,66 +553,68 @@ export default function BannerForm({
                                                     />
                                                 </li>
                                             )}
+                                            {tabOn === 0 && (
+                                                <li className="flex w-full flex-col gap-[8px]">
+                                                    <p className="text-[#666]">
+                                                        배너 파일
+                                                        <span className="pl-[5px] font-[700] text-console-2">*</span>
+                                                    </p>
+                                                    <div>
+                                                        <FileUpload
+                                                            uploadFiles={files}
+                                                            setFiles={setFiles}
+                                                            setFilesData={setFilesData}
+                                                            handleDelt={() => {
+                                                                setFiles([]);
+                                                                setFilesData([]);
+                                                            }}
+                                                            showPreview
+                                                            accept="image/*"
+                                                        />
+                                                        <InputError message={errors.file?.message} />
+                                                    </div>
+                                                </li>
+                                            )}
+                                            {tabOn === 1 && values.b_mov_type === "1" && (
+                                                <li className="flex w-full flex-col gap-[8px]">
+                                                    <p className="text-[#666]">
+                                                        배너 파일
+                                                        <span className="pl-[5px] font-[700] text-console-2">*</span>
+                                                    </p>
+                                                    <div>
+                                                        <FileUpload
+                                                            uploadFiles={videoFiles}
+                                                            setFiles={setVideoFiles}
+                                                            setFilesData={setVideoFilesData}
+                                                            handleDelt={() => {
+                                                                setVideoFiles([]);
+                                                                setVideoFilesData([]);
+                                                            }}
+                                                            showPreview
+                                                            accept="video/*"
+                                                            video
+                                                        />
+                                                        <InputError message={errors.file?.message} />
+                                                    </div>
+                                                </li>
+                                            )}
+                                            {tabOn === 1 && values.b_mov_type === "2" && (
+                                                <li className="flex w-full flex-col gap-[8px]">
+                                                    <p className="text-[#666]">
+                                                        동영상 URL
+                                                        <span className="pl-[5px] font-[700] text-console-2">*</span>
+                                                    </p>
+                                                    <div>
+                                                        <Input
+                                                            {...register("b_mov_url")}
+                                                            placeholder="URL을 입력해주세요."
+                                                        />
+                                                        <InputError message={errors.b_mov_url?.message} />
+                                                    </div>
+                                                </li>
+                                            )}
                                             {tabOn < 2 && (
                                                 <>
-                                                    {values.b_mov_type === "1" && (
-                                                        <li className="flex w-full flex-col gap-[8px]">
-                                                            <p className="text-[#666]">
-                                                                배너 파일
-                                                                <span className="pl-[5px] font-[700] text-console-2">
-                                                                    *
-                                                                </span>
-                                                            </p>
-                                                            <div>
-                                                                {tabOn === 0 ? (
-                                                                    <FileUpload
-                                                                        uploadFiles={files}
-                                                                        setFiles={setFiles}
-                                                                        setFilesData={setFilesData}
-                                                                        handleDelt={() => {
-                                                                            setFiles([]);
-                                                                            setFilesData([]);
-                                                                        }}
-                                                                        showPreview
-                                                                        accept="image/*"
-                                                                    />
-                                                                ) : (
-                                                                    tabOn === 1 && (
-                                                                        <FileUpload
-                                                                            uploadFiles={videoFiles}
-                                                                            setFiles={setVideoFiles}
-                                                                            setFilesData={setVideoFilesData}
-                                                                            handleDelt={() => {
-                                                                                setVideoFiles([]);
-                                                                                setVideoFilesData([]);
-                                                                            }}
-                                                                            showPreview
-                                                                            accept="video/*"
-                                                                            video
-                                                                        />
-                                                                    )
-                                                                )}
-                                                                <InputError message={errors.file?.message} />
-                                                            </div>
-                                                        </li>
-                                                    )}
-                                                    {values.b_mov_type === "2" && (
-                                                        <li className="flex w-full flex-col gap-[8px]">
-                                                            <p className="text-[#666]">
-                                                                동영상 URL
-                                                                <span className="pl-[5px] font-[700] text-console-2">
-                                                                    *
-                                                                </span>
-                                                            </p>
-                                                            <div>
-                                                                <Input
-                                                                    {...register("b_mov_url")}
-                                                                    placeholder="URL을 입력해주세요."
-                                                                />
-                                                                <InputError message={errors.b_mov_url?.message} />
-                                                            </div>
-                                                        </li>
-                                                    )}
                                                     <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
                                                         <label htmlFor="b_url" className="text-[#666]">
                                                             배너링크
@@ -617,38 +653,36 @@ export default function BannerForm({
                                                             )}
                                                         />
                                                     </li>
-                                                    {tabOn === 1 && (
-                                                        <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
-                                                            <p className="text-[#666]">자동 재생</p>
-                                                            <Controller
-                                                                name="b_mov_play"
-                                                                control={control}
-                                                                render={({ field }) => (
-                                                                    <Checkbox
-                                                                        {...field}
-                                                                        checked={field.value === "Y"}
-                                                                        txt="체크시 동영상 배너 자동재생"
-                                                                        className="justify-start"
-                                                                        onChange={e => {
-                                                                            const check = e.currentTarget.checked;
-                                                                            setValue("b_mov_play", check ? "Y" : "N");
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                            />
-                                                        </li>
-                                                    )}
                                                 </>
                                             )}
+                                            {tabOn === 1 && (
+                                                <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                    <p className="text-[#666]">자동 재생</p>
+                                                    <Controller
+                                                        name="b_mov_play"
+                                                        control={control}
+                                                        render={({ field }) => (
+                                                            <Checkbox
+                                                                {...field}
+                                                                checked={field.value === "Y"}
+                                                                txt="체크시 동영상 배너 자동재생"
+                                                                className="justify-start"
+                                                                onChange={e => {
+                                                                    const check = e.currentTarget.checked;
+                                                                    setValue("b_mov_play", check ? "Y" : "N");
+                                                                }}
+                                                            />
+                                                        )}
+                                                    />
+                                                </li>
+                                            )}
                                             {tabOn === 2 && (
-                                                <>
-                                                    <li className="w-full">
-                                                        <EditorWithHtml
-                                                            value={values.b_content || ""}
-                                                            onChange={cont => setValue("b_content", cont)}
-                                                        />
-                                                    </li>
-                                                </>
+                                                <li className="w-full">
+                                                    <EditorWithHtml
+                                                        value={values.b_content || ""}
+                                                        onChange={cont => setValue("b_content", cont)}
+                                                    />
+                                                </li>
                                             )}
                                         </ul>
                                     </div>

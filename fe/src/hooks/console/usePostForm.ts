@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { notFound } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
@@ -7,6 +8,7 @@ import { z } from "zod";
 import type { FileData } from "@/components/console/form/FileUpload";
 import type { SelectItem } from "@/components/console/form/SelectBox";
 import { API_URL } from "@/config/apiConfig";
+import { useToast } from "@/hooks/use-toast";
 import { useDelPostFile, useGetPost, useGetPostGroupList,usePostPostCreate, usePutPost } from "@/service/common";
 import { useBoardStore } from "@/store/common/useBoardStore";
 import { usePopupStore } from "@/store/common/usePopupStore";
@@ -24,6 +26,7 @@ export const schema = z
         preview_img: z.enum(["Y", "N"]).optional(),
         b_depth: z.number(),
         parent_id: z.number().nullable(),
+        b_group: z.enum(["Y", "N"]),
     })
     .superRefine((data, ctx) => {
         if (data.b_secret === "Y" && !data.m_pwd) {
@@ -38,6 +41,13 @@ export const schema = z
                 code: z.ZodIssueCode.custom,
                 message: "미리보기 이미지를 등록해주세요.",
                 path: ["preview_img"],
+            });
+        }
+        if (data.b_group === "Y" && !data.group_id) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "유형을 설정해주세요.",
+                path: ["group_id"],
             });
         }
     });
@@ -56,7 +66,6 @@ export function usePostForm(
 ) {
     const { loginUser } = useAuthStore();
     const { boardSettingData } = useBoardStore();
-    const { setConfirmPop, setLoadingPop } = usePopupStore();
     const initialValues = useMemo<FormValues>(
         () => ({
             b_title: "",
@@ -68,6 +77,7 @@ export function usePostForm(
             preview_img: "N",
             b_depth: 0,
             parent_id: null,
+            b_group: "N",
         }),
         []
     );
@@ -82,7 +92,7 @@ export function usePostForm(
     const [filesData, setFilesData] = useState<File[]>([]);
     const [imgFiles, setImgFiles] = useState<FileData[]>([]);
     const [imgFilesData, setImgFilesData] = useState<File[]>([]);
-    const { data: configData, isLoading: isInitialLoading, refetch: refetchPost } = useGetPost(category || "", detailIdx || "", "T", {
+    const { data: configData, isLoading: isInitialLoading, refetch: refetchPost, error: getPostError } = useGetPost(category || "", detailIdx || "", "T", {
         enabled: !!detailIdx && mode === "edit",
     });
     const postBoardCreateMutation = usePostPostCreate();
@@ -91,31 +101,44 @@ export function usePostForm(
         enabled: boardSettingData.b_group === "Y",
     });
     const delBoardFileMutation = useDelPostFile();
+    const { setConfirmPop, setLoadingPop } = usePopupStore();
+    const { toast } = useToast();
 
     // 데이터 로딩 또는 저장,수정 중일 때 로딩 팝업 표시
     useEffect(() => {
         const isLoading = isInitialLoading || putBoardMutation.isPending || postBoardCreateMutation.isPending;
-        setLoadingPop(isLoading, true);
+        setLoadingPop(isLoading);
         return () => setLoadingPop(false);
-    }, [isInitialLoading, putBoardMutation.isPending, postBoardCreateMutation.isPending, setLoadingPop]);
+    }, [isInitialLoading, putBoardMutation.isPending, postBoardCreateMutation.isPending]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // 게시글 상세 조회
     useEffect(() => {
         if (mode === "reply") {
-            // 답글 모드에서는 reset 하지 않음 (빈 폼)
-            return;
+            reset({
+                ...initialValues,
+                ...(boardSettingData.c_content_type && { c_content_type: boardSettingData.c_content_type }),
+                ...(boardSettingData.b_template === "Y" && { b_contents: boardSettingData.b_template_text }),
+                ...(boardSettingData.b_group === "Y" ? { b_group: "Y" } : { b_group: "N" }),
+            });
         }
         if (mode === "create") {
-            reset(initialValues);
+            reset({
+                ...initialValues,
+                ...(boardSettingData.c_content_type && { c_content_type: boardSettingData.c_content_type }),
+                ...(boardSettingData.b_template === "Y" && { b_contents: boardSettingData.b_template_text }),
+                ...(boardSettingData.b_group === "Y" ? { b_group: "Y" } : { b_group: "N" }),
+            });
         }
-        if (configData) {
-            const { b_title, b_notice, b_contents, group_id, b_file, b_img, parent_id} = configData.data;
+        if (mode === "edit" && configData) {
+            const { b_title, b_notice, b_contents, group_id, b_file, b_img, parent_id, b_secret} = configData.data;
             reset({
                 ...initialValues,
                 b_title,
                 b_notice,
                 b_contents,
                 parent_id,
+                b_secret,
+                ...(boardSettingData.b_group === "Y" ? { b_group: "Y" } : { b_group: "N" }),
                 ...(group_id && { group_id: group_id.toString() }),
                 ...(boardSettingData.c_content_type && { c_content_type: boardSettingData.c_content_type }),
             });
@@ -124,7 +147,14 @@ export function usePostForm(
                 setImgFiles([{ idx: uuidv4(), original_name: b_img, url: `${API_URL}/${b_img}` }]);
             }
         }
-    }, [configData, reset, initialValues, boardSettingData.c_content_type, mode]);
+    }, [configData, boardSettingData, mode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // 404 에러 처리
+    useEffect(() => {
+        if (getPostError) {
+            notFound();
+        }
+    }, [getPostError]);
 
     // 게시글 분류 목록 조회
     useEffect(() => {
@@ -138,6 +168,16 @@ export function usePostForm(
         }
     }, [configBoardGroupList]);
 
+    // boardGroupList가 로드된 후 group_id 재설정 (수정일때만 적용)
+    useEffect(() => {
+        if (mode === "edit" && configData && boardGroupList.length > 0) {
+            const { group_id } = configData.data;
+            if (group_id) {
+                setValue("group_id", group_id.toString());
+            }
+        }
+    }, [boardGroupList, mode, configData]); // eslint-disable-line react-hooks/exhaustive-deps
+
     // 미리보기 이미지 설정
     useEffect(() => {
         if (imgFiles.length > 0) {
@@ -145,7 +185,7 @@ export function usePostForm(
         } else {
             setValue("preview_img", "N");
         }
-    }, [imgFiles, setValue]);
+    }, [imgFiles]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (refetch) {
@@ -185,7 +225,9 @@ export function usePostForm(
         const body = { idx: [file_idx] };
         delBoardFileMutation.mutate(body, {
             onSuccess: () => {
-                setConfirmPop(true, "삭제되었습니다.", 1);
+                toast({
+                    title: "삭제되었습니다.",
+                });
                 if (img) {
                     const newList = [...imgFiles];
                     newList.splice(idx, 1);
@@ -227,7 +269,9 @@ export function usePostForm(
             const body = { ...baseBody, idx: detailIdx, parent_id: baseBody.parent_id?.toString() || ""};
             putBoardMutation.mutate(body, {
                 onSuccess: () => {
-                    setConfirmPop(true, "수정되었습니다.", 1);
+                    toast({
+                        title: "수정되었습니다.",
+                    });
                     onComplete?.(true);
                 },
             });
@@ -237,7 +281,9 @@ export function usePostForm(
             const body = {...baseBody, parent_id: ""};
             postBoardCreateMutation.mutate(body, {
                 onSuccess: () => {
-                    setConfirmPop(true, "등록되었습니다.", 1);
+                    toast({
+                        title: "등록되었습니다.",
+                    });
                     onComplete?.();
                 },
             });
@@ -247,7 +293,9 @@ export function usePostForm(
             const body = { ...baseBody, b_depth: 1, parent_id: detailIdx };
             postBoardCreateMutation.mutate(body, {
                 onSuccess: () => {
-                    setConfirmPop(true, "등록되었습니다.", 1);
+                    toast({
+                        title: "등록되었습니다.",
+                    });
                     onComplete?.();
                 },
             });

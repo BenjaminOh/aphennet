@@ -6,14 +6,14 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import LoadingSpinner from "@/components/console/common/LoadingSpinner";
-import NoData from "@/components/console/common/Nodata";
+import NoData from "@/components/console/common/NoData";
 import Pagination from "@/components/console/common/Pagination";
 import ResizableSplit from "@/components/console/common/ResizableSplit";
 import SearchInput from "@/components/console/form/SearchInput";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { initialListSize, MaintListParams } from "@/constants/console/listParams";
-import usePagination from "@/hooks/console/usePagination";
-import useUrlParams from "@/hooks/console/useUrlParams";
+import { initialListSize, initialPage, MaintListParams } from "@/constants/console/listParams";
+import { usePagination } from "@/hooks/console/usePagination";
+import { useUrlParams } from "@/hooks/console/useUrlParams";
 import { useGetMaintList } from "@/service/console/maintenance";
 import { useAuthStore } from "@/store/console/useAuthStore";
 import { makeIntComma } from "@/utils/numberUtils";
@@ -42,7 +42,7 @@ export default function MaintList() {
     const [totalCount, setTotalCount] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const { urlParams, updateUrlParams } = useUrlParams<MaintListParams>({
-        page: { defaultValue: 1, type: "number" },
+        page: { defaultValue: initialPage, type: "number" },
         searchtxt: { defaultValue: "", type: "string" },
         detail: { defaultValue: "", type: "string" },
         create: { defaultValue: "0", type: "string" },
@@ -170,6 +170,14 @@ export default function MaintList() {
                     <div className="min-h-0 flex-1">
                         <ScrollArea className="h-full pr-[7px]">
                             <div className="flex h-full flex-col">
+                                <div className="flex justify-center bg-white">
+                                    <div
+                                        className="relative max-w-[800px] cursor-pointer"
+                                        onClick={() => window.open("https://www.likeweb.co.kr/", "_blank")}
+                                    >
+                                        <img src="https://likeweb.co.kr/admin/banner2.jpg" alt="유지보수 서비스" />
+                                    </div>
+                                </div>
                                 <div className="flex items-center justify-between border-b border-[#D9D9D9] py-[8px]">
                                     <p className="font-[500]">
                                         <span className="text-console">{makeIntComma(totalCount)} </span>개
@@ -261,10 +269,7 @@ export default function MaintList() {
                         />
                     ) : (
                         <div className="h-full p-[0_20px_20px_7px]">
-                            <NoData
-                                txt="선택된 컨텐츠가 없습니다."
-                                className="h-full rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]"
-                            />
+                            <NoData txt="선택된 컨텐츠가 없습니다." className="h-full rounded-[12px] bg-white" />
                         </div>
                     )}
                 </ScrollArea>

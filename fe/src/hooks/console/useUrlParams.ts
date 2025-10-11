@@ -18,9 +18,9 @@ interface IUseUrlParamsReturn<T extends Record<string, string | number>> {
     resetUrlParams: () => void;
 }
 
-export default function useUrlParams<T extends Record<string, string | number>>(
+export const useUrlParams = <T extends Record<string, string | number>>(
     config: IUrlParamsConfig,
-): IUseUrlParamsReturn<T> {
+): IUseUrlParamsReturn<T> => {
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -114,4 +114,4 @@ export default function useUrlParams<T extends Record<string, string | number>>(
         updateUrlParams,
         resetUrlParams,
     };
-}
+};

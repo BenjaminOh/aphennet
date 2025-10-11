@@ -11,13 +11,26 @@ import { useSiteStore } from "@/store/common/useSiteStore";
 import { useAuthStore } from "@/store/console/useAuthStore";
 
 const LocaMapper: Record<string, string[]> = {
+    "/console/main": ["대시보드"],
     // 게시판 관리
-    "/console/board/": ["게시판 관리", "공지사항"],
-    "/console/board/166": ["게시판 관리", "공지사항"],
-    "/console/board/167": ["게시판 관리", "자주 묻는 질문"],
+    "/console/board/post": ["게시판 관리", "게시글 관리"],
+    "/console/board/comment": ["게시판 관리", "댓글 관리"],
+    // 메뉴 관리
+    "/console/menu/category": ["메뉴 관리", "카테고리 관리"],
+    // 회원 관리
+    "/console/member": ["회원 관리"],
     // 디자인 관리
-    "/console/design/": ["디자인 관리"],
+    "/console/design/banner": ["디자인 관리", "메인 배너 관리"],
     "/console/design/popup": ["디자인 관리", "팝업 관리"],
+    // 환경설정
+    "/console/setting/site": ["환경설정", "사이트정보"],
+    "/console/setting/policy": ["환경설정", "시스템 운영정책"],
+    "/console/setting/level": ["환경설정", "회원 등급 관리"],
+    // 통계관리
+    "/console/statistics/chart": ["통계관리", "전체 통계"],
+    "/console/statistics/visitor": ["통계관리", "접속자 이력 통계"],
+    // 유지보수 게시판
+    "/console/maintenance": ["유지보수 게시판"],
 };
 
 export default function Header() {

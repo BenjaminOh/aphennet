@@ -20,7 +20,8 @@ module.exports = {
                     foreground: "hsl(var(--popover-foreground))",
                 },
                 primary: {
-                    DEFAULT: "#206B6E",
+                    DEFAULT: "hsl(var(--primary))",
+                    foreground: "hsl(var(--primary-foreground))",
                 },
                 // 관리자단 색상
                 console: {
@@ -58,11 +59,6 @@ module.exports = {
                 border: "hsl(var(--border))",
             },
             backgroundImage: {
-                logo: "url('../assets/images/user/logo.svg')",
-                icMenu: "url('../assets/images/user/icMenu.svg')",
-                icClose: "url('../assets/images/user/icClose.svg')",
-                icInstagram: "url('../assets/images/user/icInstagram.svg')",
-                icFacebook: "url('../assets/images/user/icFacebook.svg')",
                 "console-pop-close": "url('../assets/images/console/popClose.svg')",
                 "console-ic-calendar": "url('../assets/images/console/icCalendar.svg')",
             },

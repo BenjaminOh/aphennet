@@ -33,7 +33,7 @@ const categoryTypeList = [
     },
 ];
 
-export default function useCategoryType() {
+export const useCategoryType = () => {
     const [categoryType, setCategoryType] = useState<number | null>(null);
     const [categoryTypeTitle, setCategoryTypeTitle] = useState("");
 

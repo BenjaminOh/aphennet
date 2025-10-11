@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { notFound } from "next/navigation";
 import { useEffect } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -10,6 +11,7 @@ import LoadingSpinner from "@/components/console/common/LoadingSpinner";
 import EditorWithHtml from "@/components/console/form/EditorWithHtml";
 import Input from "@/components/console/form/Input";
 import Toggle from "@/components/console/form/Toggle";
+import { useToast } from "@/hooks/use-toast";
 import { useGetPolicy, usePutPolicy } from "@/service/console/setting/policy";
 import { usePopupStore } from "@/store/common/usePopupStore";
 
@@ -45,11 +47,13 @@ export default function PolicyForm({ detailIdx, onComplete, handleCancel, refetc
         data: configData,
         isLoading: isInitialLoading,
         refetch: refetchBanner,
+        error: getPolicyError,
     } = useGetPolicy(detailIdx, {
         enabled: Boolean(detailIdx),
     });
     const putPolicyMutation = usePutPolicy();
     const { setConfirmPop } = usePopupStore();
+    const { toast } = useToast();
 
     // 상세 조회
     useEffect(() => {
@@ -62,6 +66,13 @@ export default function PolicyForm({ detailIdx, onComplete, handleCancel, refetc
             });
         }
     }, [configData, reset]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // 404 에러 처리
+    useEffect(() => {
+        if (getPolicyError) {
+            notFound();
+        }
+    }, [getPolicyError]);
 
     useEffect(() => {
         if (refetch) {
@@ -84,7 +95,9 @@ export default function PolicyForm({ detailIdx, onComplete, handleCancel, refetc
         };
         putPolicyMutation.mutate(body, {
             onSuccess: () => {
-                setConfirmPop(true, "수정되었습니다.", 1);
+                toast({
+                    title: "수정되었습니다.",
+                });
                 onComplete();
             },
         });
@@ -96,7 +109,7 @@ export default function PolicyForm({ detailIdx, onComplete, handleCancel, refetc
                 <LoadingSpinner console />
             ) : (
                 <div className="p-[0_20px_20px_7px]">
-                    <div className="rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]">
+                    <div className="rounded-[12px] bg-white">
                         <form onSubmit={handleSubmit(handleConfirmSave)}>
                             <div className="flex items-center gap-[10px] p-[16px_20px]">
                                 <p className="text-[20px] font-[700]">이용정책 관리</p>

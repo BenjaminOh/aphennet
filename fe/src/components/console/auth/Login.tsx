@@ -31,7 +31,7 @@ export default function Login() {
     } = useForm<FormValues>({
         resolver: zodResolver(schema),
         defaultValues: {
-            m_email: "ohsjwe@gmail.com",
+            m_email: "likeweb@likeweb.co.kr",
             m_password: "test1!@#$",
         },
     });
@@ -48,6 +48,7 @@ export default function Login() {
                         m_email: data.m_email,
                         m_level: data.m_level,
                         m_name: data.m_name,
+                        m_menu_auth: data.m_menu_auth,
                         siteId: process.env.NEXT_PUBLIC_SITE_ID || "",
                         maintName: process.env.NEXT_PUBLIC_MAINT_NAME || "",
                     };

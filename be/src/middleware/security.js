@@ -10,9 +10,10 @@ const whiteIPs = new Set(ipAllowed);
 const ipDenied = process.env.DENIED_IP ? process.env.DENIED_IP.split(',').map(ip => ip.trim()) : [];
 const suspiciousIPs = new Set(ipDenied);
 
-// 차단 user agent (curl은 허용)
+// 차단 user agent
 const blockedUserAgents = [
     /^$/, // 빈 User-Agent 추가
+    /curl/i,
     /wget/i,
     /python-requests/i,
     /postman/i,
@@ -77,7 +78,6 @@ exports.requestLimiter = rateLimit({
 */
 exports.security = (req, res, next) => {
     const userAgent = req.get('User-Agent') || '';
-    const blockedAgents = ['bot', 'crawler', 'spider', 'scraper'];
     const acceptHeader = req.get('Accept') || '';
     const acceptLanguage = req.get('Accept-Language') || '';
     const acceptEncoding = req.get('Accept-Encoding') || '';
@@ -98,26 +98,19 @@ exports.security = (req, res, next) => {
         return errorHandler.errorThrow(enumConfig.statusErrorCode._403_ERROR[0], '');
     }
 
-    // curl과 wget은 명시적으로 허용
-    if (userAgent.toLowerCase().includes('curl') || userAgent.toLowerCase().includes('wget')) {
-        console.log(`허용된 도구 요청: ${userAgent} from IP: ${clientIP}`);
-        return next();
-    }
-
     // User-Agent가 없거나 차단 목록에 있는 경우
     const isBlockedUserAgent = blockedUserAgents.some(pattern => pattern.test(userAgent));
 
-    // 내부 요청 (localhost, 127.0.0.1)은 User-Agent 없이도 허용
-    const isInternalRequest = clientIP === '127.0.0.1' || clientIP === '::1' || clientIP.includes('172.18.0.');
-
-    if ((userAgent === '' || isBlockedUserAgent) && !isInternalRequest) {
+    if (userAgent === '' || isBlockedUserAgent) {
         console.log(`차단된 User-Agent: ${userAgent} from IP: ${clientIP}`);
         // suspiciousIPs.add(clientIP);
         return errorHandler.errorThrow(enumConfig.statusErrorCode._403_ERROR[0], '');
     }
 
-    // 다른 봇들은 차단
-    if (blockedAgents.some(agent => userAgent.toLowerCase().includes(agent))) {
+    // curl 특별 검사 강화
+    if (userAgent.toLowerCase().includes('curl') || userAgent.toLowerCase().includes('libcurl')) {
+        console.log(`curl/libcurl 감지: ${userAgent} from IP: ${clientIP}`);
+        // suspiciousIPs.add(clientIP);
         return errorHandler.errorThrow(enumConfig.statusErrorCode._403_ERROR[0], '');
     }
 

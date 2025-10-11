@@ -32,17 +32,21 @@ export default function LanguageTabs({ activeLang, handleLanguageChange }: Langu
     };
 
     return (
-        <ul className="flex">
-            {languageNames.map((tab, i) => (
-                <li
-                    key={`tab_${i}`}
-                    className={activeIdx === i ? liOnStyle : liStyle}
-                    style={{ boxShadow: "inset 0px -4px 4px rgba(0, 0, 0, 0.04)" }}
-                    onClick={() => handleClick(i)}
-                >
-                    {tab}
-                </li>
-            ))}
-        </ul>
+        <>
+            {languageNames.length > 1 && (
+                <ul className="flex">
+                    {languageNames.map((tab, i) => (
+                        <li
+                            key={`tab_${i}`}
+                            className={activeIdx === i ? liOnStyle : liStyle}
+                            style={{ boxShadow: "inset 0px -4px 4px rgba(0, 0, 0, 0.04)" }}
+                            onClick={() => handleClick(i)}
+                        >
+                            {tab}
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </>
     );
 }

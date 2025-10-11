@@ -8,21 +8,23 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import LoadingSpinner from "@/components/console/common/LoadingSpinner";
-import NoData from "@/components/console/common/Nodata";
+import NoData from "@/components/console/common/NoData";
 import Pagination from "@/components/console/common/Pagination";
 import ResizableSplit from "@/components/console/common/ResizableSplit";
 import AllCheckbox from "@/components/console/form/AllCheckbox";
 import Checkbox from "@/components/console/form/Checkbox";
 import SelectBox from "@/components/console/form/SelectBox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { initialListSize, MemberListParams, memberListSearchTypes } from "@/constants/console/listParams";
-import useCheckboxList from "@/hooks/console/useCheckboxList";
-import useLevelSelectOptions from "@/hooks/console/useLevelSelectOptions";
-import usePagination from "@/hooks/console/usePagination";
-import useUrlParams from "@/hooks/console/useUrlParams";
+import { initialListSize, initialPage, MemberListParams, memberListSearchTypes } from "@/constants/console/listParams";
+import { useCheckboxList } from "@/hooks/console/useCheckboxList";
+import { useLevelSelectOptions } from "@/hooks/console/useLevelSelectOptions";
+import { usePagination } from "@/hooks/console/usePagination";
+import { useUrlParams } from "@/hooks/console/useUrlParams";
+import { useToast } from "@/hooks/use-toast";
 import { useDelMember, useGetMemberList, usePutMemberLevel } from "@/service/console/member";
 import { usePopupStore } from "@/store/common/usePopupStore";
 import { makeIntComma } from "@/utils/numberUtils";
+import { calculatePrevPage } from "@/utils/paginationUtils";
 
 import MemberSearchFilterPop from "./-components/MemberSearchFilterPop";
 import MemberForm from "./MemberForm";
@@ -51,7 +53,7 @@ export default function MemberList() {
     const [totalCount, setTotalCount] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const { urlParams, updateUrlParams } = useUrlParams<MemberListParams>({
-        page: { defaultValue: 1, type: "number" },
+        page: { defaultValue: initialPage, type: "number" },
         search: { defaultValue: "email", type: "string", validValues: memberListSearchTypes.map(type => type.value) },
         searchtxt: { defaultValue: "", type: "string" },
         sdate: { defaultValue: "", type: "string" },
@@ -93,6 +95,7 @@ export default function MemberList() {
     const delMemberMutation = useDelMember();
     const putMemberLevelMutation = usePutMemberLevel();
     const { setConfirmPop, setLoadingPop } = usePopupStore();
+    const { toast } = useToast();
 
     // urlParams 변경 시 동기화
     useEffect(() => {
@@ -194,7 +197,9 @@ export default function MemberList() {
         const body = { idx: checkedList, m_level: Number(level) };
         putMemberLevelMutation.mutate(body, {
             onSuccess: () => {
-                setConfirmPop(true, "회원등급이 변경되었습니다.", 1);
+                toast({
+                    title: "회원등급이 변경되었습니다.",
+                });
                 setLevel("");
                 refetch();
                 setDetailRefetch(true);
@@ -221,7 +226,9 @@ export default function MemberList() {
         const body = { idx: checkedList };
         delMemberMutation.mutate(body, {
             onSuccess: () => {
-                setConfirmPop(true, "탈퇴 처리되었습니다.", 1);
+                toast({
+                    title: "탈퇴 처리되었습니다.",
+                });
                 if (checkedList.includes(Number(detailOn))) {
                     updateUrlParams({
                         ...urlParams,
@@ -248,11 +255,16 @@ export default function MemberList() {
 
     // 회원탈퇴 완료시
     const onDeleteComplete = () => {
+        // 삭제 후 refetch 전에 페이지 이동 처리
+        const prevPage = calculatePrevPage(urlParams.page, items.length);
+
         updateUrlParams({
             ...urlParams,
+            page: prevPage,
             detail: undefined,
         });
         refetch();
+        setCurrentPage(prevPage);
     };
 
     return (
@@ -393,10 +405,7 @@ export default function MemberList() {
                         />
                     ) : (
                         <div className="h-full p-[0_20px_20px_7px]">
-                            <NoData
-                                txt="선택된 컨텐츠가 없습니다."
-                                className="h-full rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]"
-                            />
+                            <NoData txt="선택된 컨텐츠가 없습니다." className="h-full rounded-[12px] bg-white" />
                         </div>
                     )}
                 </ScrollArea>

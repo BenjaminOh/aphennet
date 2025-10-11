@@ -12,16 +12,24 @@ interface BoardFormProps {
     handleCancel: () => void;
     refetch: boolean;
     onRefetched: () => void;
+    handleConfirmDelete: (idx: string) => void;
 }
 
-export default function PostForm({ detailIdx, onComplete, handleCancel, refetch, onRefetched }: BoardFormProps) {
+export default function PostForm({
+    detailIdx,
+    onComplete,
+    handleCancel,
+    refetch,
+    onRefetched,
+    handleConfirmDelete,
+}: BoardFormProps) {
     const params = useParams<{ category: string }>();
     const category = params.category;
     const postForm = usePostForm(category, detailIdx, detailIdx ? "edit" : "create", onComplete, refetch, onRefetched);
 
     return (
         <div className="p-[0_20px_20px_7px]">
-            <div className="rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]">
+            <div className="rounded-[12px] bg-white">
                 <form onSubmit={postForm.handleSubmit(postForm.handleConfirmSave)}>
                     <div className="flex items-center justify-between p-[16px_20px]">
                         <p className="text-[20px] font-[700]">게시글 관리</p>
@@ -30,6 +38,7 @@ export default function PostForm({ detailIdx, onComplete, handleCancel, refetch,
                             <button
                                 type="button"
                                 className="h-[34px] rounded-[8px] bg-[#FEE2E2] px-[16px] font-[500] text-[#E5313D]"
+                                onClick={() => handleConfirmDelete(detailIdx)}
                             >
                                 삭제
                             </button>

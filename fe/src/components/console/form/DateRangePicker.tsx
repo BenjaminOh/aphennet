@@ -14,6 +14,10 @@ export interface DateRangePickerProps {
     timePicker?: boolean;
     timeIntervals?: number;
     className?: string;
+    startMinDate?: Date;
+    startMaxDate?: Date;
+    endMinDate?: Date;
+    endMaxDate?: Date;
 }
 
 export default function DateRangePicker({
@@ -24,9 +28,13 @@ export default function DateRangePicker({
     timePicker,
     timeIntervals = 30,
     className,
+    startMinDate,
+    startMaxDate,
+    endMinDate,
+    endMaxDate,
 }: DateRangePickerProps) {
     registerLocale("ko", ko);
-    const inputStyle = `w-full h-[48px] rounded-[5px] pr-[32px] bg-console-ic-calendar bg-no-repeat bg-[right_center] rounded-[8px] placeholder:text-[#9F9FA5] ${className}`;
+    const inputStyle = `w-full h-[46px] rounded-[5px] pr-[32px] bg-console-ic-calendar bg-no-repeat bg-[right_center] rounded-[8px] placeholder:text-[#9F9FA5] ${className}`;
 
     // 달력 오픈 상태 관리
     const [isOpen, setIsOpen] = useState(false);
@@ -51,6 +59,8 @@ export default function DateRangePicker({
                     placeholderText="기간"
                     onCalendarOpen={() => setIsOpen(true)}
                     onCalendarClose={() => setIsOpen(false)}
+                    minDate={startMinDate}
+                    maxDate={startMaxDate}
                 />
             </li>
             <li className="flex-1 [&>.react-datepicker-wrapper]:w-full">
@@ -62,11 +72,12 @@ export default function DateRangePicker({
                     className={inputStyle}
                     dateFormat={timePicker ? "yyyy.MM.dd HH:mm" : "yyyy.MM.dd"}
                     showTimeSelect={timePicker}
-                    minDate={startDate || undefined}
                     timeIntervals={timeIntervals}
                     placeholderText="기간"
                     onCalendarOpen={() => setIsOpen(true)}
                     onCalendarClose={() => setIsOpen(false)}
+                    minDate={endMinDate ? endMinDate : startDate || undefined}
+                    maxDate={endMaxDate}
                 />
             </li>
         </ul>

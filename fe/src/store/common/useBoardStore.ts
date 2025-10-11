@@ -57,6 +57,8 @@ interface BoardStore {
     boardMenuList: BoardMenu[];
     setBoardMenuList: (data: BoardMenu[]) => void;
     clearBoardMenuList: () => void;
+    refreshBoardMenu: boolean;
+    setRefreshBoardMenu: (refresh: boolean) => void;
 }
 
 export const initialBoardSettingData: BoardSetting = {
@@ -122,6 +124,8 @@ export const useBoardStore = create<BoardStore>()(
                 set({ boardMenuList: data }),
 
             clearBoardMenuList: () => set({ boardMenuList: [] }),
+            refreshBoardMenu: false,
+            setRefreshBoardMenu: (refresh: boolean) => set({ refreshBoardMenu: refresh }),
         }),
         {
             name: "board-storage",

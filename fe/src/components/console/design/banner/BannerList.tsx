@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import DraggableList from "@/components/console/common/DraggableList";
 import LoadingSpinner from "@/components/console/common/LoadingSpinner";
-import NoData from "@/components/console/common/Nodata";
+import NoData from "@/components/console/common/NoData";
 import Pagination from "@/components/console/common/Pagination";
 import ResizableSplit from "@/components/console/common/ResizableSplit";
 import Tabs from "@/components/console/common/Tabs";
@@ -18,13 +18,21 @@ import SearchInput from "@/components/console/form/SearchInput";
 import Toggle from "@/components/console/form/Toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { API_URL } from "@/config/apiConfig";
-import { BannerListParams, deviceTypes, initialDeviceType, initialListSize } from "@/constants/console/listParams";
-import useCheckboxList from "@/hooks/console/useCheckboxList";
-import usePagination from "@/hooks/console/usePagination";
-import useUrlParams from "@/hooks/console/useUrlParams";
+import {
+    BannerListParams,
+    deviceTypes,
+    initialDeviceType,
+    initialListSize,
+    initialPage,
+} from "@/constants/console/listParams";
+import { useCheckboxList } from "@/hooks/console/useCheckboxList";
+import { usePagination } from "@/hooks/console/usePagination";
+import { useUrlParams } from "@/hooks/console/useUrlParams";
+import { useToast } from "@/hooks/use-toast";
 import { useDelBanner, useGetBannerList, usePostBannerOpen, usePutBannerOrder } from "@/service/console/design/banner";
 import { usePopupStore } from "@/store/common/usePopupStore";
 import { makeIntComma } from "@/utils/numberUtils";
+import { calculatePrevPage } from "@/utils/paginationUtils";
 
 import BannerForm from "./BannerForm";
 
@@ -53,7 +61,7 @@ export default function BannerList() {
     const [totalCount, setTotalCount] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const { urlParams, updateUrlParams } = useUrlParams<BannerListParams>({
-        page: { defaultValue: 1, type: "number" },
+        page: { defaultValue: initialPage, type: "number" },
         type: { defaultValue: initialDeviceType, type: "string", validValues: deviceTypes },
         searchtxt: { defaultValue: "", type: "string" },
         detail: { defaultValue: "", type: "string" },
@@ -81,12 +89,14 @@ export default function BannerList() {
     const putBannerOrderMutation = usePutBannerOrder();
     const delBannerMutation = useDelBanner();
     const { setConfirmPop, setLoadingPop } = usePopupStore();
+    const { toast } = useToast();
 
     // urlParams 변경 시 동기화
     useEffect(() => {
         setValue("searchtxt", urlParams.searchtxt);
     }, [urlParams.searchtxt, setValue]);
 
+    // type 파라미터 동기화
     useEffect(() => {
         setTabOn(urlParams.type === "P" ? 0 : 1);
     }, [urlParams.type]);
@@ -194,6 +204,9 @@ export default function BannerList() {
         };
         putBannerOrderMutation.mutate(body, {
             onSuccess: () => {
+                toast({
+                    title: "순서가 변경되었습니다.",
+                });
                 refetch();
             },
         });
@@ -216,6 +229,9 @@ export default function BannerList() {
         };
         postBannerOpenMutation.mutate(body, {
             onSuccess: () => {
+                toast({
+                    title: "노출설정이 변경되었습니다.",
+                });
                 refetch();
                 setDetailRefetch(true);
             },
@@ -236,7 +252,9 @@ export default function BannerList() {
         const body = { idx: checkedList };
         delBannerMutation.mutate(body, {
             onSuccess: () => {
-                setConfirmPop(true, "삭제되었습니다.", 1);
+                toast({
+                    title: "삭제되었습니다.",
+                });
                 if (checkedList.includes(Number(detailOn))) {
                     updateUrlParams({
                         ...urlParams,
@@ -269,13 +287,7 @@ export default function BannerList() {
     // 배너 삭제 완료시
     const onDeleteComplete = () => {
         // 삭제 후 refetch 전에 페이지 이동 처리
-        const isLastItemOnPage = items.length === 1; // 현재 페이지에 1개만 있을 때
-        const isNotFirstPage = urlParams.page > 1;
-
-        let prevPage = urlParams.page;
-        if (isLastItemOnPage && isNotFirstPage) {
-            prevPage = urlParams.page - 1;
-        }
+        const prevPage = calculatePrevPage(urlParams.page, items.length);
 
         updateUrlParams({
             ...urlParams,
@@ -283,6 +295,7 @@ export default function BannerList() {
             detail: undefined,
         });
         refetch();
+        setCurrentPage(prevPage);
     };
 
     return (
@@ -320,7 +333,7 @@ export default function BannerList() {
                                         </button>
                                         <button
                                             type="button"
-                                            className="h-[34px] rounded-[8px] bg-[##F6F7FA] px-[16px] font-[500] text-[#666]"
+                                            className="h-[34px] rounded-[8px] bg-[#F6F7FA] px-[16px] font-[500] text-[#666]"
                                             onClick={() => handleConfirmOpenChange(false)}
                                         >
                                             중단
@@ -447,10 +460,7 @@ export default function BannerList() {
                         />
                     ) : (
                         <div className="h-full p-[0_20px_20px_7px]">
-                            <NoData
-                                txt="선택된 컨텐츠가 없습니다."
-                                className="h-full rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]"
-                            />
+                            <NoData txt="선택된 컨텐츠가 없습니다." className="h-full rounded-[12px] bg-white" />
                         </div>
                     )}
                 </ScrollArea>

@@ -1,12 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import icPlusBlack from "@/assets/images/console/icPlusBlack.svg";
 import LoadingSpinner from "@/components/console/common/LoadingSpinner";
-import NoData from "@/components/console/common/Nodata";
+import NoData from "@/components/console/common/NoData";
 import {
     useGetConnectorCount,
     useGetConnectorList,
@@ -100,7 +98,7 @@ export default function Main() {
                 <div className="flex justify-between gap-[50px]">
                     <div className="flex-1">
                         <p className="py-[10px] text-[24px] font-[600]">최근 게시글 정보</p>
-                        <ul className="flex rounded-[5px] bg-white p-[40px_12px] shadow-[0_0_8px_0_rgba(0,0,0,0.05)]">
+                        <ul className="flex rounded-[20px] bg-white p-[40px_12px] shadow-[0_0_8px_0_rgba(0,0,0,0.05)]">
                             {boardCountList.map((item, i) => (
                                 <li
                                     key={`board_count_${i}`}
@@ -115,13 +113,8 @@ export default function Main() {
                                 </li>
                             ))}
                         </ul>
-                        <div className="mt-[24px] flex flex-col gap-[25px] rounded-[5px] bg-white p-[20px] shadow-[0_0_8px_0_rgba(0,0,0,0.05)]">
-                            <div className="flex items-center justify-between">
-                                <p className="text-[20px] font-[500]">최근 게시판 조회</p>
-                                <Link href={``}>
-                                    <Image src={icPlusBlack} alt="더보기" />
-                                </Link>
-                            </div>
+                        <div className="mt-[24px] flex flex-col gap-[25px] rounded-[20px] bg-white p-[20px] shadow-[0_0_8px_0_rgba(0,0,0,0.05)]">
+                            <p className="text-[20px] font-[500]">최근 게시판 조회</p>
                             <table className="border-t border-[#D9D9D9]">
                                 <thead className="border-b border-[#D9D9D9] bg-[#F7F6FB] text-[18px] text-[#666] [&>tr>th]:font-[500]">
                                     <tr>
@@ -139,7 +132,10 @@ export default function Main() {
                                               >
                                                   <td className="p-3 text-center text-[#666]">{item.c_name}</td>
                                                   <td className="p-3">
-                                                      <Link href={``} className="truncate">
+                                                      <Link
+                                                          href={`/console/board/post/${item.category}?page=1&search=titlecontents&detail=${item.idx}`}
+                                                          className="truncate"
+                                                      >
                                                           {item.b_title}
                                                       </Link>
                                                   </td>
@@ -159,7 +155,7 @@ export default function Main() {
                     </div>
                     <div className="flex-1">
                         <p className="py-[10px] text-[24px] font-[600]">최근 접속자 정보</p>
-                        <ul className="flex rounded-[5px] bg-white p-[40px_12px] shadow-[0_0_8px_0_rgba(0,0,0,0.05)]">
+                        <ul className="flex rounded-[20px] bg-white p-[40px_12px] shadow-[0_0_8px_0_rgba(0,0,0,0.05)]">
                             {connectorCountList.map((item, i) => (
                                 <li
                                     key={`board_count_${i}`}
@@ -174,7 +170,7 @@ export default function Main() {
                                 </li>
                             ))}
                         </ul>
-                        <div className="mt-[24px] flex flex-col gap-[25px] rounded-[5px] bg-white p-[20px] shadow-[0_0_8px_0_rgba(0,0,0,0.05)]">
+                        <div className="mt-[24px] flex flex-col gap-[25px] rounded-[20px] bg-white p-[20px] shadow-[0_0_8px_0_rgba(0,0,0,0.05)]">
                             <p className="text-[20px] font-[500]">접속자 이력 조회</p>
                             <table className="border-t border-[#D9D9D9]">
                                 <thead className="border-b border-[#D9D9D9] bg-[#F7F6FB] text-[18px] text-[#666] [&>tr>th]:font-[500]">

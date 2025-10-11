@@ -2,8 +2,8 @@
 
 import ConsoleDialogContent from "@/components/console/common/ConsoleDialogContent";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { usePostForm } from "@/hooks/console/usePostForm";
 
-import { usePostForm } from "../../../../../hooks/console/usePostForm";
 import PostFormBody from "./PostFormBody";
 
 interface ReplyFormProps {

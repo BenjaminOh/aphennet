@@ -60,6 +60,7 @@ export default function Comment({
             setEditOn(false);
             setReply(false);
             onCompletePost?.();
+            setReplyValue("");
         }
     }, [completePost]); // eslint-disable-line react-hooks/exhaustive-deps
 

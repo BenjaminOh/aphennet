@@ -7,7 +7,7 @@ interface UsePaginationProps {
     initialPage?: number;
 }
 
-export default function usePagination({ totalPages, initialPage = 1 }: UsePaginationProps) {
+export const usePagination = ({ totalPages, initialPage = 1 }: UsePaginationProps) => {
     const [currentPage, setCurrentPage] = useState(initialPage);
     const maxPagesToShow = 5;
 
@@ -45,4 +45,4 @@ export default function usePagination({ totalPages, initialPage = 1 }: UsePagina
         pages,
         handleChangePage,
     };
-}
+};

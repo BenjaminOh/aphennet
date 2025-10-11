@@ -8,8 +8,8 @@ export const useGetLevelList = () => {
     return useQuery({
         queryKey: ["levelList"],
         queryFn: async () => {
-            const res = await consoleAxios.get(CONSOLE_API_ROUTES.LEVEL.GET);
+            const res = await consoleAxios.get(CONSOLE_API_ROUTES.LEVEL.BASE);
             return res.data;
-        }
+        },
     });
 };

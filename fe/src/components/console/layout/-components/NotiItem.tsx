@@ -1,27 +1,35 @@
-export default function NotiItem() {
+import Image from "next/image";
+
+import icCloseBlack from "@/assets/images/console/icCloseBlack.svg";
+
+import { Item } from "./NotiPopup";
+
+export default function NotiItem({
+    item,
+    handleRead,
+}: {
+    item: Item;
+    handleRead: (follow: string, idx: number, flg: string) => void;
+}) {
+    const { idx, follow, c_name, m_name, title, content, reg_date } = item;
+
     return (
-        <div className="flex cursor-pointer">
-            <div className="flex flex-1">
-                <p className="w-[64px] text-[18px] font-[500] text-[#00BA97]">취소</p>
-                <div className="flex flex-1 flex-col gap-[4px]">
-                    <ul className="flex gap-[24px]">
-                        <li className="text-[#666]">2023091352042551</li>
-                        <li className="text-[#666]">카드 결제</li>
-                    </ul>
-                    <p className="line-clamp-1 text-[18px]">
-                        <strong>자사몰</strong>
-                        <span className="pl-[8px]">
-                            잇포세트 6 비건베이커리 잇포레스트 비건빵비건빵비건빵비건빵비건빵
-                        </span>
+        <div className="flex items-start">
+            <div className="flex w-[calc(100%-20px)] cursor-pointer">
+                <p className="w-[64px] text-[18px] font-[500] text-[#0CB2AD]">{follow}</p>
+                <div className="flex w-[calc(100%-64px)] flex-col gap-[4px]">
+                    <p className="text-[#999]">{`[${c_name}] ‘${title}‘${
+                        follow === "게시글" ? " 새 글 작성" : follow === "댓글" ? " 댓글 작성" : ""
+                    }`}</p>
+                    <p className="flex items-center gap-[8px] text-[18px]">
+                        <strong className="max-w-[20%] truncate">{m_name}</strong>
+                        <span className="max-w-[80%] truncate">{content}</span>
                     </p>
-                    <p className="text-[14px] text-[#999]">2023.07.23</p>
+                    <p className="text-[14px] text-[#999]">{reg_date}</p>
                 </div>
             </div>
-            <button
-                type="button"
-                className="text-0 bg-ic_close_small size-[20px] bg-center bg-no-repeat -indent-[9999px]"
-            >
-                읽음처리
+            <button type="button" className="size-[20px] p-[4px]" onClick={() => handleRead("delete", idx, follow)}>
+                <Image src={icCloseBlack} alt="읽음처리" />
             </button>
         </div>
     );

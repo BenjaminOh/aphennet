@@ -1,10 +1,12 @@
 "use client";
 
+import { notFound } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import LoadingSpinner from "@/components/console/common/LoadingSpinner";
 import Comment, { CommentItem } from "@/components/console/form/Comment";
 import CommentForm from "@/components/console/form/CommentForm";
+import { useToast } from "@/hooks/use-toast";
 import {
     useGetMaint,
     useGetMaintComment,
@@ -34,7 +36,11 @@ export default function MaintDetail({ maintName, detailIdx, onCompleteComment }:
     const [downloadFile, setDownloadFile] = useState<string | null>(null);
     const [commentList, setCommentList] = useState<CommentItem[]>([]);
     const [commentValue, setCommentValue] = useState("");
-    const { data: configData, isLoading: isInitialLoading } = useGetMaint(maintName, detailIdx, {
+    const {
+        data: configData,
+        isLoading: isInitialLoading,
+        error: getMaintError,
+    } = useGetMaint(maintName, detailIdx, {
         enabled: Boolean(maintName) && Boolean(detailIdx),
     });
     const { data: downloadData } = useGetMaintFileDownload(downloadFile && detailIdx ? detailIdx : "");
@@ -56,6 +62,7 @@ export default function MaintDetail({ maintName, detailIdx, onCompleteComment }:
     );
     const [info, setInfo] = useState<InfoItem>(initialInfo);
     const { setConfirmPop } = usePopupStore();
+    const { toast } = useToast();
 
     // 상세 조회
     useEffect(() => {
@@ -65,6 +72,13 @@ export default function MaintDetail({ maintName, detailIdx, onCompleteComment }:
             setInfo(initialInfo);
         }
     }, [configData, initialInfo]);
+
+    // 404 에러 처리
+    useEffect(() => {
+        if (getMaintError) {
+            notFound();
+        }
+    }, [getMaintError]);
 
     // 게시글 댓글 조회
     useEffect(() => {
@@ -110,6 +124,9 @@ export default function MaintDetail({ maintName, detailIdx, onCompleteComment }:
         };
         postMaintCommentMutation.mutate(body, {
             onSuccess: () => {
+                toast({
+                    title: "댓글이 등록되었습니다.",
+                });
                 refetchPostComment();
                 onCompleteComment();
                 setCommentValue("");
@@ -123,7 +140,7 @@ export default function MaintDetail({ maintName, detailIdx, onCompleteComment }:
                 <LoadingSpinner console />
             ) : (
                 <div className="flex min-h-full flex-col">
-                    <div className="flex flex-1 flex-col rounded-[12px] bg-white shadow-[0_18px_40px_0_rgba(112,144,176,0.12)]">
+                    <div className="flex flex-1 flex-col rounded-[12px] bg-white">
                         <div className="flex flex-col gap-[20px] border-b border-[#D9D9D9] p-[16px_20px]">
                             <p className="break-all text-[20px] font-[700]">{info.subject}</p>
                             <ul className="flex gap-[8px]">

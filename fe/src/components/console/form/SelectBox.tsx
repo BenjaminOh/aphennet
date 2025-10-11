@@ -34,7 +34,7 @@ const SelectBox = React.forwardRef<HTMLButtonElement, SelectBoxProps>(
         ref,
     ) => {
         const boxClass = twMerge(
-            "h-[48px] w-auto min-w-[160px] bg-[#fff] px-[12px] border-none text-[16px] ring-[#D9D9D9] rounded-[8px] leading-1 ring-inset ring-1 focus:ring-1 focus:ring-console focus:ring-offset-0 data-[state=open]:ring-console data-[placeholder]:text-[#999]",
+            "h-[48px] w-auto min-w-[160px] bg-[#fff] px-[12px] shadow-none border-none text-[16px] ring-[#D9D9D9] rounded-[8px] leading-1 ring-inset ring-1 focus:ring-1 focus:ring-console focus:ring-offset-0 data-[state=open]:ring-console data-[placeholder]:text-[#999]",
             triggerClassName,
         );
         const selectClass = twMerge("bg-[#fff] text-[15px] border-[#D9D9D9]", contentClassName);
