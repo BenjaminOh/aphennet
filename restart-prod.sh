@@ -5,6 +5,9 @@ set -e
 
 echo "=== 운영서버 빠른 재시작 ==="
 
+# .env.dev를 .env로 복사
+cp .env.prod .env
+
 # 1. 기존 컨테이너 중지
 echo "### 기존 컨테이너 중지 중..."
 docker compose -f docker-compose.base.yml -f docker-compose.prod.yml down
