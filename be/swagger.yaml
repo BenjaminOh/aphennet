@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-    title: basic solution
+    title: Aphen
     version: 1.0.0
     description: API documentation
 
@@ -2612,7 +2612,7 @@ paths:
                                 c_web_title:
                                     type: string
                                     description: '웹브라우저타이틀'
-                                    example: 'basic solution'
+                                    example: 'Aphen'
                                 c_ceo:
                                     type: string
                                     description: '대표자'
