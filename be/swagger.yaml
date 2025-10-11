@@ -118,39 +118,7 @@ components:
                             type: object
                             nullable: true
                             example: null
-    schemas:
-        pagination:
-            type: object
-            properties:
-                limit:
-                    type: integer
-                    description: '페이지당 데이터 수'
-                    example: 20
-                current_page:
-                    type: integer
-                    description: '현재 페이지'
-                    example: 1
-                start_page:
-                    type: integer
-                    description: '시작 페이지'
-                    example: 1
-                max_page:
-                    type: integer
-                    description: '최대 페이지 수'
-                    example: 10
-                last_page:
-                    type: integer
-                    description: '마지막 페이지'
-                    example: 1
-                end_page:
-                    type: integer
-                    description: '끝 페이지'
-                    example: 1
-                total_count:
-                    type: integer
-                    description: '전체 데이터 수'
-                    example: 5
-
+                            
 security:
     - bearerAuth: []
 
@@ -172,7 +140,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 m_password:
                                     type: string
                                     description: '비밀번호'
@@ -205,7 +173,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             m_mobile:
                                                 type: string
                                                 description: '연락처'
@@ -242,7 +210,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 m_password:
                                     type: string
                                     description: '비밀번호'
@@ -271,7 +239,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             m_level:
                                                 type: integer
                                                 description: '회원 레벨'
@@ -335,7 +303,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             m_mobile:
                                                 type: string
                                                 description: '연락처'
@@ -378,7 +346,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 m_password:
                                     type: string
                                     description: '비밀번호'
@@ -407,7 +375,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             m_level:
                                                 type: integer
                                                 description: '회원 레벨'
@@ -486,7 +454,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             m_mobile:
                                                 type: string
                                                 description: '연락처'
@@ -654,7 +622,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
             responses:
                 '200':
                     description: 'Success.'
@@ -739,6 +707,122 @@ paths:
                 '500':
                     $ref: '#/components/500Error'
 
+    /v1/config/site/{site_id}/{c_lang}:
+        get:
+            summary: '사이트 정보'
+            description: ''
+            operationId: 'getConfigSite'
+            tags:
+                - '사용자 > 메인'
+            parameters:
+                - in: path
+                  name: site_id
+                  schema:
+                      type: string
+                      description: '사이트 ID'
+                      example: 'aphen'
+                - in: path
+                  name: c_lang
+                  schema:
+                      type: string
+                      description: '사이트 언어'
+                      example: 'KR'
+            responses:
+                '200':
+                    description: ''
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    statusCode:
+                                        type: integer
+                                        example: 200
+                                    message:
+                                        type: string
+                                        example: ''
+                                    data:
+                                        type: object
+                                        properties:
+                                            c_site_name:
+                                                type: string
+                                                description: '사이트명'
+                                                example: '사이트명'
+                                            c_site_lang:
+                                                type: array
+                                                description: '언어 정보'
+                                                items:
+                                                    type: object
+                                                    properties:
+                                                        site_lang_hangul:
+                                                            type: string
+                                                            description: '언어 한글'
+                                                            example: '한국어'
+                                                        site_lang:
+                                                            type: string
+                                                            description: '언어 영어'
+                                                            example: 'KR'
+                                            c_web_title:
+                                                type: string
+                                                description: '웹브라우저타이틀'
+                                                example: '웹브라우저타이틀'
+                                            c_ceo:
+                                                type: string
+                                                description: '대표자'
+                                                example: '대표자'
+                                            c_tel:
+                                                type: string
+                                                description: '대표전화'
+                                                example: '대표전화'
+                                            c_num:
+                                                type: string
+                                                description: '사업자번호'
+                                                example: '사업자번호'
+                                            c_num2:
+                                                type: string
+                                                description: '통신판매번호'
+                                                example: '통신판매번호'
+                                            c_email:
+                                                type: string
+                                                description: '이메일'
+                                                example: '이메일'
+                                            c_address:
+                                                type: string
+                                                description: '주소'
+                                                example: '주소'
+                                            c_fax:
+                                                type: string
+                                                description: '팩스'
+                                                example: '팩스'
+                                            c_manager:
+                                                type: string
+                                                description: '개인정보관리책임자'
+                                                example: '개인정보관리책임자'
+                                            c_b_title:
+                                                type: string
+                                                description: '브라우저타이틀'
+                                                example: '브라우저타이틀'
+                                            c_meta:
+                                                type: string
+                                                description: '메타설명'
+                                                example: '메타설명'
+                                            c_meta_tag:
+                                                type: string
+                                                description: '메타태그'
+                                                example: '메타태그'
+                                            c_meta_type:
+                                                type: string
+                                                description: '메타분류'
+                                                example: '메타분류'
+                                            c_lang:
+                                                type: string
+                                                description: '다국어구분'
+                                                example: '다국어구분'
+                '400':
+                    $ref: '#/components/400Error'
+                '500':
+                    $ref: '#/components/500Error'
+
     /v1/auth/view:
         get:
             summary: '회원정보 조회'
@@ -788,7 +872,7 @@ paths:
                                                         m_email:
                                                             type: string
                                                             description: '회원 이메일'
-                                                            example: 'likeweb@likeweb.co.kr'
+                                                            example: 'ohsjwe@gmail.com'
                                                         m_name:
                                                             type: string
                                                             description: '회원명'
@@ -1169,7 +1253,7 @@ paths:
                                                               m_email:
                                                                   type: string
                                                                   description: '작성자 이메일'
-                                                                  example: 'likeweb@likeweb.co.kr'
+                                                                  example: 'ohsjwe@gmail.com'
                                                               m_name:
                                                                   type: string
                                                                   description: '작성자명'
@@ -1247,7 +1331,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '작성자 이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 m_name:
                                     type: string
                                     description: '작성자명'
@@ -1301,7 +1385,7 @@ paths:
                                 b_email:
                                     type: string
                                     description: '알림email주소'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 b_secret:
                                     type: string
                                     description: '비밀글'
@@ -1358,7 +1442,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '작성자 이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 m_name:
                                     type: string
                                     description: '작성자명'
@@ -1545,7 +1629,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '작성자 이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             m_name:
                                                 type: string
                                                 description: '작성자명'
@@ -1611,7 +1695,7 @@ paths:
                                             b_email:
                                                 type: string
                                                 description: '알림email주소'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             b_secret:
                                                 type: string
                                                 description: '비밀글'
@@ -2048,7 +2132,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '본인 이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
             responses:
                 '200':
                     description: ''
@@ -2215,7 +2299,7 @@ paths:
                                                               m_email:
                                                                   type: string
                                                                   description: '작성자 이메일'
-                                                                  example: 'likeweb@likeweb.co.kr'
+                                                                  example: 'ohsjwe@gmail.com'
                                                               m_name:
                                                                   type: string
                                                                   description: '작성자명'
@@ -2548,7 +2632,7 @@ paths:
                                 c_email:
                                     type: string
                                     description: '이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 c_address:
                                     type: string
                                     description: '주소'
@@ -6458,7 +6542,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 m_name:
                                     type: string
                                     description: '이름'
@@ -6703,7 +6787,7 @@ paths:
                                                 m_email:
                                                     type: string
                                                     description: '이메일'
-                                                    example: 'likeweb@likeweb.co.kr'
+                                                    example: 'ohsjwe@gmail.com'
                                                 m_name:
                                                     type: string
                                                     description: '이름'
@@ -6741,7 +6825,7 @@ paths:
                                                             m_email:
                                                                 type: string
                                                                 description: '이메일'
-                                                                example: 'likeweb@likeweb.co.kr'
+                                                                example: 'ohsjwe@gmail.com'
                                                             m_name:
                                                                 type: string
                                                                 description: '이름'
@@ -6833,7 +6917,7 @@ paths:
                                 m_email:
                                     type: string
                                     description: '회원 이메일'
-                                    example: 'likeweb@likeweb.co.kr'
+                                    example: 'ohsjwe@gmail.com'
                                 m_name:
                                     type: string
                                     description: '회원명'
@@ -7028,7 +7112,7 @@ paths:
                                                               m_email:
                                                                   type: string
                                                                   description: '이메일'
-                                                                  example: 'likeweb@likeweb.co.kr'
+                                                                  example: 'ohsjwe@gmail.com'
                                                               m_mobile:
                                                                   type: string
                                                                   description: '연락처'
@@ -7147,7 +7231,7 @@ paths:
                                             m_email:
                                                 type: string
                                                 description: '회원 이메일'
-                                                example: 'likeweb@likeweb.co.kr'
+                                                example: 'ohsjwe@gmail.com'
                                             m_name:
                                                 type: string
                                                 description: '회원명'
@@ -7318,7 +7402,7 @@ paths:
                                                               m_email:
                                                                   type: string
                                                                   description: '이메일'
-                                                                  example: 'likeweb@likeweb.co.kr'
+                                                                  example: 'ohsjwe@gmail.com'
                                                               sec_date:
                                                                   type: string
                                                                   description: '탈퇴일 (YYYY.MM.DD HH:mm)'
@@ -7443,7 +7527,7 @@ paths:
                                                               m_email:
                                                                   type: string
                                                                   description: '이메일'
-                                                                  example: 'likeweb@likeweb.co.kr'
+                                                                  example: 'ohsjwe@gmail.com'
                                                               m_name:
                                                                   type: string
                                                                   description: '회원명'
@@ -8106,332 +8190,5 @@ paths:
                     $ref: '#/components/400Error'
                 '401':
                     $ref: '#/components/401Error'
-                '500':
-                    $ref: '#/components/500Error'
-
-    /v1/admin/maintenance/view/{category}/{list_no}:
-        get:
-            summary: '유지보수 게시판 조회'
-            description: '2025-06-20 15:30'
-            operationId: 'getMaintenanceBoardView'
-            tags:
-                - '관리자 > 유지보수'
-            parameters:
-                - in: path
-                  name: category
-                  schema:
-                      type: string
-                      description: '업체명'
-                - in: path
-                  name: list_no
-                  schema:
-                      type: integer
-                      description: '게시글 index'
-                      example: 1
-            responses:
-                '200':
-                    description: ''
-                    content:
-                        application/json:
-                            schema:
-                                type: object
-                                properties:
-                                    statusCode:
-                                        type: integer
-                                        example: 200
-                                    message:
-                                        type: string
-                                        example: ''
-                                    data:
-                                        type: object
-                                        properties:
-                                            list_no:
-                                                type: integer
-                                                description: '리스트 index'
-                                                example: 1
-                                            category_id:
-                                                type: string
-                                                description: '업체명'
-                                                example: '업체명'
-                                            email:
-                                                type: string
-                                                description: '이메일'
-                                                example: 'likeweb@likeweb.co.kr'
-                                            company:
-                                                type: string
-                                                description: '사이트 아이디'
-                                                example: 'likeweb'
-                                            subject:
-                                                type: string
-                                                description: '제목'
-                                                example: '제목'
-                                            name:
-                                                type: string
-                                                description: '이름'
-                                                example: '이름'
-                                            w_date:
-                                                type: string
-                                                description: '등록일 (YYYY.MM.DD HH:mm)'
-                                                example: '2025.02.21 12:00'
-                                            counter:
-                                                type: integer
-                                                description: '조회수'
-                                                example: 1
-                                            process:
-                                                type: string
-                                                description: '진행상황'
-                                                example: '협의중'
-                                            contents:
-                                                type: string
-                                                description: '내용'
-                                                example: '내용'
-                                            b_file:
-                                                type: string
-                                                description: '첨부파일명'
-                                                example: '첨부파일명'
-                                            m_tel:
-                                                type: string
-                                                description: '담당자연락처'
-                                                example: '010-1234-5678'
-                                            m_email:
-                                                type: string
-                                                description: '담당자이메일'
-                                                example: 'likeweb@likeweb.co.kr'
-                '400':
-                    $ref: '#/components/400Error'
-                '401':
-                    $ref: '#/components/401Error'
-                '404':
-                    $ref: '#/components/404Error'
-                '500':
-                    $ref: '#/components/500Error'
-
-    /v1/admin/maintenance/create:
-        post:
-            summary: '유지보수 게시판 등록'
-            description: '2025-06-20 16:00'
-            operationId: 'getMaintenanceBoardCreate'
-            tags:
-                - '관리자 > 유지보수'
-            requestBody:
-                required: true
-                content:
-                    multipart/form-data:
-                        schema:
-                            type: object
-                            properties:
-                                b_file:
-                                    type: file
-                                    format: binary
-                                    description: '첨부파일'
-                                category:
-                                    type: string
-                                    description: '업체명'
-                                    example: '업체명'
-                                name:
-                                    type: string
-                                    description: '이름'
-                                    example: '이름'
-                                password:
-                                    type: string
-                                    description: '비밀번호'
-                                    example: '비밀번호'
-                                subject:
-                                    type: string
-                                    description: '제목'
-                                    example: '제목'
-                                contents:
-                                    type: string
-                                    description: '내용'
-                                    example: '내용'
-                                company:
-                                    type: string
-                                    description: '사이트 아이디'
-                                    example: 'likeweb'
-                                email:
-                                    type: string
-                                    description: '이메일'
-                                    example: 'likeweb@likeweb.co.kr'
-            responses:
-                '200':
-                    description: ''
-                    content:
-                        application/json:
-                            schema:
-                                type: object
-                                properties:
-                                    statusCode:
-                                        type: integer
-                                        example: 200
-                                    message:
-                                        type: string
-                                        example: ''
-                                    data:
-                                        type: object
-                                        nullable: true
-                                        example: null
-                '400':
-                    $ref: '#/components/400Error'
-                '401':
-                    $ref: '#/components/401Error'
-                '404':
-                    $ref: '#/components/404Error'
-                '500':
-                    $ref: '#/components/500Error'
-
-    /v1/admin/maintenance/comment:
-        post:
-            summary: '유지보수 게시판 댓글 등록'
-            description: '2025-06-20 16:00'
-            operationId: 'postMaintenanceCommentCreate'
-            tags:
-                - '관리자 > 유지보수'
-            requestBody:
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            type: object
-                            properties:
-                                list_no:
-                                    type: integer
-                                    description: '리스트 index'
-                                    example: 1
-                                c_name:
-                                    type: string
-                                    description: '업체명'
-                                    example: '업체명'
-                                c_content:
-                                    type: string
-                                    description: '내용'
-                                    example: '내용'
-                                m_id:
-                                    type: string
-                                    description: '아이디'
-                                    example: '아이디'
-                                c_password:
-                                    type: string
-                                    description: '댓글 비밀번호'
-                                    example: '댓글 비밀번호'
-                                c_table:
-                                    type: string
-                                    description: 'admin'
-                                    example: 'admin'
-            responses:
-                '200':
-                    description: ''
-                    content:
-                        application/json:
-                            schema:
-                                type: object
-                                properties:
-                                    statusCode:
-                                        type: integer
-                                        example: 200
-                                    message:
-                                        type: string
-                                        example: ''
-                                    data:
-                                        type: object
-                                        nullable: true
-                                        example: null
-                '400':
-                    $ref: '#/components/400Error'
-                '401':
-                    $ref: '#/components/401Error'
-                '404':
-                    $ref: '#/components/404Error'
-                '500':
-                    $ref: '#/components/500Error'
-
-    /v1/admin/maintenance/comment/{list_no}:
-        get:
-            summary: '유지보수 게시판 댓글 리스트'
-            description: '2025-06-20 17:30'
-            operationId: 'getMaintenanceCommentList'
-            tags:
-                - '관리자 > 유지보수'
-            parameters:
-                - in: path
-                  name: list_no
-                  schema:
-                      type: integer
-                      description: '게시글 index'
-                      example: 1
-            responses:
-                '200':
-                    description: 'Success.'
-                    content:
-                        application/json:
-                            schema:
-                                type: object
-                                properties:
-                                    statusCode:
-                                        type: integer
-                                        example: 200
-                                    message:
-                                        type: string
-                                        example: 'Success.'
-                                    data:
-                                        type: array
-                                        items:
-                                            type: object
-                                            properties:
-                                                c_list_no:
-                                                    type: integer
-                                                    description: '댓글 index'
-                                                    example: 1
-                                                list_no:
-                                                    type: integer
-                                                    description: '게시글 index'
-                                                    example: 1
-                                                c_name:
-                                                    type: string
-                                                    description: '업체명'
-                                                    example: '업체명'
-                                                c_wdate:
-                                                    type: string
-                                                    description: '등록일 (YYYY.MM.DD HH:mm)'
-                                                    example: '2025.02.21 12:00'
-                                                c_contents:
-                                                    type: string
-                                                    description: '내용'
-                                                    example: '내용'
-                '400':
-                    $ref: '#/components/400Error'
-                '401':
-                    $ref: '#/components/401Error'
-                '500':
-                    $ref: '#/components/500Error'
-
-    /v1/admin/maintenance/download/{list_no}:
-        get:
-            summary: '유지보수 게시판 첨부파일 다운로드'
-            description: '2025-06-20 17:30'
-            operationId: 'getFileDownload'
-            tags:
-                - '관리자 > 유지보수'
-            parameters:
-                - in: path
-                  name: list_no
-                  schema:
-                      type: integer
-                      description: '게시글 index'
-                      example: 1
-            responses:
-                '200':
-                    description: 파일 다운로드 성공
-                    headers:
-                        Content-Disposition:
-                            description: 다운로드 파일 이름
-                            schema:
-                                type: string
-                                example: 'attachment; filename='
-                '400':
-                    $ref: '#/components/400Error'
-                '401':
-                    $ref: '#/components/401Error'
-                '404':
-                    $ref: '#/components/404Error'
                 '500':
                     $ref: '#/components/500Error'

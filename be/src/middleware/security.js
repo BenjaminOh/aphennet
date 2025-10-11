@@ -82,6 +82,11 @@ exports.security = (req, res, next) => {
         return next();
     }
 
+    // Swagger API 문서 경로는 보안 검사 건너뛰기
+    if (req.path.startsWith('/api-docs')) {
+        return next();
+    }
+
     const userAgent = req.get('User-Agent') || '';
     const acceptHeader = req.get('Accept') || '';
     const acceptLanguage = req.get('Accept-Language') || '';

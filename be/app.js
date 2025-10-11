@@ -23,6 +23,7 @@ const requestIp = require('request-ip');
 const boardRoutes = require('./src/routes/board');
 const commentRoutes = require('./src/routes/comment');
 const authRoutes = require('./src/routes/auth');
+const configUserRoutes = require('./src/routes/configUser');
 
 const adminFirstRoutes = require('./src/routes/first');
 const adminMenuRoutes = require('./src/routes/menu');
@@ -57,7 +58,25 @@ app.set('trust proxy', 1); // 1단계 프록시 신뢰
 
 app.use(cors(corsOptions));
 
-app.use(helmet());
+// Swagger 경로를 제외한 모든 경로에 helmet 적용
+app.use((req, res, next) => {
+    if (req.path.startsWith('/api-docs')) {
+        // Swagger 경로는 CSP 완화
+        helmet({
+            contentSecurityPolicy: {
+                directives: {
+                    defaultSrc: ["'self'"],
+                    scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+                    styleSrc: ["'self'", "'unsafe-inline'", "https:"],
+                    imgSrc: ["'self'", "data:", "https:"],
+                    fontSrc: ["'self'", "https:", "data:"],
+                },
+            },
+        })(req, res, next);
+    } else {
+        helmet()(req, res, next);
+    }
+});
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' })); // URL-encoded 데이터 허용 크기
 app.use(bodyParser.json({ limit: '50mb' })); // JSON 데이터 허용 크기
@@ -81,6 +100,9 @@ app.use(securityMiddleware.security);
 app.use('/v1/board', boardRoutes);
 app.use('/v1/comment', commentRoutes);
 app.use('/v1/auth', authRoutes);
+
+app.use('/v1/config', configUserRoutes);
+
 
 // Admin Routes //
 app.use('/v1/admin/first', adminFirstRoutes);

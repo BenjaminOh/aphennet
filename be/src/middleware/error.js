@@ -4,6 +4,11 @@ const multer = require('multer');
 exports.statusCodeReturn = (err, req, res, next) => {
     console.error(err); // Log the error for debugging (you can customize this)
 
+    // 응답이 이미 전송되었는지 확인
+    if (res.headersSent) {
+        return next(err);
+    }
+
     const statusCode = err.statusCode || enumConfig.statusErrorCode._500_ERROR[0];
     const message =
         statusCode === enumConfig.statusErrorCode._500_ERROR[0]
@@ -44,6 +49,11 @@ exports.errorThrow = (status, msg) => {
 };
 
 exports.handleMulterError = (err, req, res, next) => {
+    // 응답이 이미 전송되었는지 확인
+    if (res.headersSent) {
+        return next(err);
+    }
+
     if (err instanceof multer.MulterError) {
         let statusCode;
         let message;
