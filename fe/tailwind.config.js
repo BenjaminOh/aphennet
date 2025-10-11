@@ -58,7 +58,7 @@ module.exports = {
                 border: "hsl(var(--border))",
             },
             backgroundImage: {
-                logo: "url('../assets/images/user/logo.svg')",
+                // logo: "url('../assets/images/user/logo.svg')",
                 icMenu: "url('../assets/images/user/icMenu.svg')",
                 icClose: "url('../assets/images/user/icClose.svg')",
                 icInstagram: "url('../assets/images/user/icInstagram.svg')",
