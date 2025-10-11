@@ -20,3 +20,5 @@ docker-compose -f docker-compose.prod.yml up -d
 echo "=== 운영환경이 시작되었습니다 ==="
 echo "접속 URL: https://aphennet.likeweb.co.kr"
 echo "API URL: https://aphennetapi.likeweb.co.kr"
+
+# 주석 추가 
