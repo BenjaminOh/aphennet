@@ -47,11 +47,8 @@ app.use(requestIp.mw());
 
 const corsOptions = {
     origin: [
-        'http://localhost:3028',
-        'http://basic.likeweb.co.kr',
-        'http://basicapi.likeweb.co.kr',
-        'https://basic.likeweb.co.kr',
-        'https://basicapi.likeweb.co.kr',
+        'http://localhost:3000',
+        'https://aphennet.likeweb.co.kr',
     ],
     methods: ['GET', 'PUT', 'POST', 'DELETE'],
 };
