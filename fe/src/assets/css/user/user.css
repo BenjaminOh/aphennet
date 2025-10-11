@@ -1,7 +1,7 @@
 @font-face {
     font-family: "KoPubWorld Dotum";
     font-style: normal;
-    font-weight: 100;
+    font-weight: 300;
     src:
         local("KoPubWorld-Dotum-Light"),
         url("../../fonts/KoPubWorld-Dotum-Light.ttf") format("truetype");
@@ -27,6 +27,7 @@
     font-family:
         "KoPubWorld Dotum", "Noto Sans KR", "맑은 고딕", "malgun gothic", "Apple SD Gothic Neo",
         sans-serif;
+    font-weight: 300;
     letter-spacing: -0.05em;
     line-height: 1.4;
 }
