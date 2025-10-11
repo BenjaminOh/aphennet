@@ -4,13 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-import arrowDown from "@/assets/images/user/arrowDown.svg";
+import arrowDown from "@/assets/images/user/arrowDown.png";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
+// import { useGetCategoryList } from "@/service/user/menu";
 
 export default function Header() {
     const [open, setOpen] = useState(false);
     const [menuOn, setMenuOn] = useState<number | null>(null);
+    // const { data: configData } = useGetCategoryList("KR");
 
     return (
         <header className="sticky top-0 z-50 bg-white">
@@ -48,7 +50,7 @@ export default function Header() {
                                                 >
                                                     <button
                                                         type="button"
-                                                        className={`text-[20px] font-[700] leading-[1.5] md:text-[36px]${
+                                                        className={`w-[calc(100%-24px)] text-left text-[20px] font-[700] leading-[1.5] md:text-[36px]${
                                                             menuOn === 1 ? " text-primary" : ""
                                                         }`}
                                                     >
@@ -64,7 +66,13 @@ export default function Header() {
                                                             }
                                                         }}
                                                     >
-                                                        <Image src={arrowDown} alt="화살표" />
+                                                        <Image
+                                                            src={arrowDown}
+                                                            alt="화살표"
+                                                            width={24}
+                                                            height={24}
+                                                            className={menuOn === 1 ? "rotate-180" : ""}
+                                                        />
                                                     </button>
                                                 </div>
                                                 {menuOn === 1 && (
