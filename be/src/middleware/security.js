@@ -77,6 +77,11 @@ exports.requestLimiter = rateLimit({
 // Discription  : 보안 미들웨어
 */
 exports.security = (req, res, next) => {
+    // healthcheck 경로는 보안 검사 건너뛰기
+    if (req.path === '/health') {
+        return next();
+    }
+
     const userAgent = req.get('User-Agent') || '';
     const acceptHeader = req.get('Accept') || '';
     const acceptLanguage = req.get('Accept-Language') || '';
