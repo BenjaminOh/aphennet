@@ -3,12 +3,20 @@ import Image from "next/image";
 import arrowTop from "@/assets/images/user/arrowTop.png";
 
 export default function Footer() {
+    // 스크롤위치 맨위로 이동
+    const handleScrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+    };
+
     return (
         <footer className="bg-[#F2F2F2] p-[20px] md:p-[40px_28px] xl:py-[60px]">
             <div className="mx-auto flex max-w-[1360px] flex-col gap-[16px] md:gap-[40px]">
                 <div className="flex items-center justify-between border-b border-[#ddd] py-[20px]">
                     <div className="h-[60px] w-[183px] bg-logo bg-contain bg-center bg-no-repeat xl:h-[60px] xl:w-[274px]" />
-                    <button type="button">
+                    <button type="button" onClick={handleScrollToTop}>
                         <Image src={arrowTop} alt="최상단으로 이동" width={40} height={40} />
                     </button>
                 </div>

@@ -1,9 +1,9 @@
 import { DragEndEvent } from "@dnd-kit/core";
 import { useEffect, useRef, useState } from "react";
 
+import LoadingSpinner from "@/components/common/common/LoadingSpinner";
 import ConsoleDialogContent from "@/components/console/common/ConsoleDialogContent";
 import DraggableList from "@/components/console/common/DraggableList";
-import LoadingSpinner from "@/components/console/common/LoadingSpinner";
 import NoData from "@/components/console/common/NoData";
 import AllCheckbox from "@/components/console/form/AllCheckbox";
 import Checkbox from "@/components/console/form/Checkbox";

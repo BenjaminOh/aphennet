@@ -6,8 +6,8 @@ import { useEffect } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
+import LoadingSpinner from "@/components/common/common/LoadingSpinner";
 import InputError from "@/components/console/common/InputError";
-import LoadingSpinner from "@/components/console/common/LoadingSpinner";
 import EditorWithHtml from "@/components/console/form/EditorWithHtml";
 import Input from "@/components/console/form/Input";
 import Toggle from "@/components/console/form/Toggle";

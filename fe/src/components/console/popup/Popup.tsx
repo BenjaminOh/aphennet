@@ -3,8 +3,8 @@
 import Portal from "@/components/common/common/Portal";
 import { usePopupStore } from "@/store/common/usePopupStore";
 
+import LoadingPop from "../../common/popup/LoadingPop";
 import ConfirmPop from "./ConfirmPop";
-import LoadingPop from "./LoadingPop";
 
 export default function Popup() {
     const { loadingPop, confirmPop, loadingPopConsole } = usePopupStore();

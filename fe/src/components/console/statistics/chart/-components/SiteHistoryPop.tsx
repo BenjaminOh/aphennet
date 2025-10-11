@@ -2,7 +2,7 @@ import { PopoverClose } from "@radix-ui/react-popover";
 import Image from "next/image";
 
 import popClose from "@/assets/images/console/popClose.svg";
-import LoadingSpinner from "@/components/console/common/LoadingSpinner";
+import LoadingSpinner from "@/components/common/common/LoadingSpinner";
 import NoData from "@/components/console/common/NoData";
 import { PopoverContent } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
