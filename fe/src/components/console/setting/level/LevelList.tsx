@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import LoadingSpinner from "@/components/console/common/LoadingSpinner";
+import LoadingSpinner from "@/components/common/common/LoadingSpinner";
 import NoData from "@/components/console/common/NoData";
 import Input from "@/components/console/form/Input";
 import InputWithButton from "@/components/console/form/InputWithButton";
