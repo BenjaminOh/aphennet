@@ -161,12 +161,12 @@ export default function Header({ menuList = [] }: HeaderProps) {
                     </PopoverContent>
                 </Popover>
                 <div className="hidden flex-1 items-center justify-between xl:flex">
-                    <ul className="flex items-center">
+                    <ul className="flex flex-1 items-center">
                         {menuList.map((menu, idx) => (
-                            <li className="group relative" key={`menu_${idx}`}>
+                            <li className="group relative max-w-[180px] flex-1" key={`menu_${idx}`}>
                                 <button
                                     type="button"
-                                    className="relative h-[80px] w-[180px] text-[18px] font-[500] transition-all duration-300 after:absolute after:bottom-[8px] after:left-1/2 after:h-[4px] after:w-0 after:-translate-x-1/2 after:rounded-[4px] after:bg-primary after:transition-all after:duration-300 group-hover:font-[700] group-hover:text-primary group-hover:after:w-[50px]"
+                                    className="relative h-[80px] w-full text-[20px] font-[500] transition-all duration-300 after:absolute after:bottom-[8px] after:left-1/2 after:h-[4px] after:w-0 after:-translate-x-1/2 after:rounded-[4px] after:bg-primary after:transition-all after:duration-300 group-hover:font-[700] group-hover:text-primary group-hover:after:w-[50px]"
                                     onClick={() => handleCategoryClick(menu)}
                                 >
                                     {menu.c_name}
@@ -178,7 +178,7 @@ export default function Header({ menuList = [] }: HeaderProps) {
                                                 <li key={`submenu_${submenu.id}`}>
                                                     <button
                                                         type="button"
-                                                        className="w-full font-[300] transition-all duration-300 hover:font-[500]"
+                                                        className="w-full text-[18px] font-[300] transition-all duration-300 hover:font-[500]"
                                                         onClick={() => handleCategoryClick(submenu)}
                                                     >
                                                         {submenu.c_name}

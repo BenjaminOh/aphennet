@@ -1,7 +1,7 @@
 import { useRouter } from "next/navigation";
 
+import { usePopupStore } from "@/store/common/usePopupStore";
 import { MenuItem } from "@/store/common/useSiteStore";
-import { usePopupStore } from "@/store/user/usePopupStore";
 
 export const useMenuNavigation = () => {
     const router = useRouter();
