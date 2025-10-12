@@ -27,6 +27,8 @@ export default function Sub({
     });
     const { setLoadingPop } = usePopupStore();
 
+    console.log(postIdx, mode);
+
     // 데이터 수정,삭제 중일 때 로딩 팝업 표시
     useEffect(() => {
         setLoadingPop(isLoading);
