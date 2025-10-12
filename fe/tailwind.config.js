@@ -8,6 +8,9 @@ module.exports = {
     ],
     theme: {
         extend: {
+            fontFamily: {
+                batang: ["KoPubWorld Batang", "serif"],
+            },
             colors: {
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",

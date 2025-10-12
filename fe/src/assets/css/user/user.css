@@ -22,6 +22,30 @@
         local("KoPubWorld-Dotum-Bold"),
         url("../../fonts/KoPubWorld-Dotum-Bold.ttf") format("truetype");
 }
+@font-face {
+    font-family: "KoPubWorld Batang";
+    font-style: normal;
+    font-weight: 300;
+    src:
+        local("KoPubWorld-Batang-Light"),
+        url("../../fonts/KoPubWorld-Batang-Light.ttf") format("truetype");
+}
+@font-face {
+    font-family: "KoPubWorld Batang";
+    font-style: normal;
+    font-weight: 400;
+    src:
+        local("KoPubWorld-Batang-Medium"),
+        url("../../fonts/KoPubWorld-Batang-Medium.ttf") format("truetype");
+}
+@font-face {
+    font-family: "KoPubWorld Batang";
+    font-style: normal;
+    font-weight: 700;
+    src:
+        local("KoPubWorld-Batang-Bold"),
+        url("../../fonts/KoPubWorld-Batang-Bold.ttf") format("truetype");
+}
 
 .user-layout {
     font-family:

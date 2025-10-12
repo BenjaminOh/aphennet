@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useGetSubCategory } from "@/service/user/menu";
 import { usePopupStore } from "@/store/common/usePopupStore";
 
+import About from "../custom/intro/About";
 import Greeting from "../custom/intro/Greeting";
 import SubTop from "./-components/SubTop";
 
@@ -47,6 +48,8 @@ export default function Sub({
             <SubTop category={category} />
             {configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/greeting" ? (
                 <Greeting />
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/about" ? (
+                <About />
             ) : null}
         </>
     );
