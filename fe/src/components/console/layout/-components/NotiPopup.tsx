@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import icBell from "@/assets/images/console/icBell.svg";
 import popClose from "@/assets/images/console/popClose.svg";
-import LoadingSpinner from "@/components/console/common/LoadingSpinner";
+import LoadingSpinner from "@/components/common/common/LoadingSpinner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useGetAlarm, usePutAlarm } from "@/service/console/common";

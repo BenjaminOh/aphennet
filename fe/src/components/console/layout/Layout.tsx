@@ -5,8 +5,8 @@ import "@/assets/css/console/console.css";
 import { Suspense } from "react";
 
 import ScrollToTop from "@/components/common/common/ScrollToTop";
+import LoadingPop from "@/components/common/popup/LoadingPop";
 import Header from "@/components/console/layout/Header";
-import LoadingPop from "@/components/console/popup/LoadingPop";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 import Nav from "./-components/Nav";

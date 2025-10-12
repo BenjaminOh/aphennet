@@ -27,6 +27,8 @@ export const USER_API_ROUTES = {
     // 로그인 --------------------
     LOGIN: "/v1/auth/login",
 
+    GET_SITE_INFO: "/v1/config/site/:site_id/:c_lang",
+
     CATEGORY: {
         GET_LIST: "/v1/menu",
         GET_SUB: "/v1/menu/sub/:id",

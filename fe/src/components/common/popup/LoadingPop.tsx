@@ -1,4 +1,4 @@
-import LoadingSpinner from "@/components/console/common/LoadingSpinner";
+import LoadingSpinner from "@/components/common/common/LoadingSpinner";
 
 export default function LoadingPop({ console }: { console?: boolean }) {
     return (

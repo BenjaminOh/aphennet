@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import LoadingSpinner from "@/components/console/common/LoadingSpinner";
+import LoadingSpinner from "@/components/common/common/LoadingSpinner";
 import NoData from "@/components/console/common/NoData";
 import {
     useGetConnectorCount,

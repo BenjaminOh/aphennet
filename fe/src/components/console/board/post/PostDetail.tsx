@@ -3,7 +3,7 @@
 import { notFound } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
-import LoadingSpinner from "@/components/console/common/LoadingSpinner";
+import LoadingSpinner from "@/components/common/common/LoadingSpinner";
 import Comment, { CommentItem } from "@/components/console/form/Comment";
 import CommentForm from "@/components/console/form/CommentForm";
 import { FileData } from "@/components/console/form/FileUpload";
