@@ -1191,6 +1191,136 @@ paths:
                 '500':
                     $ref: '#/components/500Error'
 
+    /v1/main/popup:
+        get:
+            summary: '팝업 리스트'
+            description: '2025-10-12 15:00'
+            operationId: 'getPopupList'
+            tags:
+                - '사용자 > 메인'
+            parameters:
+                   - in: query
+                     name: limit
+                     description: '페이지당 항목 수'
+                     schema:
+                         type: integer
+                         default: 10
+                   - in: query
+                     name: page
+                     description: '페이지 번호'
+                     schema:
+                         type: integer
+                         default: 1
+                   - in: query
+                     name: p_type
+                     description: 'pc, mobile 선택 (P, M)'
+                     schema:
+                         type: string
+                         default: 'P'
+                   - in: query
+                     name: searchtxt
+                     description: '검색어'
+                     schema:
+                         type: string
+                         description: '제목 검색어'
+            responses:
+                '200':
+                    description: ''
+                    content:
+                        application/json:
+                            schema:
+                                   type: object
+                                   properties:
+                                       statusCode:
+                                           type: integer
+                                           example: 200
+                                       message:
+                                           type: string
+                                           example: ''
+                                       data:
+                                           allOf:
+                                               - $ref: '#/components/schemas/pagination'
+                                               - type: object
+                                                 properties:
+                                                     data_list:
+                                                         type: array
+                                                         description: '리스트'
+                                                         items:
+                                                             type: object
+                                                             properties:
+                                                                 idx:
+                                                                     type: integer
+                                                                     description: '팝업 index'
+                                                                     example: 1
+                                                                 p_type:
+                                                                     type: array
+                                                                     description: 'pc, mobile 선택 (P, M)'
+                                                                     example:
+                                                                         - 'P'
+                                                                         - 'PC'
+                                                                 p_title:
+                                                                     type: string
+                                                                     description: '팝업명'
+                                                                     example: '팝업명'
+                                                                 p_s_date:
+                                                                     type: string
+                                                                     description: '노출시작일'
+                                                                     example: '2024.03.05'
+                                                                 p_e_date:
+                                                                     type: string
+                                                                     description: '노출종료일'
+                                                                     example: '2024.03.05'
+                                                                 p_width_size:
+                                                                     type: integer
+                                                                     description: '팝업 가로사이즈'
+                                                                     example: 500
+                                                                 p_height_size:
+                                                                     type: integer
+                                                                     description: '팝업 세로사이즈'
+                                                                     example: 400
+                                                                 p_one_day:
+                                                                     type: string
+                                                                     description: '하루동안 보지 않기'
+                                                                     example: 'Y'
+                                                                 p_left_point:
+                                                                     type: integer
+                                                                     description: '팝업 좌측 위치'
+                                                                     example: 100
+                                                                 p_top_point:
+                                                                     type: integer
+                                                                     description: '팝업 상단 위치'
+                                                                     example: 100
+                                                                 p_open:
+                                                                     type: array
+                                                                     description: '노출여부 (사용:Y, 사용안함:N)'
+                                                                     example:
+                                                                         - 'Y'
+                                                                         - '노출'
+                                                                 p_layer_pop:
+                                                                     type: string
+                                                                     description: '레이어팝업 여부'
+                                                                     example: 'Y'
+                                                                 p_scroll:
+                                                                     type: string
+                                                                     description: '스크롤 고정 여부'
+                                                                     example: 'Y'
+                                                                 p_link_target:
+                                                                     type: string
+                                                                     description: '링크타겟 (부모창: 1, 새창: 2)'
+                                                                     example: '1'
+                                                                 p_link_url:
+                                                                     type: string
+                                                                     description: '링크주소'
+                                                                     example: 'https://example.com'
+                                                                 p_content:
+                                                                     type: string
+                                                                     description: '팝업 내용'
+                                                                     example: '<div>팝업 내용</div>'
+                '400':
+                    $ref: '#/components/400Error'
+                '500':
+                    $ref: '#/components/500Error'
+
     /v1/auth/view:
         get:
             summary: '회원정보 조회'
