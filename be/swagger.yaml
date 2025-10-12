@@ -16,6 +16,26 @@ components:
             bearerFormat: JWT
             in: header
             name: Authorization
+    schemas:
+        pagination:
+            type: object
+            properties:
+                total:
+                    type: integer
+                    description: '전체 항목 수'
+                    example: 100
+                page:
+                    type: integer
+                    description: '현재 페이지'
+                    example: 1
+                limit:
+                    type: integer
+                    description: '페이지당 항목 수'
+                    example: 10
+                totalPages:
+                    type: integer
+                    description: '전체 페이지 수'
+                    example: 10
     400Error:
         description: '유효하지 않는 값 입력 오류입니다.'
         content:
