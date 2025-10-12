@@ -5,21 +5,19 @@ import { useEffect, useState } from "react";
 import { Autoplay, EffectFade, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-import banner1 from "@/assets/images/user/sample/banner1.png";
-import banner2 from "@/assets/images/user/sample/banner2.png";
-// import { API_URL } from "@/config/apiConfig";
-// import { useGetBannerList } from "@/service/user/main";
+import { API_URL } from "@/config/apiConfig";
+import { useGetBannerList } from "@/service/user/main";
 
-// interface BannerItem {
-//     idx: number;
-//     b_file: string;
-//     b_title: string;
-//     b_open: string[];
-//     b_s_date: string;
-//     b_e_date: string;
-//     b_url: string;
-//     b_url_target: string;
-// }
+interface BannerItem {
+    idx: number;
+    b_file: string;
+    b_title: string;
+    b_open: string[];
+    b_s_date: string;
+    b_e_date: string;
+    b_url: string;
+    b_url_target: string;
+}
 
 const swiperStyle = `
     [&>.swiper-pagination]:leading-[0]
@@ -46,31 +44,8 @@ const swiperStyle = `
 export default function MainBanner() {
     const router = useRouter();
     const [type, setType] = useState<"P" | "M">("P");
-    console.log(type);
-    // const [bannerList, setBannerList] = useState<BannerItem[]>([]);
-    const bannerList = [
-        {
-            idx: 1,
-            b_file: banner1.src,
-            b_title: "한중일 3국\n공동부 교재",
-            b_open: ["Y", "노출"],
-            b_s_date: "",
-            b_e_date: "",
-            b_url: "",
-            b_url_target: "1",
-        },
-        {
-            idx: 2,
-            b_file: banner2.src,
-            b_title: "한중일 3국 공동부 교재",
-            b_open: ["Y", "노출"],
-            b_s_date: "",
-            b_e_date: "",
-            b_url: "",
-            b_url_target: "1",
-        },
-    ];
-    // const { data: configBannerData } = useGetBannerList("100", type);
+    const [bannerList, setBannerList] = useState<BannerItem[]>([]);
+    const { data: configBannerData } = useGetBannerList("100", type);
 
     // 디바이스 크기에 따른 타입 설정
     useEffect(() => {
@@ -95,38 +70,38 @@ export default function MainBanner() {
     }, []);
 
     // 메인 배너 목록 조회
-    // useEffect(() => {
-    //     if (configBannerData) {
-    //         const list = configBannerData.data.data_list;
+    useEffect(() => {
+        if (configBannerData) {
+            const list = configBannerData.data.data_list;
 
-    //         const getDateString = (date: Date) => date.toISOString().slice(0, 10);
+            const getDateString = (date: Date) => date.toISOString().slice(0, 10);
 
-    //         const currentDateStr = getDateString(new Date());
+            const currentDateStr = getDateString(new Date());
 
-    //         const updatedList = list.filter((item: BannerItem) => {
-    //             if (item.b_open.includes("N")) return false;
+            const updatedList = list.filter((item: BannerItem) => {
+                if (item.b_open.includes("N")) return false;
 
-    //             // 시작일 체크
-    //             if (item.b_s_date) {
-    //                 const startDate = new Date(item.b_s_date.replace(/\./g, "-"));
-    //                 const startDateStr = getDateString(startDate);
-    //                 if (startDateStr > currentDateStr) return false;
-    //             }
+                // 시작일 체크
+                if (item.b_s_date) {
+                    const startDate = new Date(item.b_s_date.replace(/\./g, "-"));
+                    const startDateStr = getDateString(startDate);
+                    if (startDateStr > currentDateStr) return false;
+                }
 
-    //             // 종료일 체크
-    //             if (item.b_e_date) {
-    //                 const endDate = new Date(item.b_e_date.replace(/\./g, "-"));
-    //                 const endDateStr = getDateString(endDate);
-    //                 if (endDateStr < currentDateStr) return false; // 오늘까지 노출
-    //             }
+                // 종료일 체크
+                if (item.b_e_date) {
+                    const endDate = new Date(item.b_e_date.replace(/\./g, "-"));
+                    const endDateStr = getDateString(endDate);
+                    if (endDateStr < currentDateStr) return false; // 오늘까지 노출
+                }
 
-    //             return true;
-    //         });
-    //         setBannerList(updatedList);
-    //     } else {
-    //         setBannerList([]);
-    //     }
-    // }, [configBannerData]);
+                return true;
+            });
+            setBannerList(updatedList);
+        } else {
+            setBannerList([]);
+        }
+    }, [configBannerData]);
 
     return (
         <>
@@ -165,10 +140,15 @@ export default function MainBanner() {
                                 }}
                             >
                                 <div className="relative flex flex-col gap-[14px] md:gap-[47px] xl:flex-row xl:justify-end">
-                                    <img src={item.b_file} alt={item.b_title} className="w-full xl:w-auto" />
-                                    <div className="whitespace-pre-line px-[20px] text-left text-[24px] font-[700] md:px-[28px] md:text-[48px] xl:absolute xl:left-1/2 xl:top-[30%] xl:mx-auto xl:w-full xl:max-w-[1360px] xl:-translate-x-1/2 xl:px-0 xl:text-[60px]">
-                                        {item.b_title}
-                                    </div>
+                                    <img
+                                        src={`${API_URL}/${item.b_file}`}
+                                        alt={item.b_title}
+                                        className="w-full xl:w-auto"
+                                    />
+                                    <div
+                                        className="whitespace-pre-line px-[20px] text-left text-[24px] font-[700] md:px-[28px] md:text-[48px] xl:absolute xl:left-1/2 xl:top-[30%] xl:mx-auto xl:w-full xl:max-w-[1360px] xl:-translate-x-1/2 xl:px-0 xl:text-[60px]"
+                                        dangerouslySetInnerHTML={{ __html: item.b_title }}
+                                    />
                                 </div>
                             </SwiperSlide>
                         );

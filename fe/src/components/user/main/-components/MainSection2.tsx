@@ -69,7 +69,7 @@ export default function MainSection2({
                     <p className="p-[8px_0_20px] text-[24px] font-[700] md:p-[20px_0_40px] md:text-[40px]">
                         우리는 왜 행동할까요?
                     </p>
-                    <p className="leading-[1.5] text-[#666] md:text-[18px]">
+                    <p className="text-[18px] leading-[1.5] text-[#666] md:text-[20px]">
                         국내외 교과서의 역사왜곡을 바로잡고, <br />
                         20세기 침략과 저항의 역사에 대한 아시아 공동의 역사인식을 만들기 위해 <br />
                         2001년 4월 86개의 시민사회단체, 학자, 교사 등이 모여 <br className="hidden md:block" />
@@ -94,7 +94,7 @@ export default function MainSection2({
                         우리의 철학
                     </p>
                     <p className="p-[8px_0_20px] text-[24px] font-[700] md:text-[40px]">무엇을 지키고자 할까요?</p>
-                    <ul className="list-disc pl-[20px] leading-[1.5] text-[#666] md:text-[18px]">
+                    <ul className="list-disc pl-[20px] text-[18px] leading-[1.5] text-[#666] md:text-[20px]">
                         <li>역사: 20세기의 아픔을 외면하지 않고 마주합니다.</li>
                         <li>평화: 공동의 역사 인식이 동아시아 평화의 기초입니다.</li>
                         <li>미래: 아이들에게 거짓을 가르치지 않기 위한 우리의 약속입니다.</li>
@@ -120,7 +120,7 @@ export default function MainSection2({
                     <p className="p-[8px_0_20px] text-[24px] font-[700] md:text-[40px]">
                         다시 쓰는 역사, 다시 쓰는 평화
                     </p>
-                    <div className="flex flex-col gap-[20px] leading-[1.5] text-[#666] md:text-[18px]">
+                    <div className="flex flex-col gap-[20px] text-[18px] leading-[1.5] text-[#666] md:text-[20px]">
                         <p>우리는 단순한 비판이 아닌, 함께 만들어가는 대안의 길을 제시합니다.</p>
                         <ul className="list-disc pl-[20px]">
                             <li>미래 세대를 위한 진짜 역사교육</li>

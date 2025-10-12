@@ -7,7 +7,7 @@ import ConfirmPop from "../../common/popup/ConfirmPop";
 import LoadingPop from "../../common/popup/LoadingPop";
 
 export default function Popup() {
-    const { loadingPop, confirmPop, loadingPopConsole } = usePopupStore();
+    const { loadingPop, confirmPop } = usePopupStore();
 
     return (
         <Portal>
@@ -15,7 +15,7 @@ export default function Popup() {
             {confirmPop && <ConfirmPop />}
 
             {/* 로딩 팝업 */}
-            {loadingPop && <LoadingPop console={loadingPopConsole} />}
+            {loadingPop && <LoadingPop />}
         </Portal>
     );
 }

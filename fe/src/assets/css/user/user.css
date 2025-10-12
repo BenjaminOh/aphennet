@@ -28,8 +28,6 @@
         "KoPubWorld Dotum", "Noto Sans KR", "맑은 고딕", "malgun gothic", "Apple SD Gothic Neo",
         sans-serif;
     font-weight: 300;
-    letter-spacing: -0.05em;
-    line-height: 1.4;
 }
 
 .user-layout input,
@@ -40,8 +38,4 @@
     font-family:
         "KoPubWorld Dotum", "Noto Sans KR", "맑은 고딕", "malgun gothic", "Apple SD Gothic Neo",
         sans-serif;
-    font-size: 16px;
-    word-break: keep-all;
-    word-wrap: break-word;
-    letter-spacing: -0.05em;
 }
