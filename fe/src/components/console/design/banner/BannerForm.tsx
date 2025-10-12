@@ -405,7 +405,7 @@ export default function BannerForm({
                                         <label htmlFor="b_width_size" className="text-[#666]">
                                             노출 사이즈<span className="pl-[5px] font-[700] text-console-2">*</span>
                                         </label>
-                                        <p className="text-[14px] text-console-2">권장사이즈 : 1920*520</p>
+                                        <p className="text-[14px] text-console-2">권장사이즈 : 1280*720</p>
                                     </div>
                                     <div>
                                         <ul className="flex gap-[4px]">

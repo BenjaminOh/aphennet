@@ -1,8 +1,17 @@
 import Image from "next/image";
 
 import arrowTop from "@/assets/images/user/arrowTop.png";
+import { useMenuNavigation } from "@/hooks/user/useMenuNavigation";
+import { MenuItem, SiteInfoItem } from "@/store/common/useSiteStore";
 
-export default function Footer() {
+interface FooterProps {
+    menuList: MenuItem[];
+    siteInfo: SiteInfoItem;
+}
+
+export default function Footer({ menuList, siteInfo }: FooterProps) {
+    const { handleCategoryClick } = useMenuNavigation();
+
     // 스크롤위치 맨위로 이동
     const handleScrollToTop = () => {
         window.scrollTo({
@@ -26,32 +35,23 @@ export default function Footer() {
                             아시아평화와역사연구소
                         </a>
                         <ul className="hidden items-center gap-[40px] xl:flex">
-                            <li>
-                                <button type="button" className="text-[18px] font-[500]">
-                                    소개
-                                </button>
-                            </li>
-                            <li>
-                                <button type="button" className="text-[18px] font-[500]">
-                                    소개
-                                </button>
-                            </li>
-                            <li>
-                                <button type="button" className="text-[18px] font-[500]">
-                                    소개
-                                </button>
-                            </li>
-                            <li>
-                                <button type="button" className="text-[18px] font-[500]">
-                                    소개
-                                </button>
-                            </li>
+                            {menuList.map((menu, idx) => (
+                                <li key={`menu_${idx}`}>
+                                    <button
+                                        type="button"
+                                        className="text-[18px] font-[500]"
+                                        onClick={() => handleCategoryClick(menu)}
+                                    >
+                                        {menu.c_name}
+                                    </button>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                     <ul className="flex flex-col gap-[8px]">
                         <li className="flex items-center md:text-[18px]">
                             <p className="min-w-[80px] text-[#666]">연락처</p>
-                            <p className="flex-1">02-720-4637~9</p>
+                            <p className="flex-1">{siteInfo.c_tel}</p>
                         </li>
                         <li className="flex md:text-[18px]">
                             <p className="min-w-[80px] text-[#666]">이메일</p>
@@ -68,11 +68,7 @@ export default function Footer() {
                         </li>
                         <li className="flex md:text-[18px]">
                             <p className="min-w-[80px] text-[#666]">주&nbsp;&nbsp;&nbsp;소</p>
-                            <p className="flex-1">
-                                (04000)서울특별시 마포구 <br className="md:hidden" />
-                                월드컵북로5길 22, 4층 402호 <br className="md:hidden" />
-                                (서교동, 국일빌딩)
-                            </p>
+                            <p className="flex-1">{siteInfo.c_address}</p>
                         </li>
                     </ul>
                 </div>

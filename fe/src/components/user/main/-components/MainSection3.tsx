@@ -14,7 +14,7 @@ export default function MainSection3({
     sectOn: boolean;
 }) {
     return (
-        <div ref={sectRef} className="relative xl:pt-[120px]">
+        <div ref={sectRef} className="relative overflow-hidden xl:pt-[120px]">
             <div className="relative p-[60px_20px] md:p-[120px_28px] xl:p-[120px_0_180px]">
                 <Image src={mainSection3Img} alt="배경이미지" fill className="object-cover" />
                 <div className="xl:mx-auto xl:flex xl:max-w-[1360px] xl:justify-end">
