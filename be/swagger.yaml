@@ -1075,6 +1075,122 @@ paths:
                 '500':
                     $ref: '#/components/500Error'
 
+    /v1/main/banner:
+        get:
+            summary: '배너 리스트'
+            description: '2025-06-16 11:30'
+            operationId: 'mainList'
+            tags:
+                - '사용자 > 메인'
+            parameters:
+                - in: query
+                  name: limit
+                  description: '페이지당 항목 수'
+                  schema:
+                      type: integer
+                      default: 10
+                - in: query
+                  name: page
+                  description: '페이지 번호'
+                  schema:
+                      type: integer
+                      default: 1
+                - in: query
+                  name: b_type
+                  description: 'pc, mobile 선택 (P, M)'
+                  schema:
+                      type: string
+                      default: 'P'
+                - in: query
+                  name: searchtxt
+                  description: '검색어'
+                  schema:
+                      type: string
+                      description: '제목 검색어'
+                - in: query
+                  name: b_kind
+                  description: '배너구분 (main, gnb, band, cooper)'
+                  schema:
+                      type: string
+                      default: 'main'
+            responses:
+                '200':
+                    description: ''
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    statusCode:
+                                        type: integer
+                                        example: 200
+                                    message:
+                                        type: string
+                                        example: ''
+                                    data:
+                                        allOf:
+                                            - $ref: '#/components/schemas/pagination'
+                                            - type: object
+                                              properties:
+                                                  data_list:
+                                                      type: array
+                                                      description: '리스트'
+                                                      items:
+                                                          type: object
+                                                          properties:
+                                                                idx:
+                                                                    type: integer
+                                                                    description: '배너 index'
+                                                                    example: 1
+                                                                b_type:
+                                                                    type: array
+                                                                    description: 'pc, mobile 선택 (P, M)'
+                                                                    example:
+                                                                        - 'P'
+                                                                        - 'PC'
+                                                                b_open:
+                                                                    type: array
+                                                                    description: '노출여부 (사용:Y, 사용안함:N)'
+                                                                    example:
+                                                                        - 'Y'
+                                                                        - '노출'
+                                                                b_title:
+                                                                    type: string
+                                                                    description: '배너명'
+                                                                    example: '배너명'
+                                                                b_s_date:
+                                                                    type: string
+                                                                    description: '노출시작일'
+                                                                    example: '2024.03.05'
+                                                                b_e_date:
+                                                                    type: string
+                                                                    description: '노출종료일'
+                                                                    example: '2024.03.05'
+                                                                b_size:
+                                                                    type: array
+                                                                    description: '배너노출종류(1: 커버, 2:원본사이즈)'
+                                                                    example:
+                                                                        - '1'
+                                                                        - '커버'
+                                                                b_c_type:
+                                                                    type: string
+                                                                    description: '카테고리종류(1:이미지, 2:동영상, 3:HTML)'
+                                                                    example: '1'
+                                                                b_file:
+                                                                    type: string
+                                                                    description: '첨부파일명'
+                                                                    example: '첨부파일명'
+                                                                b_moveNum:
+                                                                    type: integer
+                                                                    description: '배너 순서'
+                                                                    example: 1
+                '400':
+                    $ref: '#/components/400Error'
+                '401':
+                    $ref: '#/components/401Error'
+                '500':
+                    $ref: '#/components/500Error'
+
     /v1/auth/view:
         get:
             summary: '회원정보 조회'

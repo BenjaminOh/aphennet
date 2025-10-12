@@ -25,6 +25,7 @@ const commentRoutes = require('./src/routes/comment');
 const authRoutes = require('./src/routes/auth');
 const menuUserRoutes = require('./src/routes/menuUser');
 const configUserRoutes = require('./src/routes/configUser');
+const mainUserRoutes = require('./src/routes/mainUser');
 
 const adminFirstRoutes = require('./src/routes/first');
 const adminMenuRoutes = require('./src/routes/menu');
@@ -104,6 +105,7 @@ app.use('/v1/auth', authRoutes);
 
 app.use('/v1/menu', menuUserRoutes);
 app.use('/v1/config', configUserRoutes);
+app.use('/v1/main', mainUserRoutes);
 
 
 // Admin Routes //
