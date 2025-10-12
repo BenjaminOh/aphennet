@@ -23,6 +23,7 @@ const requestIp = require('request-ip');
 const boardRoutes = require('./src/routes/board');
 const commentRoutes = require('./src/routes/comment');
 const authRoutes = require('./src/routes/auth');
+const menuUserRoutes = require('./src/routes/menuUser');
 const configUserRoutes = require('./src/routes/configUser');
 
 const adminFirstRoutes = require('./src/routes/first');
@@ -101,6 +102,7 @@ app.use('/v1/board', boardRoutes);
 app.use('/v1/comment', commentRoutes);
 app.use('/v1/auth', authRoutes);
 
+app.use('/v1/menu', menuUserRoutes);
 app.use('/v1/config', configUserRoutes);
 
 

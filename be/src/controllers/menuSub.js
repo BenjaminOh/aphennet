@@ -234,6 +234,7 @@ exports.getSubCategoryView = async (req, res, next) => {
         utilMiddleware.validateIdx(id, 'id');
 
         const result = await i_category.findByPk(id);
+        console.log(result);
 
         if (!result) {
             return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');

@@ -707,6 +707,258 @@ paths:
                 '500':
                     $ref: '#/components/500Error'
 
+    /v1/menu/sub/{id}:
+        get:
+            summary: '서브메뉴 내용'
+            description: ''
+            operationId: 'getSubCategoryView'
+            tags:
+                - '사용자 > 메인'
+            parameters:
+                - in: path
+                  name: id
+                  schema:
+                      type: integer
+                      description: '카테고리 index'
+                      example: 1
+            responses:
+                '200':
+                    description: ''
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    statusCode:
+                                        type: integer
+                                        example: 200
+                                    message:
+                                        type: string
+                                        example: ''
+                                    data:
+                                        type: object
+                                        properties:
+                                            parent_id:
+                                                type: integer
+                                                description: '카테고리 index'
+                                                example: 1
+                                            content:
+                                                type: string
+                                                description: 'HTML 내용'
+                                                example: '<div>내용</div>'
+                                            file_path:
+                                                type: string
+                                                description: '파일경로'
+                                                example: '/sub/custom/about'
+                                            admin_file_path:
+                                                type: string
+                                                description: '관리자파일경로'
+                                                example: '/sub/custom/about'
+                                            sms:
+                                                type: string
+                                                description: '수신문자'
+                                                example: '000-0000-0000'
+                                            email:
+                                                type: string
+                                                description: '수신메일'
+                                                example: '수신메일'
+                                            b_list_cnt:
+                                                type: integer
+                                                description: '게시글리스트갯수'
+                                                example: 1
+                                            b_column_title:
+                                                type: string
+                                                description: '제목 노출여부'
+                                                example: 'Y'
+                                            b_column_date:
+                                                type: string
+                                                description: '날짜 노출여부'
+                                                example: 'Y'
+                                            b_column_view:
+                                                type: string
+                                                description: '조회수 노출여부'
+                                                example: 'Y'
+                                            b_column_recom:
+                                                type: string
+                                                description: '추천수 노출여부'
+                                                example: 'Y'
+                                            b_column_file:
+                                                type: string
+                                                description: '첨부파일 노출여부'
+                                                example: 'Y'
+                                            b_thumbnail_with:
+                                                type: integer
+                                                description: '썸네일가로사이즈'
+                                                example: 1
+                                            b_thumbnail_height:
+                                                type: integer
+                                                description: '썸네일세로사이즈'
+                                                example: 1
+                                            b_thumbnail:
+                                                type: string
+                                                description: '썸네일이미지구분'
+                                                example: '1'
+                                            b_read_lv:
+                                                type: integer
+                                                description: '읽기권한'
+                                                example: 0
+                                            b_write_lv:
+                                                type: integer
+                                                description: '쓰기권한'
+                                                example: 0
+                                            b_group:
+                                                type: string
+                                                description: '게시판구분'
+                                                example: 'Y'
+                                            b_secret:
+                                                type: string
+                                                description: '비밀글설정여부'
+                                                example: 'Y'
+                                            b_reply:
+                                                type: string
+                                                description: '답변작성여부'
+                                                example: ''
+                                            b_reply_lv:
+                                                type: integer
+                                                description: '답변작성권한'
+                                                example: 0
+                                            b_comment:
+                                                type: string
+                                                description: '댓글쓰기여부'
+                                                example: 'Y'
+                                            b_comment_lv:
+                                                type: integer
+                                                description: '댓글쓰기권한'
+                                                example: 0
+                                            b_write_alarm:
+                                                type: string
+                                                description: '알림수신정보문자'
+                                                example: '알림수신정보문자'
+                                            b_write_send:
+                                                type: string
+                                                description: '알림수신정보메일'
+                                                example: '알림수신정보메일'
+                                            b_write_sms:
+                                                type: string
+                                                description: '알림수신정보문자'
+                                                example: '알림수신정보문자'
+                                            b_alarm:
+                                                type: string
+                                                description: '게시알림사용여부'
+                                                example: '게시알림사용여부'
+                                            b_alarm_phone:
+                                                type: string
+                                                description: '게시알림전화번호'
+                                                example: '게시알림전화번호'
+                                            b_top_html:
+                                                type: string
+                                                description: '상단HTML'
+                                                example: '상단HTML'
+                                            b_template:
+                                                type: string
+                                                description: '게시글템플릿적용'
+                                                example: '게시글템플릿적용'
+                                            b_template_text:
+                                                type: string
+                                                description: '템플릿내용'
+                                                example: '템플릿내용'
+                                            c_link_target:
+                                                type: string
+                                                description: '링크타겟 (부모창: 1, 새창: 2)'
+                                                example: ''
+                                            c_link_url:
+                                                type: string
+                                                description: '링크주소'
+                                                example: ''
+                                            c_kind_use:
+                                                type: string
+                                                description: '전체분류사용 Y'
+                                                example: ''
+                '400':
+                    $ref: '#/components/400Error'
+                '404':
+                    $ref: '#/components/404Error'
+                '500':
+                    $ref: '#/components/500Error'
+
+    /v1/menu/boardGroup/{parent_id}:
+        get:
+            summary: '서브메뉴 게시판 구분 리스트'
+            description: '2025-05-27 14:30'
+            operationId: 'getBoardGroupList'
+            tags:
+                - '사용자 > 메인'
+            parameters:
+                - in: path
+                  name: parent_id
+                  schema:
+                      type: integer
+                      description: '카테고리 index'
+                      example: 1
+            responses:
+                '200':
+                    description: ''
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    statusCode:
+                                        type: integer
+                                        example: 200
+                                    message:
+                                        type: string
+                                        example: ''
+                                    data:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                id:
+                                                    type: integer
+                                                    description: '카테고리 구분 index'
+                                                    example: 1
+                                                parent_id:
+                                                    type: integer
+                                                    description: '카테고리 index'
+                                                    example: 1
+                                                all_board:
+                                                    type: string
+                                                    description: '전체사용'
+                                                    example: 'Y'
+                                                g_img_on:
+                                                    type: string
+                                                    description: 'on이미지'
+                                                    example: 'storage/menu/test.jpg'
+                                                g_img_off:
+                                                    type: string
+                                                    description: 'on이미지'
+                                                    example: 'storage/menu/test.jpg'
+                                                g_menu_ui:
+                                                    type: string
+                                                    description: '메뉴UI (텍스트:TEXT, 이미지:IMG)'
+                                                    example: 'IMG'
+                                                g_name:
+                                                    type: string
+                                                    description: '구분명'
+                                                    example: '구분명'
+                                                g_num:
+                                                    type: integer
+                                                    description: '순서'
+                                                    example: 1
+                                                use_yn:
+                                                    type: string
+                                                    description: '사용여부(사용:Y, 미사용:N, 삭제:D)'
+                                                    example: 'Y'
+                '400':
+                    $ref: '#/components/400Error'
+                '401':
+                    $ref: '#/components/401Error'
+                '404':
+                    $ref: '#/components/404Error'
+                '500':
+                    $ref: '#/components/500Error'
+
     /v1/config/site/{site_id}/{c_lang}:
         get:
             summary: '사이트 정보'
