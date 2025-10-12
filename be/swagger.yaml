@@ -707,6 +707,102 @@ paths:
                 '500':
                     $ref: '#/components/500Error'
 
+    /v1/menu:
+        get:
+            summary: '메뉴 리스트'
+            description: '2025-01-12 16:00'
+            operationId: 'getCategoryList'
+            tags:
+                - '사용자 > 메인'
+            parameters:
+                - in: query
+                  name: c_lang
+                  description: '언어 설정'
+                  schema:
+                      type: string
+                      default: 'KR'
+                      example: 'KR'
+            responses:
+                '200':
+                    description: ''
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    statusCode:
+                                        type: integer
+                                        example: 200
+                                    message:
+                                        type: string
+                                        example: ''
+                                    data:
+                                        type: array
+                                        description: '메뉴 리스트'
+                                        items:
+                                            type: object
+                                            properties:
+                                                id:
+                                                    type: integer
+                                                    description: '카테고리 index'
+                                                    example: 1
+                                                c_depth:
+                                                    type: integer
+                                                    description: '메뉴 깊이'
+                                                    example: 1
+                                                c_depth_parent:
+                                                    type: integer
+                                                    description: '부모 메뉴 깊이'
+                                                    example: 0
+                                                c_num:
+                                                    type: integer
+                                                    description: '메뉴 순서'
+                                                    example: 1
+                                                c_name:
+                                                    type: string
+                                                    description: '메뉴명'
+                                                    example: '메뉴명'
+                                                c_use_yn:
+                                                    type: array
+                                                    description: '사용여부 (사용:Y, 미사용:N, 삭제:D)'
+                                                    example:
+                                                        - 'Y'
+                                                        - '사용'
+                                                c_main_banner:
+                                                    type: string
+                                                    description: '메인 배너 사용여부'
+                                                    example: 'Y'
+                                                c_main_banner_file:
+                                                    type: string
+                                                    description: '메인 배너 파일명'
+                                                    example: 'banner.jpg'
+                                                c_menu_ui:
+                                                    type: string
+                                                    description: '메뉴UI (텍스트:TEXT, 이미지:IMG)'
+                                                    example: 'TEXT'
+                                                c_menu_on_img:
+                                                    type: string
+                                                    description: '메뉴 활성 이미지'
+                                                    example: 'menu_on.jpg'
+                                                c_menu_off_img:
+                                                    type: string
+                                                    description: '메뉴 비활성 이미지'
+                                                    example: 'menu_off.jpg'
+                                                c_content_type:
+                                                    type: string
+                                                    description: '콘텐츠 타입'
+                                                    example: 'HTML'
+                                                c_lang:
+                                                    type: string
+                                                    description: '언어 설정'
+                                                    example: 'KR'
+                '400':
+                    $ref: '#/components/400Error'
+                '404':
+                    $ref: '#/components/404Error'
+                '500':
+                    $ref: '#/components/500Error'
+
     /v1/menu/sub/{id}:
         get:
             summary: '서브메뉴 내용'
