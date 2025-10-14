@@ -8,6 +8,7 @@ import { usePopupStore } from "@/store/common/usePopupStore";
 
 import About from "../custom/intro/About";
 import Greeting from "../custom/intro/Greeting";
+import Location from "../custom/intro/Location";
 import SubTop from "./-components/SubTop";
 
 export default function Sub({
@@ -50,6 +51,8 @@ export default function Sub({
                 <Greeting />
             ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/about" ? (
                 <About />
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/location" ? (
+                <Location />
             ) : null}
         </>
     );

@@ -52,6 +52,7 @@
         "KoPubWorld Dotum", "Noto Sans KR", "맑은 고딕", "malgun gothic", "Apple SD Gothic Neo",
         sans-serif;
     font-weight: 300;
+    line-height: 1.5;
 }
 
 .user-layout input,

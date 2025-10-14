@@ -1,6 +1,7 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
+import Script from "next/script";
 
 import QueryProvider from "@/components/common/common/QueryProvider";
 import { ConsoleToaster } from "@/components/console/common/ConsoleToaster";
@@ -42,6 +43,11 @@ export default function RootLayout({
     return (
         <html lang="ko">
             <body>
+                <Script
+                    src="https://ssl.daumcdn.net/dmaps/map_js_init/roughmapLoader.js"
+                    strategy="beforeInteractive"
+                    className="daum_roughmap_loader_script"
+                />
                 <QueryProvider>{children}</QueryProvider>
                 <div id="modal-root" />
                 <ConsoleToaster />
