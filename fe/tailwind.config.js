@@ -10,6 +10,7 @@ module.exports = {
         extend: {
             fontFamily: {
                 batang: ["KoPubWorld Batang", "serif"],
+                lato: ["Lato", "serif"],
             },
             colors: {
                 background: "hsl(var(--background))",
@@ -24,6 +25,7 @@ module.exports = {
                 },
                 primary: {
                     DEFAULT: "#206B6E",
+                    2: "#056547",
                 },
                 // 관리자단 색상
                 console: {

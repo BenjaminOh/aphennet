@@ -33,7 +33,7 @@ export default function Organization() {
                 <p className="pb-[24px] text-center text-[28px] font-[700] md:pb-[48px] md:text-[32px]">
                     조직 현황 (2025년)
                 </p>
-                <ul className="flex items-center bg-[#F3F9F5] py-[16px] text-center text-[18px] font-[500] text-[#056547] md:text-[20px] xl:rounded-[20px]">
+                <ul className="flex items-center bg-[#F3F9F5] py-[16px] text-center text-[18px] font-[500] text-primary-2 md:text-[20px] xl:rounded-[20px]">
                     <li className="w-[22%] px-[5px]">직위</li>
                     <li className="w-[20%] px-[5px]">성명</li>
                     <li className="w-[58%] px-[5px]">소속</li>

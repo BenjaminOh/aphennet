@@ -63,7 +63,7 @@ export default function MainSection2({
                         sectOn ? " opacity-100" : ""
                     }`}
                 >
-                    <p className="w-fit rounded-[30px] bg-[#056547] p-[8px_20px] font-[700] text-white md:text-[18px]">
+                    <p className="w-fit rounded-[30px] bg-primary-2 p-[8px_20px] font-[700] text-white md:text-[18px]">
                         연대 설립 이야기
                     </p>
                     <p className="p-[8px_0_20px] text-[24px] font-[700] md:p-[20px_0_40px] md:text-[40px]">
@@ -90,7 +90,7 @@ export default function MainSection2({
                         cont2On ? " opacity-100" : ""
                     }`}
                 >
-                    <p className="w-fit rounded-[30px] bg-[#056547] p-[8px_20px] font-[700] text-white md:text-[18px]">
+                    <p className="w-fit rounded-[30px] bg-primary-2 p-[8px_20px] font-[700] text-white md:text-[18px]">
                         우리의 철학
                     </p>
                     <p className="p-[8px_0_20px] text-[24px] font-[700] md:text-[40px]">무엇을 지키고자 할까요?</p>
@@ -114,7 +114,7 @@ export default function MainSection2({
                         cont3On ? " opacity-100" : ""
                     }`}
                 >
-                    <p className="w-fit rounded-[30px] bg-[#056547] p-[8px_20px] font-[700] text-white md:text-[18px]">
+                    <p className="w-fit rounded-[30px] bg-primary-2 p-[8px_20px] font-[700] text-white md:text-[18px]">
                         비전과 약속
                     </p>
                     <p className="p-[8px_0_20px] text-[24px] font-[700] md:text-[40px]">

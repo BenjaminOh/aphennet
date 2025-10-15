@@ -46,6 +46,14 @@
         local("KoPubWorld-Batang-Bold"),
         url("../../fonts/KoPubWorld-Batang-Bold.ttf") format("truetype");
 }
+@font-face {
+    font-family: "Lato";
+    font-style: normal;
+    font-weight: 700;
+    src:
+        local("Lato-Bold"),
+        url("../../fonts/Lato-Bold.ttf") format("truetype");
+}
 
 .user-layout {
     font-family:

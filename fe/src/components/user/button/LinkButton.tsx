@@ -17,7 +17,7 @@ export default function LinkButton({ txt, handleClick, type = "default", classNa
             type="button"
             onClick={handleClick}
             className={`group relative flex h-[54px] w-[240px] items-center justify-between rounded-[30px] transition-all duration-300 xl:hover:bg-[#23AA4B] ${
-                type === "black" ? "bg-[#222222]" : "bg-[#056547]"
+                type === "black" ? "bg-[#222222]" : "bg-primary-2"
             } ${className}`}
         >
             <div className="absolute left-[8px] top-1/2 flex size-[40px] -translate-y-1/2 items-center justify-center rounded-full bg-white transition-all duration-300 xl:group-hover:left-[calc(100%-48px)]">

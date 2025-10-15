@@ -43,53 +43,51 @@ export default function About() {
                     </div>
                 </div>
             </div>
-            <div className="mx-auto max-w-[1360px]">
-                <ul className="relative flex flex-col gap-[80px] px-[20px] after:absolute after:bottom-[40px] after:left-1/2 after:h-[80px] after:w-[1px] after:-translate-x-1/2 after:bg-[#ddd] after:opacity-0 after:content-[''] md:gap-[100px] md:p-[0_28px_100px] xl:gap-[80px] xl:after:opacity-100">
-                    <li className="flex flex-col md:gap-[20px] xl:flex-row xl:items-center xl:gap-0">
-                        <Image src={aboutImg1} alt="이미지" className="mx-auto xl:order-2 xl:mx-0" />
-                        <div className="flex flex-col gap-[8px] md:gap-[40px] xl:order-1 xl:flex-1">
-                            <p className="font-batang text-[40px] font-[700] text-[#23AA4B] md:text-[60px]">歷史</p>
-                            <p className="text-[18px] text-[#666] md:text-[20px]">
-                                20세기 어두웠던 아픔의 역사 <br />
-                                그 역사적 진실을 밝히며 <br />
-                                <span className="text-[20px] font-[500] text-[#222] md:text-[24px]">
-                                    21세기 미래를 향한 반성과 화해의 세상
-                                </span>
-                                을 만들어가고자 합니다.
-                            </p>
-                        </div>
-                    </li>
-                    <li className="flex flex-col md:gap-[20px] xl:flex-row xl:items-center xl:gap-0">
-                        <Image src={aboutImg2} alt="이미지" className="mx-auto xl:mx-0" />
-                        <div className="flex flex-col gap-[8px] md:gap-[40px] xl:flex-1">
-                            <p className="font-batang text-[40px] font-[700] text-[#407FFA] md:text-[60px]">平和</p>
-                            <p className="text-[18px] text-[#666] md:text-[20px]">
-                                역사는 과거와 미래를 잇는 다리 <br />
-                                공동의 역사인식, 그것은 동아시아평화를 위한 첫걸음 <br />
-                                <span className="text-[20px] font-[500] text-[#222] md:text-[24px]">
-                                    공존과 공생, 그리고 평화의 세상
-                                </span>
-                            </p>
-                        </div>
-                    </li>
-                    <li className="flex flex-col md:gap-[20px] xl:flex-row xl:items-center xl:gap-0">
-                        <Image src={aboutImg3} alt="이미지" className="mx-auto xl:order-2 xl:mx-0" />
-                        <div className="flex flex-col gap-[8px] md:gap-[40px] xl:order-1 xl:flex-1">
-                            <p className="font-batang text-[40px] font-[700] text-[#F36E2D] md:text-[60px]">未來</p>
-                            <p className="text-[18px] text-[#666] md:text-[20px]">
-                                교과서는 아이들의 미래를 위한 나침반 <br />
-                                아이들에게 더 이상 거짓을 가르칠 수는 없습니다.
-                                <br />
-                                <span className="text-[20px] font-[500] text-[#222] md:text-[24px]">
-                                    미래를 향한 우리들의 손짓, 발짓, 몸짓
-                                </span>
-                                <br />
-                                우리 아이들의 미래에 날개를 달아주십시오.
-                            </p>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+            <ul className="relative mx-auto flex max-w-[1360px] flex-col gap-[80px] px-[20px] after:absolute after:bottom-[40px] after:left-1/2 after:h-[80px] after:w-[1px] after:-translate-x-1/2 after:bg-[#ddd] after:opacity-0 after:content-[''] md:gap-[100px] md:p-[0_28px_100px] xl:gap-[80px] xl:after:opacity-100 min-[1400px]:px-0">
+                <li className="flex flex-col md:gap-[20px] xl:flex-row xl:items-center xl:gap-0">
+                    <Image src={aboutImg1} alt="이미지" className="mx-auto xl:order-2 xl:mx-0" />
+                    <div className="flex flex-col gap-[8px] md:gap-[40px] xl:order-1 xl:flex-1">
+                        <p className="font-batang text-[40px] font-[700] text-[#23AA4B] md:text-[60px]">歷史</p>
+                        <p className="text-[18px] text-[#666] md:text-[20px]">
+                            20세기 어두웠던 아픔의 역사 <br />
+                            그 역사적 진실을 밝히며 <br />
+                            <span className="text-[20px] font-[500] text-[#222] md:text-[24px]">
+                                21세기 미래를 향한 반성과 화해의 세상
+                            </span>
+                            을 만들어가고자 합니다.
+                        </p>
+                    </div>
+                </li>
+                <li className="flex flex-col md:gap-[20px] xl:flex-row xl:items-center xl:gap-0">
+                    <Image src={aboutImg2} alt="이미지" className="mx-auto xl:mx-0" />
+                    <div className="flex flex-col gap-[8px] md:gap-[40px] xl:flex-1">
+                        <p className="font-batang text-[40px] font-[700] text-[#407FFA] md:text-[60px]">平和</p>
+                        <p className="text-[18px] text-[#666] md:text-[20px]">
+                            역사는 과거와 미래를 잇는 다리 <br />
+                            공동의 역사인식, 그것은 동아시아평화를 위한 첫걸음 <br />
+                            <span className="text-[20px] font-[500] text-[#222] md:text-[24px]">
+                                공존과 공생, 그리고 평화의 세상
+                            </span>
+                        </p>
+                    </div>
+                </li>
+                <li className="flex flex-col md:gap-[20px] xl:flex-row xl:items-center xl:gap-0">
+                    <Image src={aboutImg3} alt="이미지" className="mx-auto xl:order-2 xl:mx-0" />
+                    <div className="flex flex-col gap-[8px] md:gap-[40px] xl:order-1 xl:flex-1">
+                        <p className="font-batang text-[40px] font-[700] text-[#F36E2D] md:text-[60px]">未來</p>
+                        <p className="text-[18px] text-[#666] md:text-[20px]">
+                            교과서는 아이들의 미래를 위한 나침반 <br />
+                            아이들에게 더 이상 거짓을 가르칠 수는 없습니다.
+                            <br />
+                            <span className="text-[20px] font-[500] text-[#222] md:text-[24px]">
+                                미래를 향한 우리들의 손짓, 발짓, 몸짓
+                            </span>
+                            <br />
+                            우리 아이들의 미래에 날개를 달아주십시오.
+                        </p>
+                    </div>
+                </li>
+            </ul>
             <div className="p-[80px_20px_20px] md:p-[120px_28px_40px] md:text-center">
                 <p className="text-[32px] font-[700] md:text-[40px]">목적 및 주요사업</p>
                 <p className="pt-[12px] text-[18px] text-[#666] md:pt-[20px] md:text-[20px]">
@@ -107,67 +105,65 @@ export default function About() {
                     <li>일본과 중국의 역사왜곡과 관련하여 홍보물 발간 및 온라인을 통한 무상 정보제공사업</li>
                 </ul>
             </div>
-            <div className="mx-auto max-w-[1720px]">
-                <ul className="flex flex-wrap gap-y-[24px] p-[40px_20px_93px] md:justify-center md:gap-y-[40px] md:p-[80px_28px_145px] xl:flex-nowrap xl:p-[100px_0_160px]">
-                    <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
-                        <Image src={aboutIcon1} alt="아이콘" />
-                        <p className="text-center text-[20px] font-[500]">
-                            일본 역사왜곡 <br />
-                            대응 활동
-                        </p>
-                    </li>
-                    <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
-                        <Image src={aboutIcon2} alt="아이콘" />
-                        <p className="text-center text-[20px] font-[500]">
-                            중국 역사왜곡 <br />
-                            대응 활동
-                        </p>
-                    </li>
-                    <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
-                        <Image src={aboutIcon3} alt="아이콘" />
-                        <p className="text-center text-[20px] font-[500]">
-                            한국사 교과서 <br />
-                            개정 및 정상화 활동
-                        </p>
-                    </li>
-                    <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
-                        <Image src={aboutIcon4} alt="아이콘" />
-                        <p className="text-center text-[20px] font-[500]">
-                            역사인식과 <br />
-                            동아시아 평화포럼
-                        </p>
-                    </li>
-                    <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
-                        <Image src={aboutIcon5} alt="아이콘" />
-                        <p className="text-center text-[20px] font-[500]">
-                            일본의 과거청산 <br />
-                            촉구와 평화 만들기
-                        </p>
-                    </li>
-                    <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
-                        <Image src={aboutIcon6} alt="아이콘" />
-                        <p className="text-center text-[20px] font-[500]">
-                            한중일 역사공동교재 <br />
-                            개발 활동
-                        </p>
-                    </li>
-                    <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
-                        <Image src={aboutIcon7} alt="아이콘" />
-                        <p className="text-center text-[20px] font-[500]">
-                            동아시아 청소년 <br />
-                            역사체험캠프
-                        </p>
-                    </li>
-                    <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
-                        <Image src={aboutIcon8} alt="아이콘" />
-                        <p className="text-center text-[20px] font-[500]">교육활동</p>
-                    </li>
-                    <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
-                        <Image src={aboutIcon9} alt="아이콘" />
-                        <p className="text-center text-[20px] font-[500]">평화기행</p>
-                    </li>
-                </ul>
-            </div>
+            <ul className="mx-auto flex max-w-[1720px] flex-wrap gap-y-[24px] p-[40px_20px_93px] md:justify-center md:gap-y-[40px] md:p-[80px_28px_145px] xl:flex-nowrap xl:p-[100px_0_160px]">
+                <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
+                    <Image src={aboutIcon1} alt="아이콘" />
+                    <p className="text-center text-[20px] font-[500]">
+                        일본 역사왜곡 <br />
+                        대응 활동
+                    </p>
+                </li>
+                <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
+                    <Image src={aboutIcon2} alt="아이콘" />
+                    <p className="text-center text-[20px] font-[500]">
+                        중국 역사왜곡 <br />
+                        대응 활동
+                    </p>
+                </li>
+                <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
+                    <Image src={aboutIcon3} alt="아이콘" />
+                    <p className="text-center text-[20px] font-[500]">
+                        한국사 교과서 <br />
+                        개정 및 정상화 활동
+                    </p>
+                </li>
+                <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
+                    <Image src={aboutIcon4} alt="아이콘" />
+                    <p className="text-center text-[20px] font-[500]">
+                        역사인식과 <br />
+                        동아시아 평화포럼
+                    </p>
+                </li>
+                <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
+                    <Image src={aboutIcon5} alt="아이콘" />
+                    <p className="text-center text-[20px] font-[500]">
+                        일본의 과거청산 <br />
+                        촉구와 평화 만들기
+                    </p>
+                </li>
+                <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
+                    <Image src={aboutIcon6} alt="아이콘" />
+                    <p className="text-center text-[20px] font-[500]">
+                        한중일 역사공동교재 <br />
+                        개발 활동
+                    </p>
+                </li>
+                <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
+                    <Image src={aboutIcon7} alt="아이콘" />
+                    <p className="text-center text-[20px] font-[500]">
+                        동아시아 청소년 <br />
+                        역사체험캠프
+                    </p>
+                </li>
+                <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
+                    <Image src={aboutIcon8} alt="아이콘" />
+                    <p className="text-center text-[20px] font-[500]">교육활동</p>
+                </li>
+                <li className="flex w-1/2 flex-col items-center gap-[12px] md:w-1/4 xl:flex-1">
+                    <Image src={aboutIcon9} alt="아이콘" />
+                    <p className="text-center text-[20px] font-[500]">평화기행</p>
+                </li>
+            </ul>
         </>
     );
 }

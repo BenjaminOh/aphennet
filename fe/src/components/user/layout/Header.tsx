@@ -172,7 +172,7 @@ export default function Header({ menuList = [] }: HeaderProps) {
                                     {menu.c_name}
                                 </button>
                                 {menu.submenu && (
-                                    <div className="absolute left-1/2 top-[100%] flex max-h-0 w-[200px] -translate-x-1/2 flex-col gap-[20px] overflow-hidden bg-white transition-all duration-300 group-hover:max-h-[500px]">
+                                    <div className="absolute left-1/2 top-[100%] flex max-h-0 w-max min-w-[200px] -translate-x-1/2 flex-col gap-[20px] overflow-hidden bg-white transition-all duration-300 group-hover:max-h-[500px]">
                                         <ul className="flex flex-col gap-[20px] p-[34px_24px_24px]">
                                             {menu.submenu.map((submenu, _) => (
                                                 <li key={`submenu_${submenu.id}`}>
