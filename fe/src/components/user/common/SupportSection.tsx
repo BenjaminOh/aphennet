@@ -6,11 +6,11 @@ import arrowRightWhite from "@/assets/images/user/arrowRightWhite.png";
 import mainSection3Img from "@/assets/images/user/mainSection3Img.jpg";
 import LinkButton from "@/components/user/button/LinkButton";
 
-export default function MainSection3({
+export default function SupportSection({
     sectRef,
     sectOn,
 }: {
-    sectRef: React.RefObject<HTMLDivElement>;
+    sectRef?: React.RefObject<HTMLDivElement>;
     sectOn: boolean;
 }) {
     return (

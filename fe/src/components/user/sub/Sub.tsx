@@ -9,6 +9,7 @@ import { usePopupStore } from "@/store/common/usePopupStore";
 import About from "../custom/intro/About";
 import Greeting from "../custom/intro/Greeting";
 import Location from "../custom/intro/Location";
+import Organization from "../custom/intro/Organization";
 import SubTop from "./-components/SubTop";
 
 export default function Sub({
@@ -53,6 +54,8 @@ export default function Sub({
                 <About />
             ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/location" ? (
                 <Location />
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/organization" ? (
+                <Organization />
             ) : null}
         </>
     );
