@@ -7,7 +7,7 @@ export default function Greeting() {
             <SubBanner banner={subBannerGreeting} title={`아시아평화와 <br/>역사교육연대는`} />
             <div className="p-[40px_20px_120px] md:p-[60px_28px_160px] xl:pt-[80px]">
                 <div className="mx-auto max-w-[1360px] xl:flex xl:justify-end xl:pl-[560px]">
-                    <div className="xl:max-w-[680px]">
+                    <div className="xl:w-[680px]">
                         <div className="text-[18px] leading-[1.5] text-[#666] md:text-[20px]">
                             아무도 예기치 못한 순간에 등장한 ‘코로나19’ 바이러스는 전 세계를 공포에 빠트리며, 인류에게
                             많은 것을 되돌아보게 하였습니다. 그것은 대자연에 대한 인간의 폭력이 얼마나 자기 파괴적인지를

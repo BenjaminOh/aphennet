@@ -16,7 +16,7 @@ export default function Textbook() {
             <SubBanner banner={subBannerTextbook} title={`일본 교과서 <br/>역사왜곡 대응`} />
             <div className="p-[40px_20px_80px] md:p-[60px_28px_100px] xl:pt-[80px]">
                 <div className="mx-auto max-w-[1360px] xl:flex xl:justify-end xl:pl-[560px]">
-                    <div className="xl:max-w-[680px]">
+                    <div className="xl:w-[680px]">
                         <p className="text-[28px] font-[700] md:text-[52px]">
                             역사를 바라보는 것은 <br />
                             <span className="text-primary">미래세대를 위한 의무</span>입니다!

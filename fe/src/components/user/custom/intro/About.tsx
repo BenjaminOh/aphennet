@@ -22,7 +22,7 @@ export default function About() {
             <SubBanner banner={subBannerAbout} title={`아시아평화와 <br/>역사교육연대는`} />
             <div className="p-[40px_20px_80px] md:p-[60px_28px_100px] xl:pt-[80px]">
                 <div className="mx-auto max-w-[1360px] xl:flex xl:justify-end xl:pl-[560px]">
-                    <div className="text-[18px] text-[#666] md:text-[20px] xl:max-w-[680px]">
+                    <div className="text-[18px] text-[#666] md:text-[20px] xl:w-[680px]">
                         국내외 교과서의 역사왜곡을 바로잡고, 20세기 침략과 저항의 역사에 대한 아시아 공동의 역사인식을
                         만들기 위해 2001년 4월 86개의 시민사회단체, 학자, 교사 등이 모여 일본교과서바로잡기운동본부를
                         결성하였습니다.
