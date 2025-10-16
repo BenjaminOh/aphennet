@@ -15,8 +15,8 @@ export default function SubBanner({ banner, title }: SubBannerProps) {
                     <Image src={banner} alt="banner" fill className="object-cover" />
                 </div>
             </div>
-            <div className="w-full max-w-[1360px] xl:absolute xl:left-1/2 xl:top-[200px] xl:-translate-x-1/2">
-                <div className="relative min-h-[172px] w-full max-w-[600px] rounded-[0_0_40px_0] bg-[linear-gradient(316deg,#171E1D_6.2%,#206B6E_98.86%)] p-[32px_20px] md:min-h-[320px] md:p-[40px] xl:min-h-[520px] xl:max-w-[560px] xl:p-[60px]">
+            <div className="pointer-events-none w-full max-w-[1360px] xl:absolute xl:left-1/2 xl:top-[200px] xl:-translate-x-1/2">
+                <div className="pointer-events-auto relative min-h-[172px] w-full max-w-[600px] rounded-[0_0_40px_0] bg-[linear-gradient(316deg,#171E1D_6.2%,#206B6E_98.86%)] p-[32px_20px] md:min-h-[320px] md:p-[40px] xl:min-h-[520px] xl:max-w-[560px] xl:p-[60px]">
                     <p
                         className="text-[32px] font-[700] leading-[1.5] text-white md:text-[60px]"
                         dangerouslySetInnerHTML={{ __html: title }}

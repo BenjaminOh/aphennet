@@ -46,12 +46,21 @@
         local("KoPubWorld-Batang-Bold"),
         url("../../fonts/KoPubWorld-Batang-Bold.ttf") format("truetype");
 }
+@font-face {
+    font-family: "Lato";
+    font-style: normal;
+    font-weight: 700;
+    src:
+        local("Lato-Bold"),
+        url("../../fonts/Lato-Bold.ttf") format("truetype");
+}
 
 .user-layout {
     font-family:
         "KoPubWorld Dotum", "Noto Sans KR", "맑은 고딕", "malgun gothic", "Apple SD Gothic Neo",
         sans-serif;
     font-weight: 300;
+    line-height: 1.5;
 }
 
 .user-layout input,

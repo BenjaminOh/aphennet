@@ -6,11 +6,11 @@ import arrowRightWhite from "@/assets/images/user/arrowRightWhite.png";
 import mainSection3Img from "@/assets/images/user/mainSection3Img.jpg";
 import LinkButton from "@/components/user/button/LinkButton";
 
-export default function MainSection3({
+export default function SupportSection({
     sectRef,
     sectOn,
 }: {
-    sectRef: React.RefObject<HTMLDivElement>;
+    sectRef?: React.RefObject<HTMLDivElement>;
     sectOn: boolean;
 }) {
     return (
@@ -48,7 +48,7 @@ export default function MainSection3({
             </div>
             <div className="xl:pointer-events-none xl:absolute xl:left-1/2 xl:top-0 xl:flex xl:w-full xl:max-w-[1360px] xl:-translate-x-1/2">
                 <div
-                    className={`pointer-events-auto translate-y-[50%] bg-[#056547] p-[40px_20px] opacity-0 transition-all duration-700 ease-in-out md:p-[60px_28px] xl:w-[640px] xl:rounded-[24px] xl:p-[60px]${
+                    className={`pointer-events-auto translate-y-[50%] bg-primary-2 p-[40px_20px] opacity-0 transition-all duration-700 ease-in-out md:p-[60px_28px] xl:w-[640px] xl:rounded-[24px] xl:p-[60px]${
                         sectOn ? " !translate-y-0 opacity-100" : ""
                     }`}
                 >

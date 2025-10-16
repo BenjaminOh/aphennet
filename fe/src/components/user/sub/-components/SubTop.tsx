@@ -144,11 +144,11 @@ export default function SubTop({ category }: { category: string }) {
             <div className="absolute bottom-0 right-0 hidden h-[192px] w-[584px] md:block xl:right-[6%]">
                 <Image src={subTitle} alt="Asia Peace & History Institute" fill className="object-contain" />
             </div>
-            <div className="mx-auto flex max-w-[1360px] flex-col gap-[20px] md:gap-[40px]">
+            <div className="relative mx-auto flex max-w-[1360px] flex-col gap-[20px] md:gap-[40px]">
                 <p className="relative pt-[12px] text-[36px] font-[700] leading-[1.5] after:absolute after:inset-0 after:h-[4px] after:w-[24px] after:bg-primary after:content-[''] md:pt-[28px] md:text-[60px] md:after:h-[8px]">
                     {topParent?.c_name}
                 </p>
-                <ul className="hidden items-center gap-[40px] md:flex xl:gap-[60px]">
+                <ul className="hidden items-center gap-[40px] md:flex md:flex-wrap md:gap-x-[60px] md:gap-y-[20px]">
                     {selectList.map((item, idx) => (
                         <li key={`item-${idx}`}>
                             <button

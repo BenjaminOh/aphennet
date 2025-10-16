@@ -163,7 +163,7 @@ export default function Header({ menuList = [] }: HeaderProps) {
                 <div className="hidden flex-1 items-center justify-between xl:flex">
                     <ul className="flex flex-1 items-center">
                         {menuList.map((menu, idx) => (
-                            <li className="group relative max-w-[180px] flex-1" key={`menu_${idx}`}>
+                            <li className="group relative max-w-[150px] flex-1" key={`menu_${idx}`}>
                                 <button
                                     type="button"
                                     className="relative h-[80px] w-full text-[20px] font-[500] transition-all duration-300 after:absolute after:bottom-[8px] after:left-1/2 after:h-[4px] after:w-0 after:-translate-x-1/2 after:rounded-[4px] after:bg-primary after:transition-all after:duration-300 group-hover:font-[700] group-hover:text-primary group-hover:after:w-[50px]"
@@ -172,7 +172,7 @@ export default function Header({ menuList = [] }: HeaderProps) {
                                     {menu.c_name}
                                 </button>
                                 {menu.submenu && (
-                                    <div className="absolute left-1/2 top-[100%] flex max-h-0 w-[200px] -translate-x-1/2 flex-col gap-[20px] overflow-hidden bg-white transition-all duration-300 group-hover:max-h-[500px]">
+                                    <div className="absolute left-1/2 top-[calc(100%+10px)] flex max-h-0 w-max min-w-[200px] -translate-x-1/2 flex-col gap-[20px] overflow-hidden rounded-[20px] bg-[rgba(255,255,255,0.80)] backdrop-blur-sm transition-all duration-300 group-hover:max-h-[500px]">
                                         <ul className="flex flex-col gap-[20px] p-[34px_24px_24px]">
                                             {menu.submenu.map((submenu, _) => (
                                                 <li key={`submenu_${submenu.id}`}>
@@ -204,10 +204,12 @@ export default function Header({ menuList = [] }: HeaderProps) {
                                 </a>
                             </li>
                         </ul>
-                        <ul className="flex gap-[40px]">
+                        <ul className="flex gap-[24px]">
                             <li>
                                 <a
-                                    href="/"
+                                    href="https://www.instagram.com/aphen2001"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="block size-[40px] bg-icInstagram bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
                                 >
                                     인스타그램
@@ -215,10 +217,22 @@ export default function Header({ menuList = [] }: HeaderProps) {
                             </li>
                             <li>
                                 <a
-                                    href="/"
+                                    href="https://www.facebook.com/aphen2001"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="block size-[40px] bg-icFacebook bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
                                 >
                                     페이스북
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="www.youtube.com/channel/UCLfVW_PlNxA7jXePV8wpE8w"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block size-[40px] bg-icYoutube bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
+                                >
+                                    유튜브
                                 </a>
                             </li>
                         </ul>

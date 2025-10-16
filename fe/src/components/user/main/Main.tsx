@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import SupportSection from "@/components/user/common/SupportSection";
+
 import MainBanner from "./-components/MainBanner";
 import MainLink from "./-components/MainLink";
 import MainSection1 from "./-components/MainSection1";
 import MainSection2 from "./-components/MainSection2";
-import MainSection3 from "./-components/MainSection3";
 
 export default function Main() {
     const sect1Ref = useRef<HTMLDivElement>(null);
@@ -56,7 +57,7 @@ export default function Main() {
             <MainLink />
             <MainSection1 sectRef={sect1Ref} sectOn={sect1On} />
             <MainSection2 sectRef={sect2Ref} sectOn={sect2On} />
-            <MainSection3 sectRef={sect3Ref} sectOn={sect3On} />
+            <SupportSection sectRef={sect3Ref} sectOn={sect3On} />
         </>
     );
 }

@@ -6,8 +6,15 @@ import { useEffect } from "react";
 import { useGetSubCategory } from "@/service/user/menu";
 import { usePopupStore } from "@/store/common/usePopupStore";
 
+import Camp from "../custom/activities/Camp";
+import Forum from "../custom/activities/Forum";
+import JointTextbook from "../custom/activities/JointTextbook";
+import Solidarity from "../custom/activities/Solidarity";
+import Textbook from "../custom/activities/Textbook";
 import About from "../custom/intro/About";
 import Greeting from "../custom/intro/Greeting";
+import Location from "../custom/intro/Location";
+import Organization from "../custom/intro/Organization";
 import SubTop from "./-components/SubTop";
 
 export default function Sub({
@@ -46,10 +53,27 @@ export default function Sub({
     return (
         <>
             <SubTop category={category} />
-            {configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/greeting" ? (
+            {configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/greeting" ? (
                 <Greeting />
-            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/about" ? (
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/about" ? (
                 <About />
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/location" ? (
+                <Location />
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/organization" ? (
+                <Organization />
+            ) : configData?.data?.c_content_type?.[0] === 3 &&
+              configData?.data?.file_path === "/activities/textbook" ? (
+                <Textbook />
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/activities/camp" ? (
+                <Camp />
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/activities/forum" ? (
+                <Forum />
+            ) : configData?.data?.c_content_type?.[0] === 3 &&
+              configData?.data?.file_path === "/activities/joint-textbook" ? (
+                <JointTextbook />
+            ) : configData?.data?.c_content_type?.[0] === 3 &&
+              configData?.data?.file_path === "/activities/solidarity" ? (
+                <Solidarity />
             ) : null}
         </>
     );
