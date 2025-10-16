@@ -68,6 +68,7 @@ module.exports = {
                 icClose: "url('../assets/images/user/icClose.png')",
                 icInstagram: "url('../assets/images/user/icInstagram.png')",
                 icFacebook: "url('../assets/images/user/icFacebook.png')",
+                icYoutube: "url('../assets/images/user/icYoutube.png')",
                 "console-pop-close": "url('../assets/images/console/popClose.svg')",
                 "console-ic-calendar": "url('../assets/images/console/icCalendar.svg')",
             },
