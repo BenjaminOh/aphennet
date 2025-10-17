@@ -79,11 +79,11 @@ export default function Nav() {
                 urlPrefix: "/console/menu/",
                 subItems: [{ path: "category", label: "카테고리 관리", id: "menu1" }],
             },
-            {
-                title: "회원 관리",
-                menuId: "member",
-                urlPrefix: "/console/member/",
-            },
+            // {
+            //     title: "회원 관리",
+            //     menuId: "member",
+            //     urlPrefix: "/console/member/",
+            // },
             {
                 title: "디자인 관리",
                 menuId: "design",
