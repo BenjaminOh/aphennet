@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import { useGetSubCategory } from "@/service/user/menu";
 import { usePopupStore } from "@/store/common/usePopupStore";
 
+import PostDetail from "../board/PostDetail";
+import PostList from "../board/PostList";
 import Camp from "../custom/activities/Camp";
 import Forum from "../custom/activities/Forum";
 import JointTextbook from "../custom/activities/JointTextbook";
@@ -54,7 +56,9 @@ export default function Sub({
     return (
         <>
             <SubTop category={category} />
-            {configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/greeting" ? (
+            {postIdx && (configData?.data?.c_content_type?.[0] === 4 || configData?.data?.c_content_type?.[0] === 5) ? (
+                <PostDetail category={category} detailIdx={postIdx} />
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/greeting" ? (
                 <Greeting />
             ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/about" ? (
                 <About />
@@ -77,6 +81,10 @@ export default function Sub({
             ) : configData?.data?.c_content_type?.[0] === 3 &&
               configData?.data?.file_path === "/activities/solidarity" ? (
                 <Solidarity />
+            ) : configData?.data?.c_content_type?.[0] === 4 ? (
+                <PostList category={category} boardType="board" />
+            ) : configData?.data?.c_content_type?.[0] === 5 ? (
+                <PostList category={category} boardType="gallery" />
             ) : null}
         </>
     );

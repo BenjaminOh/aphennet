@@ -13,7 +13,7 @@ import SelectBox from "@/components/console/form/SelectBox";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { initialStatisticsDateType, statisticsDateTypes, StatisticsListParams } from "@/constants/console/listParams";
-import { useUrlParams } from "@/hooks/console/useUrlParams";
+import { useUrlParams } from "@/hooks/common/useUrlParams";
 import { useGetAllStatistics, useGetChart, useGetData } from "@/service/console/statistics";
 import { usePopupStore } from "@/store/common/usePopupStore";
 import { getOneMonthAgo, getSevenDaysAgo, getSixMonthsAgo, getThreeMonthsAgo, getToday } from "@/utils/dateUtils";

@@ -11,7 +11,7 @@ import Input from "@/components/console/form/Input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LanguageParams } from "@/constants/console/listParams";
 import { useLangTypes } from "@/hooks/console/useLangTypes";
-import { useUrlParams } from "@/hooks/console/useUrlParams";
+import { useUrlParams } from "@/hooks/common/useUrlParams";
 import { useToast } from "@/hooks/use-toast";
 import { useGetSiteInfo, usePutSiteInfo } from "@/service/console/setting/site";
 import { usePopupStore } from "@/store/common/usePopupStore";

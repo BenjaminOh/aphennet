@@ -11,7 +11,7 @@ import ResizableSplit from "@/components/console/common/ResizableSplit";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CategoryListParams } from "@/constants/console/listParams";
 import { useLangTypes } from "@/hooks/console/useLangTypes";
-import { useUrlParams } from "@/hooks/console/useUrlParams";
+import { useUrlParams } from "@/hooks/common/useUrlParams";
 import { useToast } from "@/hooks/use-toast";
 import { useGetCategoryList, usePutCategoryOrder } from "@/service/console/menu/category";
 import { useBoardStore } from "@/store/common/useBoardStore";
