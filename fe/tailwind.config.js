@@ -11,6 +11,7 @@ module.exports = {
             fontFamily: {
                 batang: ["KoPubWorld Batang", "serif"],
                 lato: ["Lato", "serif"],
+                gmarket: ["GmarketSans", "serif"],
             },
             colors: {
                 background: "hsl(var(--background))",

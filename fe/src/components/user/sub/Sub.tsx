@@ -13,6 +13,7 @@ import Solidarity from "../custom/activities/Solidarity";
 import Textbook from "../custom/activities/Textbook";
 import About from "../custom/intro/About";
 import Greeting from "../custom/intro/Greeting";
+import History from "../custom/intro/History";
 import Location from "../custom/intro/Location";
 import Organization from "../custom/intro/Organization";
 import SubTop from "./-components/SubTop";
@@ -61,6 +62,8 @@ export default function Sub({
                 <Location />
             ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/organization" ? (
                 <Organization />
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/history" ? (
+                <History />
             ) : configData?.data?.c_content_type?.[0] === 3 &&
               configData?.data?.file_path === "/activities/textbook" ? (
                 <Textbook />
