@@ -16,6 +16,8 @@ module.exports = {
             colors: {
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
+                // 기본 텍스트 색상 변경
+                DEFAULT: "#222",
                 card: {
                     DEFAULT: "hsl(var(--card))",
                     foreground: "hsl(var(--card-foreground))",

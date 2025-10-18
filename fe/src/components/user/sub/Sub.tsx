@@ -18,6 +18,8 @@ import Greeting from "../custom/intro/Greeting";
 import History from "../custom/intro/History";
 import Location from "../custom/intro/Location";
 import Organization from "../custom/intro/Organization";
+import System from "../custom/japan-distortion-response/System";
+import Timeline from "../custom/japan-distortion-response/Timeline";
 import SubTop from "./-components/SubTop";
 
 export default function Sub({
@@ -58,29 +60,35 @@ export default function Sub({
             <SubTop category={category} />
             {postIdx && (configData?.data?.c_content_type?.[0] === 4 || configData?.data?.c_content_type?.[0] === 5) ? (
                 <PostDetail category={category} detailIdx={postIdx} />
-            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/greeting" ? (
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/Greeting" ? (
                 <Greeting />
-            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/about" ? (
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/About" ? (
                 <About />
-            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/location" ? (
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/Location" ? (
                 <Location />
-            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/organization" ? (
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/Organization" ? (
                 <Organization />
-            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/history" ? (
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/History" ? (
                 <History />
             ) : configData?.data?.c_content_type?.[0] === 3 &&
-              configData?.data?.file_path === "/activities/textbook" ? (
+              configData?.data?.file_path === "/activities/Textbook" ? (
                 <Textbook />
-            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/activities/camp" ? (
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/activities/Camp" ? (
                 <Camp />
-            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/activities/forum" ? (
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/activities/Forum" ? (
                 <Forum />
             ) : configData?.data?.c_content_type?.[0] === 3 &&
-              configData?.data?.file_path === "/activities/joint-textbook" ? (
+              configData?.data?.file_path === "/activities/JointTextbook" ? (
                 <JointTextbook />
             ) : configData?.data?.c_content_type?.[0] === 3 &&
-              configData?.data?.file_path === "/activities/solidarity" ? (
+              configData?.data?.file_path === "/activities/Solidarity" ? (
                 <Solidarity />
+            ) : configData?.data?.c_content_type?.[0] === 3 &&
+              configData?.data?.file_path === "/japan-distortion-response/Timeline" ? (
+                <Timeline />
+            ) : configData?.data?.c_content_type?.[0] === 3 &&
+              configData?.data?.file_path === "/japan-distortion-response/System" ? (
+                <System />
             ) : configData?.data?.c_content_type?.[0] === 4 ? (
                 <PostList category={category} boardType="board" />
             ) : configData?.data?.c_content_type?.[0] === 5 ? (

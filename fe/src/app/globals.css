@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    * {
+        color: #222;
+    }
+    body {
+        color: #222;
+    }
+}
+
 @font-face {
     font-family: "Noto Sans KR";
     font-style: normal;
