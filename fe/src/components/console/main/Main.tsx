@@ -92,7 +92,7 @@ export default function Main() {
         <>
             {isLoading ? (
                 <div className="absolute inset-0 z-[100] size-full">
-                    <LoadingSpinner console={true} />
+                    <LoadingSpinner />
                 </div>
             ) : (
                 <div className="flex justify-between gap-[50px]">
@@ -134,7 +134,7 @@ export default function Main() {
                                                   <td className="p-3">
                                                       <Link
                                                           href={`/console/board/post/${item.category}?page=1&search=titlecontents&detail=${item.idx}`}
-                                                          className="truncate"
+                                                          className="block truncate"
                                                       >
                                                           {item.b_title}
                                                       </Link>

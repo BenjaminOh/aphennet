@@ -70,7 +70,7 @@ export default function Nav() {
                 urlPrefix: "/console/board/",
                 subItems: [
                     { path: "post", label: "게시글 관리", id: "board1", subItems: [] },
-                    { path: "comment", label: "댓글 관리", id: "board2" },
+                    // { path: "comment", label: "댓글 관리", id: "board2" },
                 ],
             },
             {
@@ -100,7 +100,7 @@ export default function Nav() {
                 subItems: [
                     { path: "site", label: "사이트정보", id: "setting1" },
                     { path: "policy", label: "시스템 운영정책", id: "setting2" },
-                    { path: "level", label: "회원 등급 관리", id: "setting3" },
+                    // { path: "level", label: "회원 등급 관리", id: "setting3" },
                 ],
             },
             {
@@ -112,11 +112,11 @@ export default function Nav() {
                     { path: "visitor", label: "접속자 이력 통계", id: "statistics2" },
                 ],
             },
-            {
-                title: "유지보수 게시판",
-                menuId: "maintenance",
-                urlPrefix: "/console/maintenance/",
-            },
+            // {
+            //     title: "유지보수 게시판",
+            //     menuId: "maintenance",
+            //     urlPrefix: "/console/maintenance/",
+            // },
         ];
 
         if (!loginUser?.m_menu_auth) {

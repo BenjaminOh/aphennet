@@ -392,7 +392,7 @@ export default function BannerList() {
                                                             )}
                                                         </div>
                                                     )}
-                                                    <div className="flex flex-1 flex-col gap-[8px]">
+                                                    <div className="flex min-w-0 flex-1 basis-0 flex-col gap-[8px]">
                                                         <p
                                                             className={`truncate text-left font-[500] text-[#222] transition-all group-hover:underline${
                                                                 detailOn === item.idx.toString() ? " underline" : ""
