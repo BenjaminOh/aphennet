@@ -1962,6 +1962,10 @@ paths:
                                     type: string
                                     description: '내용'
                                     example: '내용'
+                                b_content_type:
+                                    type: string
+                                    description: '게시물 구분(editor / html)'
+                                    example: 'editor'
                                 parent_id:
                                     type: integer
                                     description: '부모게시글idx'
@@ -2073,6 +2077,10 @@ paths:
                                     type: string
                                     description: '내용'
                                     example: '내용'
+                                b_content_type:
+                                    type: string
+                                    description: '게시물 구분(editor / html)'
+                                    example: 'editor'
                                 b_depth:
                                     type: integer
                                     description: '부모글,덧글(부모글 : 0, 덧글: 1)'
@@ -2260,6 +2268,10 @@ paths:
                                                 type: string
                                                 description: '내용'
                                                 example: '내용'
+                                            b_content_type:
+                                                type: string
+                                                description: '게시물 구분(editor / html)'
+                                                example: 'editor'
                                             b_depth:
                                                 type: integer
                                                 description: '부모글,덧글(부모글 : 0, 덧글: 1)'
