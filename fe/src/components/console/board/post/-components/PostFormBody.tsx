@@ -136,7 +136,7 @@ export default function PostFormBody({
                     handleDelt={(idx, file_idx) => handleConfirmDeleteFile(idx, file_idx)}
                 />
             </li>
-            <li className="flex w-full flex-col gap-[8px]">
+            {/* <li className="flex w-full flex-col gap-[8px]">
                 <label htmlFor="m_pwd" className="text-[#666]">
                     비밀번호
                 </label>
@@ -169,7 +169,7 @@ export default function PostFormBody({
                         <InputError message={errors.m_pwd?.message} />
                     </div>
                 </div>
-            </li>
+            </li> */}
         </ul>
     );
 }
