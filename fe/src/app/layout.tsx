@@ -11,7 +11,7 @@ import UserPopup from "@/components/user/popup/Popup";
 // 동적 메타데이터 생성
 export async function generateMetadata(): Promise<Metadata> {
     try {
-        const response = await fetch("https://selenaiminapi.likeweb.co.kr/v1/config/site/selenaimin/KR", {
+        const response = await fetch("https://aphennetapi.likeweb.co.kr/v1/config/site/aphen/KR", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
