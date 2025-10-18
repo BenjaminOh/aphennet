@@ -10,6 +10,7 @@ interface body {
     m_pwd: string;
     b_title: string;
     b_contents: string;
+    b_content_type: string; // (editor, html)
     b_depth: number; //(부모글 : 0, 답글: 1)
     b_notice: string; // (일반: 0, 공지:1)
     b_secret: string;
