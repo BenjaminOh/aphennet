@@ -10,7 +10,7 @@ const errorHandler = require('../middleware/error');
 router.get('/main/:category/:limit', boardController.getBoardMain); //게시글 메인 공지
 router.get('/:category/:getLimit', boardController.getBoardList); //게시글 리스트
 router.post('/myList', isAuthMiddleware.isAuth, boardController.postMyBoardList); //본인 게시글 리스트
-router.get('/view/:category/:idx', isAuthMiddleware.isAuthBoard, boardController.getBoardView); //게시글 뷰페이지
+router.get('/view/:category/:idx', boardController.getBoardView); //게시글 뷰페이지
 
 router.post(
     '/',
