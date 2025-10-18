@@ -27,8 +27,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (siteInfoData) {
-            const { c_site_name, c_address, c_tel, c_fax, c_email, c_num, c_ceo, c_b_title, c_meta, c_meta_tag } =
-                siteInfoData.data;
+            const { c_site_name, c_address, c_tel, c_fax, c_email, c_num, c_ceo } = siteInfoData.data;
             setSiteInfo({
                 c_site_name,
                 c_ceo,
@@ -47,61 +46,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 c_email,
                 c_num,
             });
-
-            // 동적으로 meta 태그 변경
-            if (c_b_title) {
-                document.title = c_b_title;
-            }
-
-            // description meta 태그 업데이트
-            let descMeta = document.querySelector('meta[name="description"]');
-            if (!descMeta) {
-                descMeta = document.createElement("meta");
-                descMeta.setAttribute("name", "description");
-                document.head.appendChild(descMeta);
-            }
-            if (c_meta) {
-                descMeta.setAttribute("content", c_meta);
-            }
-
-            // keywords meta 태그 업데이트
-            let keywordsMeta = document.querySelector('meta[name="keywords"]');
-            if (!keywordsMeta) {
-                keywordsMeta = document.createElement("meta");
-                keywordsMeta.setAttribute("name", "keywords");
-                document.head.appendChild(keywordsMeta);
-            }
-            if (c_meta_tag) {
-                keywordsMeta.setAttribute("content", c_meta_tag);
-            }
-
-            // OpenGraph meta 태그 업데이트
-            if (c_b_title) {
-                const ogTitleMeta = document.querySelector('meta[property="og:title"]');
-                if (ogTitleMeta) {
-                    ogTitleMeta.setAttribute("content", c_b_title);
-                }
-            }
-            if (c_meta) {
-                const ogDescMeta = document.querySelector('meta[property="og:description"]');
-                if (ogDescMeta) {
-                    ogDescMeta.setAttribute("content", c_meta);
-                }
-            }
-
-            // Twitter meta 태그 업데이트
-            if (c_b_title) {
-                const twitterTitleMeta = document.querySelector('meta[name="twitter:title"]');
-                if (twitterTitleMeta) {
-                    twitterTitleMeta.setAttribute("content", c_b_title);
-                }
-            }
-            if (c_meta) {
-                const twitterDescMeta = document.querySelector('meta[name="twitter:description"]');
-                if (twitterDescMeta) {
-                    twitterDescMeta.setAttribute("content", c_meta);
-                }
-            }
         } else {
             setSiteInfo(initialSiteInfo);
             setSiteInfoData(initialSiteInfo);
