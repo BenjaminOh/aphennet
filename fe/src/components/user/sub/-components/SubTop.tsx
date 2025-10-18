@@ -140,7 +140,7 @@ export default function SubTop({ category }: { category: string }) {
     };
 
     return (
-        <div className="relative p-[32px_20px_48px] md:p-[60px_28px] xl:pt-[100px]">
+        <div className="relative z-[1] p-[32px_20px_48px] md:p-[60px_28px] xl:pt-[100px]">
             <div className="absolute bottom-0 right-0 hidden h-[192px] w-[584px] md:block xl:right-[6%]">
                 <Image src={subTitle} alt="Asia Peace & History Institute" fill className="object-contain" />
             </div>

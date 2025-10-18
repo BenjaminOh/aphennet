@@ -16,6 +16,7 @@ interface body {
     b_secret: string;
     b_file: File[];
     b_img?: File; // 갤러리 게시판일때 썸네일
+    b_img_name?: string; // 갤러리 게시판일때 썸네일 이름 (삭제여부 확인용)
     group_id?: string; // FAQ, 문의게시판일때 분류유형
 }
 

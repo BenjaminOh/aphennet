@@ -23,10 +23,10 @@ export const schema = z
         b_secret: z.string().optional(),
         group_id: z.string().optional(),
         c_content_type: z.number().nullable().optional(),
-        preview_img: z.enum(["Y", "N"]).optional(),
         b_depth: z.number(),
         parent_id: z.number().nullable(),
         b_group: z.enum(["Y", "N"]),
+        b_img_name: z.string().optional(),
     })
     .superRefine((data, ctx) => {
         if (data.b_secret === "Y" && !data.m_pwd) {
@@ -34,13 +34,6 @@ export const schema = z
                 code: z.ZodIssueCode.custom,
                 message: "비밀번호를 설정해주세요.",
                 path: ["m_pwd"],
-            });
-        }
-        if (data.c_content_type === 5 && data.preview_img === "N") {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "미리보기 이미지를 등록해주세요.",
-                path: ["preview_img"],
             });
         }
         if (data.b_group === "Y" && !data.group_id) {
@@ -51,7 +44,6 @@ export const schema = z
             });
         }
     });
-
 export type FormValues = z.infer<typeof schema>;
 
 export type UsePostFormMode = "create" | "edit" | "reply";
@@ -74,10 +66,10 @@ export function usePostForm(
             m_pwd: "",
             b_secret: "",
             c_content_type: null,
-            preview_img: "N",
             b_depth: 0,
             parent_id: null,
             b_group: "N",
+            b_img_name: "",
         }),
         []
     );
@@ -141,6 +133,7 @@ export function usePostForm(
                 ...(boardSettingData.b_group === "Y" ? { b_group: "Y" } : { b_group: "N" }),
                 ...(group_id && { group_id: group_id.toString() }),
                 ...(boardSettingData.c_content_type && { c_content_type: boardSettingData.c_content_type }),
+                ...(boardSettingData.c_content_type === 5 && b_img && { b_img_name: b_img}),
             });
             setFiles(b_file);
             if (b_img) {
@@ -178,15 +171,6 @@ export function usePostForm(
         }
     }, [boardGroupList, mode, configData]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // 미리보기 이미지 설정
-    useEffect(() => {
-        if (imgFiles.length > 0) {
-            setValue("preview_img", "Y");
-        } else {
-            setValue("preview_img", "N");
-        }
-    }, [imgFiles]); // eslint-disable-line react-hooks/exhaustive-deps
-
     useEffect(() => {
         if (refetch) {
             refetchPost();
@@ -208,7 +192,6 @@ export function usePostForm(
                 const newFileData = [...imgFilesData];
                 newFileData.splice(idx, 1);
                 setImgFilesData(newFileData);
-                setValue("preview_img", undefined);
             } else {
                 const newList = [...files];
                 newList.splice(idx, 1);
@@ -232,7 +215,6 @@ export function usePostForm(
                     const newList = [...imgFiles];
                     newList.splice(idx, 1);
                     setImgFiles(newList);
-                    setValue("preview_img", undefined);
                 } else {
                     const newList = [...files];
                     newList.splice(idx, 1);
@@ -250,23 +232,22 @@ export function usePostForm(
     // 저장하기
     const onSubmit = (data: FormValues) => {
         if (!category) return;
+        const { c_content_type, b_img_name, ...formData} = data;
         const baseBody = {
-            ...data,
+            ...formData,
             category,
             m_email: loginUser.m_email,
             m_name: loginUser.m_name,
             b_file: filesData.length > 0 ? filesData : [],
-            m_pwd: data.m_pwd || "",
-            b_secret: data.b_secret || "",
-            ...(data.c_content_type === 5 && imgFilesData.length > 0 && { b_img: imgFilesData[0] }),
-            ...(boardSettingData.b_group === "Y" && { group_id: data.group_id }),
+            m_pwd: formData.m_pwd || "",
+            b_secret: formData.b_secret || "",
+            ...(c_content_type === 5 && imgFilesData.length > 0 && { b_img: imgFilesData[0] }),
+            ...(boardSettingData.b_group === "Y" && { group_id: formData.group_id }),
         };
-        delete baseBody.c_content_type;
-        delete baseBody.preview_img;
 
         // 게시글 수정
         if (mode === "edit") {
-            const body = { ...baseBody, idx: detailIdx, parent_id: baseBody.parent_id?.toString() || ""};
+            const body = { ...baseBody, idx: detailIdx, parent_id: baseBody.parent_id?.toString() || "", ...(c_content_type === 5 && { b_img_name: imgFilesData.length > 0 ? "" : imgFiles.length === 0 && imgFilesData.length === 0 ? "" : b_img_name}) };
             putBoardMutation.mutate(body, {
                 onSuccess: () => {
                     toast({
