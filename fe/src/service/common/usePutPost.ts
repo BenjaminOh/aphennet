@@ -11,6 +11,7 @@ interface body {
     m_pwd: string;
     b_title: string;
     b_contents: string;
+    b_content_type: string; // (editor, html)
     b_depth: number;
     b_notice: string;
     b_secret: string;

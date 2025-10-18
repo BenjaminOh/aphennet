@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { notFound } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
@@ -18,7 +18,9 @@ export const schema = z
     .object({
         b_title: z.string().min(1, "제목을 입력해주세요."),
         b_notice: z.string(),
-        b_contents: z.string().min(1, "내용을 입력해주세요."),
+        b_contents: z.string(),
+        b_contents_html: z.string(),
+        b_content_type: z.enum(["editor", "html"]),
         m_pwd: z.string().optional(),
         b_secret: z.string().optional(),
         group_id: z.string().optional(),
@@ -43,8 +45,37 @@ export const schema = z
                 path: ["group_id"],
             });
         }
+        if(data.b_content_type === "html" && !data.b_contents_html){
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "내용을 입력해주세요.",
+                path: ["b_contents_html"],
+            });
+        }
+        if(data.b_content_type === "editor" && !data.b_contents){
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "내용을 입력해주세요.",
+                path: ["b_contents"],
+            });
+        }
     });
 export type FormValues = z.infer<typeof schema>;
+
+const initialValues:FormValues = {
+    b_title: "",
+    b_notice: "0",
+    b_contents: "",
+    b_contents_html: "",
+    b_content_type: "editor",
+    m_pwd: "",
+    b_secret: "",
+    c_content_type: null,
+    b_depth: 0,
+    parent_id: null,
+    b_group: "N",
+    b_img_name: "",
+};
 
 export type UsePostFormMode = "create" | "edit" | "reply";
 
@@ -58,22 +89,8 @@ export function usePostForm(
 ) {
     const { loginUser } = useAuthStore();
     const { boardSettingData } = useBoardStore();
-    const initialValues = useMemo<FormValues>(
-        () => ({
-            b_title: "",
-            b_notice: "0",
-            b_contents: "",
-            m_pwd: "",
-            b_secret: "",
-            c_content_type: null,
-            b_depth: 0,
-            parent_id: null,
-            b_group: "N",
-            b_img_name: "",
-        }),
-        []
-    );
-    const form = useForm<FormValues>({
+    
+    const form = useForm({
         resolver: zodResolver(schema),
         defaultValues: initialValues,
     });
@@ -122,12 +139,14 @@ export function usePostForm(
             });
         }
         if (mode === "edit" && configData) {
-            const { b_title, b_notice, b_contents, group_id, b_file, b_img, parent_id, b_secret} = configData.data;
+            const { b_title, b_notice, b_contents, b_content_type, group_id, b_file, b_img, parent_id, b_secret} = configData.data;
             reset({
                 ...initialValues,
                 b_title,
                 b_notice,
-                b_contents,
+                b_content_type: b_content_type ?? initialValues.b_content_type,
+                b_contents: b_content_type === "editor" ? b_contents : initialValues.b_contents,
+                b_contents_html: b_content_type === "html" ? b_contents : initialValues.b_contents_html,
                 parent_id,
                 b_secret,
                 ...(boardSettingData.b_group === "Y" ? { b_group: "Y" } : { b_group: "N" }),
@@ -232,7 +251,7 @@ export function usePostForm(
     // 저장하기
     const onSubmit = (data: FormValues) => {
         if (!category) return;
-        const { c_content_type, b_img_name, ...formData} = data;
+        const { c_content_type, b_img_name, b_contents_html, b_content_type, b_contents, ...formData} = data;
         const baseBody = {
             ...formData,
             category,
@@ -241,6 +260,8 @@ export function usePostForm(
             b_file: filesData.length > 0 ? filesData : [],
             m_pwd: formData.m_pwd || "",
             b_secret: formData.b_secret || "",
+            b_content_type,
+            b_contents: b_content_type === "editor" ? b_contents : b_contents_html,
             ...(c_content_type === 5 && imgFilesData.length > 0 && { b_img: imgFilesData[0] }),
             ...(boardSettingData.b_group === "Y" && { group_id: formData.group_id }),
         };
