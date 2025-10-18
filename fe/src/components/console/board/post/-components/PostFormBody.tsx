@@ -112,7 +112,6 @@ export default function PostFormBody({
                             handleDelt={(idx, file_idx) => handleConfirmDeleteFile(idx, file_idx, true)}
                             showPreview
                         />
-                        <InputError message={errors.preview_img?.message} />
                     </div>
                 </li>
             )}
