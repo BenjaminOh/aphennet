@@ -12,7 +12,7 @@ export default function MainSection1({
     sectOn: boolean;
 }) {
     return (
-        <div ref={sectRef} className="mx-auto max-w-[1360px] px-[20px] md:px-[28px] min-[1400px]:px-0">
+        <div ref={sectRef} className="mx-auto max-w-[1720px] px-[20px] md:px-[28px] min-[1760px]:px-0">
             <div className="relative overflow-hidden rounded-[20px] py-[160px] md:rounded-[40px] md:py-[136px] xl:py-[160px]">
                 <Image
                     src={bgMainSection1}
