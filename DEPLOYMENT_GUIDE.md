@@ -47,13 +47,7 @@ cp .env.prod .env
 nano .env
 ```
 
-### 4단계: SSL 인증서 발급 (최초 1회)
-```bash
-# SSL 인증서 발급
-./certbot/init-letsencrypt.sh
-```
-
-### 5단계: 운영환경 배포
+### 4단계: 운영환경 배포
 ```bash
 # 배포 스크립트 실행
 chmod +x deploy-prod.sh
@@ -64,42 +58,33 @@ chmod +x deploy-prod.sh
 
 ### 컨테이너 상태 확인
 ```bash
-docker compose -f docker-compose.base.yml -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml ps
 ```
 
 ### 로그 확인
 ```bash
 # 전체 로그
-docker compose -f docker-compose.base.yml -f docker-compose.prod.yml logs
+docker compose -f docker-compose.prod.yml logs
 
 # 특정 서비스 로그
-docker compose -f docker-compose.base.yml -f docker-compose.prod.yml logs nextjs
-docker compose -f docker-compose.base.yml -f docker-compose.prod.yml logs nodejs
-docker compose -f docker-compose.base.yml -f docker-compose.prod.yml logs mariadb
+docker compose -f docker-compose.prod.yml logs nextjs
+docker compose -f docker-compose.prod.yml logs nodejs
+docker compose -f docker-compose.prod.yml logs mariadb
 ```
 
 ### 컨테이너 재시작
 ```bash
 # 전체 재시작
-docker compose -f docker-compose.base.yml -f docker-compose.prod.yml restart
+docker compose -f docker-compose.prod.yml restart
 
 # 특정 서비스 재시작
-docker compose -f docker-compose.base.yml -f docker-compose.prod.yml restart nextjs
-```
-
-### SSL 인증서 갱신
-```bash
-# 수동 갱신
-./certbot/renew.sh
-
-# 자동 갱신 (crontab 설정)
-0 12 * * * /path/to/aphennet/certbot/renew.sh
+docker compose -f docker-compose.prod.yml restart nextjs
 ```
 
 ## 🌐 접속 정보
 
-- **프론트엔드**: https://aphennet.likeweb.co.kr
-- **API**: https://aphennetapi.likeweb.co.kr
+- **프론트엔드**: http://aphennet.likeweb.co.kr:3000
+- **API**: http://aphennetapi.likeweb.co.kr:3001
 - **데이터베이스**: localhost:3306
   - 사용자: `aphennet`
   - 비밀번호: `aphennet!@34`
@@ -110,8 +95,8 @@ docker compose -f docker-compose.base.yml -f docker-compose.prod.yml restart nex
 ### 1. 포트 충돌
 ```bash
 # 포트 사용 확인
-sudo netstat -tulpn | grep :80
-sudo netstat -tulpn | grep :443
+sudo netstat -tulpn | grep :3000
+sudo netstat -tulpn | grep :3001
 sudo netstat -tulpn | grep :3306
 ```
 
@@ -124,16 +109,7 @@ docker system prune -a --volumes
 sudo journalctl --vacuum-time=7d
 ```
 
-### 3. SSL 인증서 문제
-```bash
-# 인증서 확인
-ls -la certbot/conf/live/aphennet.likeweb.co.kr/
-
-# nginx 설정 테스트
-docker exec aphennet-nginx-prod nginx -t
-```
-
-### 4. 데이터베이스 연결 문제
+### 3. 데이터베이스 연결 문제
 ```bash
 # MariaDB 상태 확인
 docker exec aphennet-mariadb mysql -u root -p -e "SHOW DATABASES;"
@@ -146,11 +122,8 @@ docker exec aphennet-nodejs node -e "console.log('DB connection test')"
 
 ### 헬스체크
 ```bash
-# nginx 헬스체크
-curl https://aphennet.likeweb.co.kr/health
-
 # API 헬스체크
-curl https://aphennetapi.likeweb.co.kr/health
+curl http://aphennetapi.likeweb.co.kr:3001/health
 ```
 
 ### 리소스 사용량

@@ -30,17 +30,14 @@ echo "### 3단계: Next.js 시작..."
 docker compose -f docker-compose.low-resource.yml up -d nextjs
 sleep 20
 
-echo "### 4단계: nginx 시작..."
-docker compose -f docker-compose.low-resource.yml up -d nginx
-
 # 5. 상태 확인
 echo "### 배포 완료! 상태 확인 중..."
 sleep 10
 docker compose -f docker-compose.low-resource.yml ps
 
 echo "=== 저사양 서버 배포 완료 ==="
-echo "접속 URL: http://aphennet.likeweb.co.kr"
-echo "API URL: http://aphennetapi.likeweb.co.kr"
+echo "접속 URL: http://aphennet.likeweb.co.kr:3000"
+echo "API URL: http://aphennetapi.likeweb.co.kr:3001"
 echo ""
 echo "메모리 사용량:"
 docker stats --no-stream --format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}"

@@ -18,7 +18,7 @@
 ```bash
 ./start-dev.sh
 ```
-- **접속 URL**: http://aphennet.likeweb.co.kr
+- **접속 URL**: http://aphennet.likeweb.co.kr:3000
 - **API URL**: http://aphennetapi.likeweb.co.kr:3001
 - **특징**: HTTP만 사용, Hot Reload 활성화
 
@@ -26,20 +26,19 @@
 ```bash
 ./start-prod.sh
 ```
-- **접속 URL**: https://aphennet.likeweb.co.kr
-- **API URL**: https://aphennetapi.likeweb.co.kr
-- **특징**: HTTPS 사용, SSL 인증서 자동 발급
+- **접속 URL**: http://aphennet.likeweb.co.kr:3000
+- **API URL**: http://aphennetapi.likeweb.co.kr:3001
+- **특징**: HTTP 사용, 직접 포트 노출
 
 ## 🔧 환경별 차이점
 
 | 구분 | 개발환경 | 운영환경 |
 |------|----------|----------|
-| **프로토콜** | HTTP | HTTPS |
-| **API URL** | http://aphennetapi.likeweb.co.kr:3001 | https://aphennetapi.likeweb.co.kr |
+| **프로토콜** | HTTP | HTTP |
+| **API URL** | http://aphennetapi.likeweb.co.kr:3001 | http://aphennetapi.likeweb.co.kr:3001 |
 | **Hot Reload** | ✅ 활성화 | ❌ 비활성화 |
 | **볼륨 마운트** | ✅ 소스코드 실시간 동기화 | ❌ 빌드된 이미지 사용 |
-| **SSL 인증서** | ❌ 사용 안함 | ✅ Let's Encrypt |
-| **Certbot** | ❌ 실행 안함 | ✅ 자동 갱신 |
+| **포트 노출** | 직접 포트 노출 | 직접 포트 노출 |
 
 ## 📋 수동 실행
 

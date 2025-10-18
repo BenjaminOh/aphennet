@@ -1,6 +1,6 @@
 # Docker 환경 설정 가이드
 
-이 프로젝트는 nginx, MariaDB, Next.js, Node.js를 포함한 완전한 Docker 환경을 제공합니다.
+이 프로젝트는 MariaDB, Next.js, Node.js를 포함한 완전한 Docker 환경을 제공합니다.
 
 ## 🚀 빠른 시작
 
@@ -18,7 +18,6 @@ REACT_EXPOSE_PORT=3000
 REACT_CONTAINER_PORT=3000
 NODE_EXPOSE_PORT=3001
 NODE_CONTAINER_PORT=3000
-NGINX_EXPOSE_PORT=80
 DB_EXPOSE_PORT=3306
 
 # API URL 설정
@@ -67,25 +66,12 @@ docker-compose up --build
 docker-compose up -d --build
 
 # 특정 서비스만 실행
-docker-compose up nginx mariadb react-app node-app
+docker-compose up mariadb react-app node-app
 ```
 
-### 3. SSL 인증서 설정 (선택사항)
+### 3. 서비스 접속
 
-```bash
-# SSL 인증서 초기화 (실제 도메인으로 변경 필요)
-./certbot/init-letsencrypt.sh
-
-# 또는 테스트 환경에서 실행
-# certbot/init-letsencrypt.sh 파일에서 staging=1로 변경 후 실행
-```
-
-### 4. 서비스 접속
-
-- **웹 애플리케이션**: 
-  - HTTP: http://localhost (nginx를 통한 접속)
-  - HTTPS: https://localhost (SSL 인증서 설정 후)
-- **Next.js 개발 서버**: http://localhost:3000 (직접 접속)
+- **웹 애플리케이션**: http://localhost:3000 (Next.js 직접 접속)
 - **Node.js API**: http://localhost:3001 (직접 접속)
 - **MariaDB**: localhost:3306
 - **API 문서 (Swagger)**: http://localhost:3001/api-docs
@@ -93,30 +79,23 @@ docker-compose up nginx mariadb react-app node-app
 ## 🏗️ 아키텍처
 
 ```
-┌─────────────────┐
-│      nginx      │ ← 포트 80 (리버스 프록시)
-│   (포트 80)     │
-└─────────┬───────┘
-          │
-    ┌─────┴─────┐
-    │           │
-┌───▼───┐   ┌───▼───┐
-│ Next.js│   │Node.js│
+┌─────────┐   ┌─────────┐
+│ Next.js │   │Node.js │
 │(포트 3000)│ │(포트 3000)│
-└───────┘   └───┬───┘
-                │
-        ┌───────▼───────┐
-        │   MariaDB     │
-        │  (포트 3306)  │
-        └───────────────┘
+└────┬────┘   └───┬────┘
+     │            │
+     └────┬───────┘
+          │
+    ┌─────▼─────┐
+    │   MariaDB │
+    │  (포트 3306)│
+    └───────────┘
 ```
 
 ## 📁 디렉토리 구조
 
 ```
 aphennet/
-├── nginx/
-│   └── nginx.conf          # nginx 설정
 ├── mariadb/
 │   └── init.sql            # MariaDB 초기화 스크립트
 ├── fe/                     # Next.js 프론트엔드
@@ -127,20 +106,6 @@ aphennet/
 ```
 
 ## 🔧 주요 기능
-
-### nginx 설정
-- 리버스 프록시로 Next.js와 Node.js 연결
-- 정적 파일 캐싱
-- Gzip 압축
-- 파일 업로드 지원 (최대 50MB)
-- SSL/HTTPS 지원 (certbot과 연동)
-- HTTP에서 HTTPS로 자동 리다이렉트
-
-### SSL/HTTPS 설정
-- Let's Encrypt 인증서 자동 발급 및 갱신
-- TLS 1.2/1.3 지원
-- 보안 헤더 설정 (HSTS, X-Frame-Options 등)
-- ACME 챌린지 지원
 
 ### MariaDB 설정
 - UTF8MB4 문자셋 지원
@@ -177,16 +142,6 @@ docker-compose down -v
 
 # 이미지 재빌드
 docker-compose build --no-cache
-
-# SSL 인증서 관련 명령어
-# 인증서 수동 갱신
-docker-compose run --rm certbot renew
-
-# 인증서 상태 확인
-docker-compose exec certbot certbot certificates
-
-# 테스트 인증서 발급 (staging)
-docker-compose run --rm certbot certonly --webroot --webroot-path=/var/www/certbot --staging -d yourdomain.com
 ```
 
 ## 🔍 문제 해결
@@ -204,7 +159,6 @@ MariaDB 컨테이너가 완전히 시작될 때까지 기다린 후 애플리케
 
 ### 프로덕션 환경
 프로덕션 환경에서는 다음을 고려하세요:
-- SSL 인증서 설정
 - 환경 변수 보안 강화
 - 로그 로테이션 설정
 - 모니터링 도구 추가
