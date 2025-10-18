@@ -13,8 +13,8 @@ import Checkbox from "@/components/console/form/Checkbox";
 import EditorWithHtml from "@/components/console/form/EditorWithHtml";
 import FileUpload, { FileData } from "@/components/console/form/FileUpload";
 import Input from "@/components/console/form/Input";
-import LevelSelect from "@/components/console/form/LevelSelect";
-import ListSizeSelect from "@/components/console/form/ListSizeSelect";
+// import LevelSelect from "@/components/console/form/LevelSelect";
+// import ListSizeSelect from "@/components/console/form/ListSizeSelect";
 import Radio from "@/components/console/form/Radio";
 import Textarea from "@/components/console/form/Textarea";
 import Toggle from "@/components/console/form/Toggle";
@@ -883,7 +883,7 @@ export default function CategoryForm({
                                                 )}
                                                 {tabOn > 2 && (
                                                     <>
-                                                        {tabOn !== 5 && ( // FAQ 아닐때만 노출
+                                                        {/* {tabOn !== 5 && ( // FAQ 아닐때만 노출
                                                             <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
                                                                 <p className="text-[#666]">목록 요소</p>
                                                                 <ul className="flex flex-wrap justify-between py-[16px]">
@@ -977,15 +977,15 @@ export default function CategoryForm({
                                                                     />
                                                                 </ul>
                                                             </li>
-                                                        )}
-                                                        <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
+                                                        )} */}
+                                                        {/* <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
                                                             <p className="text-[#666]">목록 개수</p>
                                                             <Controller
                                                                 name="b_list_cnt"
                                                                 control={control}
                                                                 render={({ field }) => <ListSizeSelect {...field} />}
                                                             />
-                                                        </li>
+                                                        </li> */}
                                                         {tabOn > 2 && ( // 게시판 카테고리일때만 노출
                                                             <li className="flex w-full flex-col gap-[8px]">
                                                                 <p className="text-[#666]">게시판 분류 사용여부</p>
@@ -1032,7 +1032,7 @@ export default function CategoryForm({
                                                                 )}
                                                             </li>
                                                         )}
-                                                        {tabOn !== 5 && ( // FAQ 아닐때만 노출
+                                                        {/* {tabOn !== 5 && ( // FAQ 아닐때만 노출
                                                             <>
                                                                 <li className="flex w-[calc(50%-10px)] gap-[8px]">
                                                                     <div className="flex w-[calc(50%-4px)] flex-col gap-[8px]">
@@ -1220,8 +1220,8 @@ export default function CategoryForm({
                                                                     </div>
                                                                 </li>
                                                             </>
-                                                        )}
-                                                        {tabOn === 6 && ( // 문의게시판일때만 노출
+                                                        )} */}
+                                                        {/* {tabOn === 6 && ( // 문의게시판일때만 노출
                                                             <>
                                                                 <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
                                                                     <p className="text-[#666]">
@@ -1310,7 +1310,7 @@ export default function CategoryForm({
                                                                     </div>
                                                                 </li>
                                                             </>
-                                                        )}
+                                                        )} */}
                                                         <li className="flex w-full flex-col gap-[8px]">
                                                             <label htmlFor="b_top_html" className="text-[#666]">
                                                                 게시판 상단 HTML
@@ -1321,7 +1321,7 @@ export default function CategoryForm({
                                                                 placeholder="HTML을 입력해주세요."
                                                             />
                                                         </li>
-                                                        <li className="flex w-full flex-col gap-[8px]">
+                                                        {/* <li className="flex w-full flex-col gap-[8px]">
                                                             <p className="text-[#666]">게시글 템플릿 적용</p>
                                                             <div className="flex h-[48px] items-center justify-start">
                                                                 <Controller
@@ -1351,7 +1351,7 @@ export default function CategoryForm({
                                                                     onChange={cont => setValue("b_template_text", cont)}
                                                                 />
                                                             </li>
-                                                        )}
+                                                        )} */}
                                                     </>
                                                 )}
                                             </ul>
