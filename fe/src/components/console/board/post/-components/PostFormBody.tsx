@@ -3,7 +3,7 @@ import { Control, Controller, FieldErrors, UseFormRegister, UseFormSetValue } fr
 import InputError from "@/components/console/common/InputError";
 import TooltipBox from "@/components/console/common/TooltipBox";
 import Checkbox from "@/components/console/form/Checkbox";
-import Editor from "@/components/console/form/Editor";
+import EditorWithHtml from "@/components/console/form/EditorWithHtml";
 import FileUpload, { FileData } from "@/components/console/form/FileUpload";
 import Input from "@/components/console/form/Input";
 import SelectBox, { SelectItem } from "@/components/console/form/SelectBox";
@@ -117,7 +117,7 @@ export default function PostFormBody({
                 </li>
             )}
             <li className="w-full">
-                <Editor value={values.b_contents || ""} onChange={cont => setValue("b_contents", cont)} />
+                <EditorWithHtml value={values.b_contents || ""} onChange={cont => setValue("b_contents", cont)} />
                 <InputError message={errors.b_contents?.message} />
             </li>
             <li className="flex w-full flex-col gap-[8px]">
@@ -136,7 +136,7 @@ export default function PostFormBody({
                     handleDelt={(idx, file_idx) => handleConfirmDeleteFile(idx, file_idx)}
                 />
             </li>
-            <li className="flex w-full flex-col gap-[8px]">
+            {/* <li className="flex w-full flex-col gap-[8px]">
                 <label htmlFor="m_pwd" className="text-[#666]">
                     비밀번호
                 </label>
@@ -169,7 +169,7 @@ export default function PostFormBody({
                         <InputError message={errors.m_pwd?.message} />
                     </div>
                 </div>
-            </li>
+            </li> */}
         </ul>
     );
 }

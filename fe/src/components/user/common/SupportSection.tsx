@@ -3,7 +3,7 @@
 import Image from "next/image";
 
 import arrowRightWhite from "@/assets/images/user/arrowRightWhite.png";
-import mainSection3Img from "@/assets/images/user/mainSection3Img.jpg";
+import supportSectionBg from "@/assets/images/user/supportSectionBg.jpg";
 import LinkButton from "@/components/user/button/LinkButton";
 
 export default function SupportSection({
@@ -16,7 +16,7 @@ export default function SupportSection({
     return (
         <div ref={sectRef} className="relative overflow-hidden xl:pt-[120px]">
             <div className="relative p-[60px_20px] md:p-[120px_28px] xl:p-[120px_0_180px]">
-                <Image src={mainSection3Img} alt="배경이미지" fill className="object-cover" />
+                <Image src={supportSectionBg} alt="배경이미지" fill className="object-cover" />
                 <div className="xl:mx-auto xl:flex xl:max-w-[1360px] xl:justify-end">
                     <div
                         className={`relative flex translate-x-[50%] flex-col gap-[40px] opacity-0 transition-all duration-700 ease-in-out md:gap-[60px]${

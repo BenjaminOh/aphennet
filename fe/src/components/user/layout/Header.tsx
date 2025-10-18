@@ -40,6 +40,12 @@ export default function Header({ menuList = [] }: HeaderProps) {
         };
     }, []);
 
+    // 메뉴 클릭시
+    const categoryClick = (menu: MenuItem) => {
+        handleCategoryClick(menu);
+        setOpen(false);
+    };
+
     return (
         <header className="sticky top-0 z-50 bg-white">
             <div className="mx-auto flex h-[60px] max-w-[1720px] items-center justify-between px-[20px] md:px-[28px] xl:h-[80px] xl:gap-[20px] min-[1760px]:px-0">
@@ -80,7 +86,7 @@ export default function Header({ menuList = [] }: HeaderProps) {
                                                             className={`w-[calc(100%-24px)] text-left text-[20px] font-[700] leading-[1.5] md:text-[36px]${
                                                                 menuOn === idx ? " text-primary" : ""
                                                             }`}
-                                                            onClick={() => handleCategoryClick(menu)}
+                                                            onClick={() => categoryClick(menu)}
                                                         >
                                                             {menu.c_name}
                                                         </button>
@@ -112,7 +118,7 @@ export default function Header({ menuList = [] }: HeaderProps) {
                                                                     type="button"
                                                                     key={`submenu_${submenu.id}`}
                                                                     className="text-left text-[18px] font-[500] text-[#666] md:w-[calc(50%-3px)]"
-                                                                    onClick={() => handleCategoryClick(submenu)}
+                                                                    onClick={() => categoryClick(submenu)}
                                                                 >
                                                                     {submenu.c_name}
                                                                 </button>
@@ -167,7 +173,7 @@ export default function Header({ menuList = [] }: HeaderProps) {
                                 <button
                                     type="button"
                                     className="relative h-[80px] w-full text-[20px] font-[500] transition-all duration-300 after:absolute after:bottom-[8px] after:left-1/2 after:h-[4px] after:w-0 after:-translate-x-1/2 after:rounded-[4px] after:bg-primary after:transition-all after:duration-300 group-hover:font-[700] group-hover:text-primary group-hover:after:w-[50px]"
-                                    onClick={() => handleCategoryClick(menu)}
+                                    onClick={() => categoryClick(menu)}
                                 >
                                     {menu.c_name}
                                 </button>
@@ -179,7 +185,7 @@ export default function Header({ menuList = [] }: HeaderProps) {
                                                     <button
                                                         type="button"
                                                         className="w-full text-[18px] font-[300] transition-all duration-300 hover:font-[500]"
-                                                        onClick={() => handleCategoryClick(submenu)}
+                                                        onClick={() => categoryClick(submenu)}
                                                     >
                                                         {submenu.c_name}
                                                     </button>

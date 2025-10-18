@@ -22,7 +22,7 @@ export default function BasicList({ items, category }: { items: PostItem[]; cate
                         <p className="flex-1 overflow-hidden text-[18px] font-[700] transition-all [-webkit-box-orient:vertical] [-webkit-line-clamp:2] [display:-webkit-box] md:text-[20px]">
                             {item.b_title}
                         </p>
-                        <div className="relative hidden h-[120px] w-[200px] overflow-hidden rounded-[8px] md:block xl:h-[200px] xl:w-[360px]">
+                        <div className="relative hidden h-[120px] w-[200px] overflow-hidden rounded-[16px] md:block md:rounded-[20px] xl:h-[200px] xl:w-[360px]">
                             {item.first_image ? (
                                 <img
                                     src={item.first_image}
