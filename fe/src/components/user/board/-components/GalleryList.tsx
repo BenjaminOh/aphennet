@@ -1,7 +1,5 @@
-// import Image from "next/image";
 import Link from "next/link";
 
-// import icPlus from "@/assets/images/user/icPlus.svg";
 import NoImage from "@/components/user/common/NoImage";
 import { API_URL } from "@/config/apiConfig";
 

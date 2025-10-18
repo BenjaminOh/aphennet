@@ -22,10 +22,10 @@ import {
     initialPage,
     PolicyListParams,
 } from "@/constants/console/listParams";
-import { useCheckboxList } from "@/hooks/console/useCheckboxList";
-import { useLangTypes } from "@/hooks/console/useLangTypes";
 import { usePagination } from "@/hooks/common/usePagination";
 import { useUrlParams } from "@/hooks/common/useUrlParams";
+import { useCheckboxList } from "@/hooks/console/useCheckboxList";
+import { useLangTypes } from "@/hooks/console/useLangTypes";
 import { useToast } from "@/hooks/use-toast";
 import { useGetPolicyList, usePostPolicyUse } from "@/service/console/setting/policy";
 import { usePopupStore } from "@/store/common/usePopupStore";
