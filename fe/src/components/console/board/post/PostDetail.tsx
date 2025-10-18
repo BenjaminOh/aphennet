@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import LoadingSpinner from "@/components/common/common/LoadingSpinner";
+import QuillContent from "@/components/common/common/QuillContent";
 import Comment, { CommentItem } from "@/components/console/form/Comment";
 import CommentForm from "@/components/console/form/CommentForm";
 import { FileData } from "@/components/console/form/FileUpload";
@@ -33,6 +34,7 @@ interface InfoItem {
     b_reg_date: string;
     b_view: number;
     b_contents: string;
+    b_content_type: string;
     b_file: FileData[];
     b_img: string | null;
     b_reply: number | null;
@@ -105,6 +107,7 @@ export default function PostDetail({
             b_reg_date: "",
             b_view: 0,
             b_contents: "",
+            b_content_type: "editor",
             b_file: [],
             b_img: null,
             b_reply: null,
@@ -395,7 +398,10 @@ export default function PostDetail({
                                     <img src={`${API_URL}/${info.b_img}`} alt="미리보기 이미지" />
                                 </div>
                             )}
-                            <div dangerouslySetInnerHTML={{ __html: info.b_contents }} />
+                            {info.b_content_type === "editor" && <QuillContent content={info.b_contents} />}
+                            {info.b_content_type === "html" && (
+                                <div dangerouslySetInnerHTML={{ __html: info.b_contents }} />
+                            )}
                         </div>
                         {info.b_file.length > 0 && (
                             <div className="flex border-t border-[#D9D9D9] p-[16px_20px]">

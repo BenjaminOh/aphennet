@@ -12,12 +12,13 @@ import { FileData } from "@/components/user/form/FileUpload";
 import { useGetPost, useGetPostFileDownload } from "@/service/user/board";
 import { usePopupStore } from "@/store/user/usePopupStore";
 
-import QuillContent from "../common/QuillContent";
+import QuillContent from "../../common/common/QuillContent";
 
 interface InfoItem {
     b_title: string;
     b_reg_date: string;
     b_contents: string;
+    b_content_type: string;
     b_file: FileData[];
     b_img: string | null;
     g_name: string | null;
@@ -41,6 +42,7 @@ export default function PostDetail({ category, detailIdx }: { category: string; 
             b_title: "",
             b_reg_date: "",
             b_contents: "",
+            b_content_type: "editor",
             b_file: [],
             b_img: null,
             g_name: null,
@@ -122,7 +124,8 @@ export default function PostDetail({ category, detailIdx }: { category: string; 
             </div>
             <div className="min-h-[300px] border-b border-[#D9D9D9] py-[24px]">
                 <div className="flex justify-center pb-[20px]"></div>
-                <QuillContent content={info.b_contents} />
+                {info.b_content_type === "editor" && <QuillContent content={info.b_contents} />}
+                {info.b_content_type === "html" && <div dangerouslySetInnerHTML={{ __html: info.b_contents }} />}
             </div>
             {info.b_file.length > 0 && (
                 <div className="flex border-b border-[#D9D9D9] p-[16px_20px]">
