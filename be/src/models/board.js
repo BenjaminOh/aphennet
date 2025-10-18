@@ -32,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.TEXT('medium'), // MEDIUMTEXT (16MB 제한)
                 allowNull: false,
             },
+            b_content_type: {
+                type: DataTypes.STRING(10),
+                allowNull: true,
+            },
             b_reg_date: {
                 type: DataTypes.DATE,
             },
