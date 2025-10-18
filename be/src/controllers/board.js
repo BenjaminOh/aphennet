@@ -583,6 +583,7 @@ exports.getBoardView = async (req, res, next) => {
         if (!result) {
             return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
         }
+        console.log(result);
 
         if (result.b_secret) {
             if (pass !== enumConfig.passTrueFalse.T[0]) {
@@ -644,6 +645,7 @@ exports.getBoardView = async (req, res, next) => {
             m_pwd: result.m_pwd,
             b_title: result.b_title,
             b_contents: result.b_contents,
+            b_content_type: result.b_content_type,
             b_reg_date: moment(result.b_reg_date).format('YYYY.MM.DD'),
             parent_id: result.parent_id,
             b_depth: result.b_depth,
