@@ -348,7 +348,7 @@ exports.getFirstBoardName = async (req, res, next) => {
                 c_use_yn: enumConfig.useType.Y[0],
                 c_content_type: {
                     [Op.in]: [
-                        enumConfig.contentType.CUSTOM[0],
+                        // enumConfig.contentType.CUSTOM[0],
                         enumConfig.contentType.BOARD[0],
                         enumConfig.contentType.GALLERY[0],
                         enumConfig.contentType.FAQ[0],

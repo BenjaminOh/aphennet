@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
             },
             b_contents: {
-                type: DataTypes.TEXT,
+                type: DataTypes.TEXT('medium'), // MEDIUMTEXT (16MB 제한)
                 allowNull: false,
             },
             b_reg_date: {
