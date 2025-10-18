@@ -3,7 +3,7 @@ import { Control, Controller, FieldErrors, UseFormRegister, UseFormSetValue } fr
 import InputError from "@/components/console/common/InputError";
 import TooltipBox from "@/components/console/common/TooltipBox";
 import Checkbox from "@/components/console/form/Checkbox";
-import EditorWithHtml from "@/components/console/form/EditorWithHtml";
+import EditorWithHtml2 from "@/components/console/form/EditorWithHtml2";
 import FileUpload, { FileData } from "@/components/console/form/FileUpload";
 import Input from "@/components/console/form/Input";
 import SelectBox, { SelectItem } from "@/components/console/form/SelectBox";
@@ -116,8 +116,15 @@ export default function PostFormBody({
                 </li>
             )}
             <li className="w-full">
-                <EditorWithHtml value={values.b_contents || ""} onChange={cont => setValue("b_contents", cont)} />
-                <InputError message={errors.b_contents?.message} />
+                <EditorWithHtml2
+                    editorValue={values.b_contents || ""}
+                    htmlValue={values.b_contents_html || ""}
+                    type={values.b_content_type ?? "editor"}
+                    onChangeEditorValue={cont => setValue("b_contents", cont)}
+                    onChangeHtmlValue={cont => setValue("b_contents_html", cont)}
+                    onTypeChange={type => setValue("b_content_type", type)}
+                />
+                <InputError message={errors.b_contents?.message || errors.b_contents_html?.message} />
             </li>
             <li className="flex w-full flex-col gap-[8px]">
                 <div className="flex items-center gap-[8px]">

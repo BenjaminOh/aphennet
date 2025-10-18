@@ -12,7 +12,7 @@ import InputError from "@/components/console/common/InputError";
 import Tabs from "@/components/console/common/Tabs";
 import Checkbox from "@/components/console/form/Checkbox";
 import DateRangePicker from "@/components/console/form/DateRangePicker";
-import EditorWithHtml from "@/components/console/form/EditorWithHtml";
+import EditorWithHtml2 from "@/components/console/form/EditorWithHtml2";
 import FileUpload, { FileData } from "@/components/console/form/FileUpload";
 import Input from "@/components/console/form/Input";
 import InputBox from "@/components/console/form/InputBox";
@@ -40,6 +40,8 @@ const schema = z
         b_mov_url: z.string().optional(),
         b_mov_play: z.enum(["Y", "N"]),
         b_content: z.string().optional(),
+        b_content_html: z.string().optional(),
+        b_content_type: z.enum(["editor", "html"]),
         file: z.enum(["Y", "N"]).optional(),
     })
     .superRefine((data, ctx) => {
@@ -111,6 +113,8 @@ export default function BannerForm({
             b_mov_url: "",
             b_mov_play: "N",
             b_content: "",
+            b_content_html: "",
+            b_content_type: "editor",
             file: "N",
         }),
         [],
@@ -183,6 +187,7 @@ export default function BannerForm({
                     b_content,
                 } = configData.data;
                 reset({
+                    ...initialValues,
                     b_open: b_open[0],
                     b_title,
                     b_width_size: b_width_size.toLocaleString(),
@@ -284,8 +289,20 @@ export default function BannerForm({
 
     // 저장하기
     const onSubmit = (data: FormValues) => {
-        const { b_width_size, b_height_size, isDate, b_s_date, b_e_date, file, b_c_type, b_mov_play, ...formData } =
-            data;
+        const {
+            b_width_size,
+            b_height_size,
+            isDate,
+            b_s_date,
+            b_e_date,
+            file,
+            b_c_type,
+            b_mov_play,
+            b_content_type,
+            b_content,
+            b_content_html,
+            ...formData
+        } = data;
         const baseBody = {
             ...formData,
             b_type: type,
@@ -305,6 +322,7 @@ export default function BannerForm({
                         : []
                     : [],
             b_mov_play: b_mov_play === "Y" ? "Y" : "",
+            b_content: b_content_type === "editor" ? b_content : b_content_html,
         };
         void isDate;
         void file;
@@ -678,9 +696,13 @@ export default function BannerForm({
                                             )}
                                             {tabOn === 2 && (
                                                 <li className="w-full">
-                                                    <EditorWithHtml
-                                                        value={values.b_content || ""}
-                                                        onChange={cont => setValue("b_content", cont)}
+                                                    <EditorWithHtml2
+                                                        editorValue={values.b_content || ""}
+                                                        htmlValue={values.b_content_html || ""}
+                                                        type={values.b_content_type ?? "editor"}
+                                                        onChangeEditorValue={cont => setValue("b_content", cont)}
+                                                        onChangeHtmlValue={cont => setValue("b_content_html", cont)}
+                                                        onTypeChange={type => setValue("b_content_type", type)}
                                                     />
                                                 </li>
                                             )}
