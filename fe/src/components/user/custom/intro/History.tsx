@@ -2,20 +2,20 @@ import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-// import history2001 from "@/assets/images/user/history2001.jpg";
-// import history2002 from "@/assets/images/user/history2002.jpg";
-// import history2003 from "@/assets/images/user/history2003.jpg";
-// import history2004 from "@/assets/images/user/history2004.jpg";
+import history2001 from "@/assets/images/user/history2001.jpg";
+import history2002 from "@/assets/images/user/history2002.jpg";
+import history2003 from "@/assets/images/user/history2003.jpg";
+import history2004 from "@/assets/images/user/history2004.jpg";
 // import history2005 from "@/assets/images/user/history2005.jpg";
 // import history2006 from "@/assets/images/user/history2006.jpg";
 // import history2007 from "@/assets/images/user/history2007.jpg";
 // import history2008 from "@/assets/images/user/history2008.jpg";
 // import history2009 from "@/assets/images/user/history2009.jpg";
 // import history2010 from "@/assets/images/user/history2010.jpg";
-// import history2011 from "@/assets/images/user/history2011.jpg";
-// import history2012 from "@/assets/images/user/history2012.jpg";
-// import history2013 from "@/assets/images/user/history2013.jpg";
-// import history2014 from "@/assets/images/user/history2014.jpg";
+import history2011 from "@/assets/images/user/history2011.jpg";
+import history2012 from "@/assets/images/user/history2012.jpg";
+import history2013 from "@/assets/images/user/history2013.jpg";
+import history2014 from "@/assets/images/user/history2014.jpg";
 import history2015 from "@/assets/images/user/history2015.jpg";
 import history2016 from "@/assets/images/user/history2016.jpg";
 import history2017 from "@/assets/images/user/history2017.jpg";
@@ -276,6 +276,263 @@ const items: Item[] = [
                     },
                 ],
             },
+            {
+                year: "2014",
+                img: history2014,
+                list: [
+                    { date: `02. 21`, text: `2014년도 정기총회 및 제1차 운영위원회(역사문제연구소)` },
+                    { date: `04. 11 ~ 04. 13`, text: `제13회 역사인식과 동아시아 평화포럼 난징대회(중국 난징)` },
+                    { date: `06. 19`, text: `일본 정부의 교과서 검정 제도 개악 저지를 위한 기자회견(서울)` },
+                    {
+                        date: `07. 28 ~ 08. 01`,
+                        text: `제13회 한중일 청소년 역사체험캠프(일본 도쿄) <br/>“청소년, 미래를 여는 역사와 평화를 배우다”`,
+                    },
+                    { date: `11. 07 ~ 11. 09`, text: `제34회 한중일3국공동역사교재편찬위원회 국제회의(일본 도쿄)` },
+                ],
+            },
+            {
+                year: "2013",
+                img: history2013,
+                list: [
+                    { date: `02. 22`, text: `2013년도 정기총회 및 제1차 운영위원회(역사문제연구소)` },
+                    { date: `03. 26`, text: `일본 정부의 교과서 검정 지침 개악에 대한 기자회견(서울)` },
+                    { date: `04. 05 ~ 04. 07`, text: `제12회 역사인식과 동아시아 평화포럼 교토대회(일본 교토)` },
+                    {
+                        date: `07. 29 ~ 08. 02`,
+                        text: `제12회 한중일 청소년 역사체험캠프(한국 인천) “아시아 청소년, 평화를 이야기하다”`,
+                    },
+                    { date: `09. 28`, text: `동아시아 평화 시민포럼 “전후 68년, 동아시아 평화를 말하다”(서울)` },
+                    { date: `11. 08 ~ 11. 10`, text: `제33회 한중일3국공동역사교재편찬위원회 국제회의(한국 서울)` },
+                ],
+            },
+            {
+                year: "2012",
+                img: history2012,
+                list: [
+                    { date: `02. 23`, text: `2012년도 정기총회 및 제1차 운영위원회(역사문제연구소)` },
+                    { date: `03. 16`, text: `‘2012 일본 중학교 교과서 검정 통과 결과 분석’ 기자회견(서울)` },
+                    { date: `03. 20`, text: `일본 교과서 검정 통과에 따른 한일 시민단체 공동행동 및 성명 발표` },
+                    { date: `04. 13 ~ 04. 15`, text: `제11회 역사인식과 동아시아 평화포럼 서울대회(한국 서울)` },
+                    {
+                        date: `07. 30 ~ 08. 03`,
+                        text: `제11회 한중일 청소년 역사체험캠프(중국 난징) <br/> “난징에서 함께 생각하는 동아시아의 평화와 공존”`,
+                    },
+                    { date: `11. 09 ~ 11. 11`, text: `제32회 한중일3국공동역사교과서편찬위원회 국제회의(중국 베이징)` },
+                ],
+            },
+            {
+                year: "2011",
+                img: history2011,
+                list: [
+                    { date: `02. 25`, text: `2011년도 정기총회 및 제1차 운영위원회(역사문제연구소)` },
+                    { date: `03. 30`, text: `‘2011 일본 역사왜곡 교과서 검정 통과’ 규탄 기자회견(서울)` },
+                    {
+                        date: `04. 07 ~ 04. 09`,
+                        text: `‘2011 일본 역사왜곡 교과서 검정 통과’에 대한 한일 시민단체 공동행동 및 기자회견 <br/>(일본 도쿄)`,
+                    },
+                    { date: `04. 13`, text: `일본 교과서 문제 대응 토론회 ‘한일 시민사회의 대응 방향’(서울)` },
+                    { date: `05. 03`, text: `일본 역사왜곡 교과서 불채택 촉구 한일 시민공동 성명 발표` },
+                    { date: `05. 10`, text: `일본의 역사왜곡 교과서 채택 저지를 위한 기자회견(서울)` },
+                    {
+                        date: `06. 11`,
+                        text: `일본의 역사왜곡 교과서 불채택을 위한 시민캠페인 <br/>(도쿄, 히로시마, 오카야마, 오사카 등)`,
+                    },
+                    {
+                        date: `07. 26 ~ 07. 29`,
+                        text: `제10회 한중일 청소년 역사체험캠프(한국 서울) “동아시아 청소년의 역사, 평화, 미래”`,
+                    },
+                    { date: `09. 17 ~ 09. 20`, text: `제10회 역사인식과 동아시아 평화포럼 베이징대회(중국 베이징)` },
+                    { date: `11. 26 ~ 11. 29`, text: `제31회 한중일3국공동역사교과서편찬위원회 국제회의(일본 오사카)` },
+                ],
+            },
+        ],
+    },
+    {
+        title: "2010 ~ 2006",
+        id: "content4",
+        history: [
+            {
+                year: "2004",
+                img: history2004,
+                list: [
+                    { date: `01. 13`, text: `중국 고구려사 왜곡 대책 공청회(서울 국회)` },
+                    {
+                        date: `02. 10`,
+                        text: `『일본 우익의 논리 - 일본 ‘새역모’의 역사관·교육관·한국관』 (역사비평사) 발간`,
+                    },
+                    { date: `02. 18`, text: `2004년도 정기대표자회의(프란치스코교육회관)` },
+                    {
+                        date: `03. 22 ~ 03. 24`,
+                        text: `일본의 과거청산을 요구하는 국제연대협의회 남북 실무협의회(금강산)`,
+                    },
+                    { date: `05. 20 ~ 05. 24`, text: `제2회 일본의 과거청산을 요구하는 국제연대협의회 서울대회(서울)` },
+                    {
+                        date: `08. 08 ~ 08. 13`,
+                        text: `제3회 한중일 청소년 역사체험캠프(한국 안양)<br />“1945.08.15 - 한·중·일 역사 인식의 공유”`,
+                    },
+                    { date: `08. 11`, text: `제3회 역사인식과 동아시아 평화포럼 서울대회(서울)` },
+                    {
+                        date: `08. 12 ~ 08. 13`,
+                        text: `2005년 일본교과서 검정채택 대비 한중일 시민단체 전략회의 및 기자회견(서울)`,
+                    },
+                    { date: `11. 02`, text: `올바른 과거청산법 쟁취를 위한 국회 앞 농성` },
+                    { date: `12. 31`, text: `2005년 일본교과서 검정·채택을 대비한 교육자료집 및 CD-ROM 제작` },
+                ],
+            },
+            {
+                year: "2003",
+                img: history2003,
+                list: [
+                    { date: `01. 09`, text: `출판기념회 및 신년하례회(크라운호텔)` },
+                    {
+                        date: `02. 07`,
+                        text: `2003년도 정기대표자회의 및 제1차 운영위원회(역사문제연구소)`,
+                    },
+                    { date: `02. 27 ~ 03. 01`, text: `제2회 역사인식과 동아시아 평화포럼 도쿄대회(일본 도쿄)` },
+                    {
+                        date: `04. 01`,
+                        text: `『한국사교과서의 희망을 찾아서 - 21세기 한국사교과서와 역사교육의 방향』 <br/>(역사비평사) 발간`,
+                    },
+                    {
+                        date: `06 ~ 07월`,
+                        text: `히로시마 ‘위험한’ 교과서 채택저지를 위한 한일공동서명 활동 전개`,
+                    },
+                    {
+                        date: `07. 25 ~ 07. 30`,
+                        text: `제2회 한일 청소년 역사체험캠프(일본 간사이) “전쟁 없는 세상! 우리가 함께 만들어요”`,
+                    },
+                    {
+                        date: `09. 08 ~ 09. 09`,
+                        text: `제4회 한중일3국공동역사교재편찬위원회 국제회의(중국 베이징)`,
+                    },
+                    {
+                        date: `09. 17 ~ 09. 18`,
+                        text: `제1회 일본의 과거청산을 요구하는 국제연대협의회 상하이대회(중국 상하이)`,
+                    },
+                    {
+                        date: `10. 30`,
+                        text: `‘미래를 여는 역사’ 영상 시사회 및 대학 특별강연 <br/>‘미래를 여는 역사’ 영상자료 각 시도 교육청 및 해외공관 배포`,
+                    },
+                    {
+                        date: `11. 21 ~ 11. 24`,
+                        text: `국제학술대회 ‘동아시아역사공동체 - 한중일 공동의 역사인식을 위해’`,
+                    },
+                    {
+                        date: `11. 21 ~ 11. 23`,
+                        text: `제5회 한중일3국공동역사교재편찬위원회 국제회의(서울)`,
+                    },
+                    {
+                        date: `11. 24`,
+                        text: `‘한중일 공동 역사부교재 편찬 작업 개시’ 한중일 공동기자회견(서울)`,
+                    },
+                    {
+                        date: `11. 28`,
+                        text: `일본의 과거청산을 요구하는 국제연대협의회 한국위원회 발족 기자회견`,
+                    },
+                    {
+                        date: `12. 30`,
+                        text: `『과거와 현재를 잇는 역사여행』 현장 답사 매뉴얼 발간`,
+                    },
+                ],
+            },
+            {
+                year: "2002",
+                img: history2002,
+                list: [
+                    { date: `01. 18 ~ 01. 20`, text: `『역사인식과 동아시아 평화포럼』 남경대회 준비회의(서울대)` },
+                    {
+                        date: `02. 06`,
+                        text: `2002년도 정기대표자회의 및 제1차 운영위원회(역사문제연구소)`,
+                    },
+                    {
+                        date: `02. 28`,
+                        text: `한일역사공동연구기구 설립과 관련 한일 시민단체 공동요청서 제출(한국)`,
+                    },
+                    {
+                        date: `03. 27 ~ 03. 31`,
+                        text: `제1회 역사인식과 동아시아 평화포럼 난징대회(중국 난징)`,
+                    },
+                    {
+                        date: `04. 09`,
+                        text: `‘최신일본사’ 검정통과에 대한 기자회견 및 한중일 공동 성명 발표(서울)`,
+                    },
+                    {
+                        date: `04. 13`,
+                        text: `‘화해와 반성을 위한 동아시아 역사인식 - 한중일 교과서와 비교를 중심으로’ 심포지엄`,
+                    },
+                    {
+                        date: `04. 17 ~ 05. 20`,
+                        text: `‘최신일본사’ 검정통과에 대한 한국정부의 강력대응을 촉구하는 1인 시위 <br/>(정부청사 입구)`,
+                    },
+                    {
+                        date: `05. 03`,
+                        text: `일본의 과거청산을 촉구하는 아시아지역 심포지엄(평양)`,
+                    },
+                    {
+                        date: `05. 03 ~ 07. 11`,
+                        text: `‘동아시아 평화 만들기’ 한일 공동캠페인`,
+                    },
+                    {
+                        date: `05. 20`,
+                        text: `『한국 지성의 소리 1 - 언론자료로 본 일본교과서 역사왜곡』 <br/>『한국 지성의 소리 2 - 지방자치단체의 결의』 (역사비평사) 발간`,
+                    },
+                    {
+                        date: `06 ~ 07월`,
+                        text: `‘최신일본사’ 불채택을 위한 한일연대캠페인(한국·일본 각지)`,
+                    },
+                    {
+                        date: `08. 18 ~ 08. 22`,
+                        text: `제1회 한일 청소년 역사체험캠프(한국 서울) <br/>“한국과 일본, 새로운 하나됨 : 한일 청소년의 힘으로”`,
+                    },
+                    {
+                        date: `08. 23 ~ 08. 25`,
+                        text: `제1회 한중일3국공동역사교재편찬위원회 국제회의(한국)`,
+                    },
+                    {
+                        date: `09. 16`,
+                        text: `‘조일 정상회담에 즈음하여 식민지배와 전쟁피해에 대한 사죄와 배상을 촉구하는 <br/>범국민 의견 광고’ 게재(한겨레신문)`,
+                    },
+                    {
+                        date: `11. 09`,
+                        text: `‘21세기 한국사 교과서와 역사교육의 방향 - 제7차 교육과정을 중심으로’ 심포지엄`,
+                    },
+                    {
+                        date: `11. 30`,
+                        text: `‘2002 평화 만들기’ 콘서트 개최(서울)`,
+                    },
+                ],
+            },
+            {
+                year: "2001",
+                img: history2001,
+                list: [
+                    { date: `03. 05`, text: `‘일본역사교과서개악저지운동본부’ 결성 제안` },
+                    {
+                        date: `03. 14`,
+                        text: `‘일본역사교과서개악저지운동본부’ 결성 선언 및 기자회견(55개 단체 참여)`,
+                    },
+                    {
+                        date: `03. 24`,
+                        text: `일본대사관 항의 방문, 일본 역사교과서 개악저지 집회`,
+                    },
+                    {
+                        date: `03. 26`,
+                        text: `일본 역사교과서 개악 규탄 아시아행동의 날 - 한일공동연대시위`,
+                    },
+                    {
+                        date: `04. 01`,
+                        text: `일본 역사교과서 개악 저지 서명운동 진행`,
+                    },
+                    {
+                        date: `04. 01`,
+                        text: `일본 문부성 ‘위험한’ 교과서 검정통과에 따른 한일공동 규탄 기자회견`,
+                    },
+                    {
+                        date: `04. 23`,
+                        text: `상설연대기구 ‘일본교과서바로잡기운동본부’ 창립(86개 단체 참여)`,
+                    },
+                ],
+            },
         ],
     },
 ];
@@ -316,7 +573,7 @@ export default function History() {
                 </div>
                 <div className="mx-auto max-w-[1360px] xl:flex xl:items-start xl:justify-between xl:pb-[160px]">
                     <div className="sticky top-[60px] z-[10] bg-[linear-gradient(316deg,#171E1D_6.2%,#206B6E_98.86%)] xl:min-h-[440px] xl:w-[320px] xl:rounded-[0_0_40px_0] xl:shadow-[8px_8px_20px_0_rgba(0,0,0,0.16)]">
-                        <ScrollArea>
+                        <ScrollArea className="relative z-[1]">
                             <ul className="flex w-max gap-[20px] p-[8px_20px] md:gap-[24px] md:p-[16px_28px] xl:flex-col xl:gap-[20px] xl:p-[40px]">
                                 {items.map((item, idx) => (
                                     <li key={`history_tab_${idx}`}>
