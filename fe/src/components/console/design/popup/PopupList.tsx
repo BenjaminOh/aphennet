@@ -23,10 +23,10 @@ import {
     initialPage,
     PopupListParams,
 } from "@/constants/console/listParams";
+import { usePagination } from "@/hooks/common/usePagination";
+import { useUrlParams } from "@/hooks/common/useUrlParams";
 import { useCheckboxList } from "@/hooks/console/useCheckboxList";
 import { useLangTypes } from "@/hooks/console/useLangTypes";
-import { usePagination } from "@/hooks/console/usePagination";
-import { useUrlParams } from "@/hooks/console/useUrlParams";
 import { useToast } from "@/hooks/use-toast";
 import { useDelPopup, useGetPopupList, usePostPopupOpen } from "@/service/console/design/popup";
 import { usePopupStore } from "@/store/common/usePopupStore";

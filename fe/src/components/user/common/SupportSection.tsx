@@ -53,9 +53,9 @@ export default function SupportSection({
                     }`}
                 >
                     <p className="text-[24px] font-[700] leading-[1.5] text-white md:text-[40px]">
-                        함께 하는 마음으로,
+                        함께 하는 마음으로
                         <br />
-                        함께 걷는 역사.
+                        함께 여는 역사
                     </p>
                     <p className="pt-[16px] text-[#ddd] md:pt-[24px] md:text-[20px]">
                         지금, 후원은 가장 쉬운 평화 실천입니다.

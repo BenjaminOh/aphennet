@@ -42,8 +42,14 @@ export interface DateParams {
     [key: string]: string | number;
 }
 
+// 공통 게시판분류 파라미터 타입
+export interface BoardGroupParams {
+    group: string;
+    [key: string]: string | number;
+}
+
 // 게시글관리 리스트 파라미터 타입
-export interface BoardListParams extends ListParams, SearchParams, DetailParams, CreateParams {
+export interface PostListParams extends ListParams, SearchParams, DetailParams, CreateParams, BoardGroupParams {
     edit: string; // 게시글 수정 ["0","1"]
 }
 

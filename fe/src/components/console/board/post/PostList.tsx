@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { notFound } from "next/navigation";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import LoadingSpinner from "@/components/common/common/LoadingSpinner";
@@ -18,15 +18,17 @@ import Checkbox from "@/components/console/form/Checkbox";
 import SearchInput from "@/components/console/form/SearchInput";
 import SelectBox, { SelectItem } from "@/components/console/form/SelectBox";
 import Toggle from "@/components/console/form/Toggle";
+import BoardGroupPop from "@/components/console/popup/BoardGroupPop";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { API_URL } from "@/config/apiConfig";
-import { BoardListParams, initialListSize, initialPage, listSearchTypes } from "@/constants/console/listParams";
+import { initialListSize, initialPage, listSearchTypes, PostListParams } from "@/constants/console/listParams";
+import { usePagination } from "@/hooks/common/usePagination";
+import { useUrlParams } from "@/hooks/common/useUrlParams";
 import { useCheckboxList } from "@/hooks/console/useCheckboxList";
-import { usePagination } from "@/hooks/console/usePagination";
-import { useUrlParams } from "@/hooks/console/useUrlParams";
 import { useToast } from "@/hooks/use-toast";
 import { useDelPost, useGetPostList } from "@/service/common";
-import { usePutPostMove, usePutPostNotice, usePutPostOrder } from "@/service/console/board/post";
+import { usePutPostNotice, usePutPostOrder } from "@/service/console/board/post";
+import { useGetBoardGroupList } from "@/service/console/menu/category";
 import { initialBoardSettingData, useBoardStore } from "@/store/common/useBoardStore";
 import { usePopupStore } from "@/store/common/usePopupStore";
 import { makeIntComma } from "@/utils/numberUtils";
@@ -42,7 +44,7 @@ const schema = z.object({
 
 type SearchValues = z.infer<typeof schema>;
 
-export interface BoardItem {
+export interface PostItem {
     idx: number;
     category: number;
     b_title: string;
@@ -54,23 +56,32 @@ export interface BoardItem {
     comment_count: number;
 }
 
+interface BoardGroupItem {
+    id: number;
+    g_num: number;
+    g_name: string;
+    use_yn: string[];
+}
+
 export default function PostList() {
     const params = useParams<{ category: string }>();
     const category = params.category;
     const prevCategoryRef = useRef(category);
     const { setBoardSettingData, boardSettingData } = useBoardStore();
-    const [items, setItems] = useState<BoardItem[]>([]);
+    const [boardGroupList, setBoardGroupList] = useState<SelectItem[]>([]);
+    const [boardGroup, setBoardGroup] = useState("");
+    const [groupEnabled, setGroupEnabled] = useState(false);
+    const [items, setItems] = useState<PostItem[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
-    const [moveBoardList, setMoveBoardList] = useState<SelectItem[]>([]);
-    const [moveCategory, setMoveCategory] = useState("");
-    const { urlParams, updateUrlParams, resetUrlParams } = useUrlParams<BoardListParams>({
+    const { urlParams, updateUrlParams, resetUrlParams } = useUrlParams<PostListParams>({
         page: { defaultValue: initialPage, type: "number" },
         search: { defaultValue: "titlecontents", type: "string", validValues: listSearchTypes.map(type => type.value) },
         searchtxt: { defaultValue: "", type: "string" },
         detail: { defaultValue: "", type: "string" },
         create: { defaultValue: "0", type: "string" },
         edit: { defaultValue: "0", type: "string" },
+        group: { defaultValue: "all", type: "string" },
     });
     const { currentPage, pages, setCurrentPage } = usePagination({ totalPages, initialPage: urlParams.page });
     const { allCheck, setCheckList, checkedList, setCheckedList, handleAllCheck, handleCheck } = useCheckboxList();
@@ -85,7 +96,9 @@ export default function PostList() {
             searchtxt: urlParams.searchtxt,
         },
     });
-    const searchFilterValues = useWatch({ control });
+    const { data: boardGroupListData, isLoading: isBoardGroupListLoading } = useGetBoardGroupList(category, {
+        enabled: groupEnabled,
+    });
     const {
         data: configData,
         isLoading: isInitialLoading,
@@ -98,10 +111,10 @@ export default function PostList() {
         { enabled: Boolean(category) },
         urlParams.search,
         urlParams.searchtxt,
+        urlParams.group === "all" ? "" : urlParams.group,
     );
     const putBoardOrderMutation = usePutPostOrder();
     const putBoardNoticeMutation = usePutPostNotice();
-    const putBoardMoveMutation = usePutPostMove();
     const delBoardMutation = useDelPost();
     const { setConfirmPop, setLoadingPop } = usePopupStore();
     const { toast } = useToast();
@@ -121,7 +134,7 @@ export default function PostList() {
     useEffect(() => {
         setValue("search", urlParams.search);
         setValue("searchtxt", urlParams.searchtxt);
-    }, [urlParams.search, urlParams.searchtxt, setValue]);
+    }, [urlParams.search, urlParams.searchtxt]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // detail 파라미터 동기화
     useEffect(() => {
@@ -138,24 +151,32 @@ export default function PostList() {
         setEditOn(urlParams.edit === "1");
     }, [urlParams.edit]);
 
+    // urlParams.group 변경 시만 동기화
+    useEffect(() => {
+        setBoardGroup(urlParams.group);
+    }, [urlParams.group]); // eslint-disable-line react-hooks/exhaustive-deps
+
     // currentPage 변경 시 URL 파라미터 업데이트
     const handleChangeCurrentPage = (page: number) => {
         updateUrlParams({
             page: page,
+            group: urlParams.group,
         });
         setCurrentPage(page);
     };
 
     // 검색 하기
     const handleSearch = () => {
-        const searchValue = searchFilterValues.search || "title";
-        const searchTxtValue = searchFilterValues.searchtxt || "";
+        const formValues = control._formValues;
+        const searchValue = formValues.search || "titlecontents";
+        const searchTxtValue = formValues.searchtxt || "";
 
         updateUrlParams({
             page: 1,
             search: searchValue,
             searchtxt: searchTxtValue,
             detail: undefined,
+            group: urlParams.group,
         });
         setCurrentPage(1);
     };
@@ -163,10 +184,37 @@ export default function PostList() {
     // 데이터 수정,삭제 중일 때 로딩 팝업 표시
     useEffect(() => {
         const isLoading =
-            putBoardNoticeMutation.isPending || delBoardMutation.isPending || putBoardOrderMutation.isPending;
-        setLoadingPop(isLoading, true);
+            isBoardGroupListLoading ||
+            putBoardNoticeMutation.isPending ||
+            delBoardMutation.isPending ||
+            putBoardOrderMutation.isPending;
+        setLoadingPop(isLoading);
         return () => setLoadingPop(false);
-    }, [putBoardNoticeMutation.isPending, delBoardMutation.isPending, putBoardOrderMutation.isPending, setLoadingPop]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        isBoardGroupListLoading,
+        putBoardNoticeMutation.isPending,
+        delBoardMutation.isPending,
+        putBoardOrderMutation.isPending,
+    ]);
+
+    // 게시판 분류 목록 조회
+    useEffect(() => {
+        if (boardGroupListData) {
+            const list = boardGroupListData.data.filter((item: BoardGroupItem) => item.use_yn[0] === "Y");
+            const newList = list.map((item: BoardGroupItem) => ({
+                value: item.id.toString(),
+                label: item.g_name,
+            }));
+            setBoardGroupList([{ value: "all", label: "전체" }, ...newList]);
+        } else {
+            setBoardGroupList([]);
+            updateUrlParams({
+                ...urlParams,
+                group: "",
+            });
+        }
+    }, [boardGroupListData]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // 게시글 목록 조회
     useEffect(() => {
@@ -196,19 +244,13 @@ export default function PostList() {
                 b_thumbnail_height: data.b_thumbnail_height,
                 b_group: data.b_group,
             });
-            setMoveBoardList(
-                data.board_Name.map((item: { category: number; c_name: string }) => ({
-                    value: item.category,
-                    label: item.c_name,
-                })),
-            );
+            setGroupEnabled(data.b_group === "Y");
         } else {
             setItems([]);
             setTotalPages(1);
             setTotalCount(0);
             setBoardSettingData(initialBoardSettingData);
-            setMoveBoardList([]);
-            setMoveCategory("");
+            setGroupEnabled(false);
         }
     }, [configData]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -224,6 +266,16 @@ export default function PostList() {
         setCheckList(items && items.length > 0 ? items.map(item => item.idx) : []);
         setCheckedList([]);
     }, [items, setCheckList, setCheckedList]);
+
+    // 게시글 분류 탭 변경 시 URL 파라미터 업데이트
+    const handleChangeBoardGroup = (value: string) => {
+        updateUrlParams({
+            ...urlParams,
+            page: 1,
+            group: value,
+        });
+        setCurrentPage(1);
+    };
 
     // 게시글 상세 열기
     const handleOpenDetail = (idx: number) => {
@@ -293,30 +345,6 @@ export default function PostList() {
                 });
                 refetch();
                 setDetailRefetch(true);
-            },
-        });
-    };
-
-    // 게시글 이동 확인
-    const handleConfirmMove = () => {
-        if (checkedList.length === 0) {
-            setConfirmPop(true, "게시글을 선택해주세요.", 1);
-        } else if (!moveCategory) {
-            setConfirmPop(true, "이동할 게시판을 선택해주세요.", 1);
-        } else {
-            setConfirmPop(true, "게시글을 이동하시겠습니까?", 2, () => handleMove());
-        }
-    };
-
-    // 게시글 이동하기
-    const handleMove = () => {
-        const body = { idx: checkedList, category: Number(moveCategory) };
-        putBoardMoveMutation.mutate(body, {
-            onSuccess: () => {
-                toast({
-                    title: "이동되었습니다.",
-                });
-                refetch();
             },
         });
     };
@@ -427,21 +455,15 @@ export default function PostList() {
                                             checked={allCheck}
                                             onChange={e => handleAllCheck(e.currentTarget.checked)}
                                         />
-                                        {moveBoardList.length > 0 && (
+                                        {groupEnabled && ( // 게시판 분류 사용시에만 노출
                                             <>
                                                 <SelectBox
-                                                    list={moveBoardList}
-                                                    value={moveCategory}
-                                                    onChange={setMoveCategory}
+                                                    list={boardGroupList}
+                                                    value={boardGroup}
+                                                    onChange={handleChangeBoardGroup}
                                                     triggerClassName="h-[34px]"
                                                 />
-                                                <button
-                                                    type="button"
-                                                    className="h-[34px] rounded-[8px] border border-[#181818] bg-white px-[16px] font-[500]"
-                                                    onClick={handleConfirmMove}
-                                                >
-                                                    이동
-                                                </button>
+                                                <BoardGroupPop parentId={category} />
                                             </>
                                         )}
                                         <button
@@ -455,7 +477,7 @@ export default function PostList() {
                                     <SearchInput {...register("searchtxt")} handleClick={handleSearch} />
                                 </div>
                                 {isInitialLoading ? (
-                                    <LoadingSpinner console />
+                                    <LoadingSpinner />
                                 ) : items && items.length > 0 ? (
                                     <DraggableList
                                         items={items}
@@ -471,7 +493,7 @@ export default function PostList() {
                                                 onClick={() => handleOpenDetail(item.idx)}
                                             >
                                                 <div className="flex min-w-0 flex-1 items-center gap-[16px]">
-                                                    <div className="flex justify-center pl-[24px]">
+                                                    <div className="flex shrink-0 justify-center pl-[24px]">
                                                         <Checkbox
                                                             checked={checkedList.includes(item.idx)}
                                                             onChange={e =>
@@ -481,24 +503,28 @@ export default function PostList() {
                                                     </div>
                                                     {/* 갤러리 게시판일때만 게시글 썸네일 노출 */}
                                                     {boardSettingData.c_content_type === 5 && item.b_img && (
-                                                        <div className="flex h-[90px] w-[160px] justify-center overflow-hidden rounded-[8px] border border-[#D9D9D9] bg-[#353535]">
+                                                        <div className="flex h-[90px] w-[160px] shrink-0 justify-center overflow-hidden rounded-[8px] border border-[#D9D9D9] bg-[#353535]">
                                                             <img
                                                                 src={`${API_URL}/${item.b_img}`}
                                                                 alt="게시글 이미지"
-                                                                className="h-full max-w-full"
+                                                                className="h-full max-w-full object-cover"
                                                             />
                                                         </div>
                                                     )}
-                                                    <div className="flex flex-1 items-center gap-[4px]">
+                                                    <div className="flex min-w-0 flex-1 basis-0 items-center gap-[4px]">
                                                         <p
-                                                            className={`truncate text-left font-[500] text-[#222] transition-all group-hover:underline${
+                                                            className={`min-w-0 flex-1 truncate text-left font-[500] text-[#222] transition-all group-hover:underline${
                                                                 detailOn === item.idx.toString() ? " underline" : ""
                                                             }`}
                                                         >
-                                                            {item.b_title}
+                                                            {`${
+                                                                groupEnabled && item.g_name ? `[${item.g_name}] ` : ""
+                                                            }${item.b_title}`}
                                                         </p>
                                                         {item.comment_count > 0 && (
-                                                            <p>({makeIntComma(item.comment_count)})</p>
+                                                            <p className="shrink-0">
+                                                                ({makeIntComma(item.comment_count)})
+                                                            </p>
                                                         )}
                                                     </div>
                                                 </div>
@@ -516,12 +542,6 @@ export default function PostList() {
                                                                 >
                                                                     {item.g_status}
                                                                 </p>
-                                                            </li>
-                                                        )}
-                                                        {boardSettingData.b_group === "Y" && ( // 게시판 분류 사용시에만 노출
-                                                            <li className="flex min-w-[80px] flex-col gap-[4px]">
-                                                                <p className="text-[14px] text-[#9F9FA5]">분류 유형</p>
-                                                                <p>{item.g_name}</p>
                                                             </li>
                                                         )}
                                                     </ul>

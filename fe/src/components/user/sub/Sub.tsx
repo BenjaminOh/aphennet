@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import { useGetSubCategory } from "@/service/user/menu";
 import { usePopupStore } from "@/store/common/usePopupStore";
 
+import PostDetail from "../board/PostDetail";
+import PostList from "../board/PostList";
 import Camp from "../custom/activities/Camp";
 import Forum from "../custom/activities/Forum";
 import JointTextbook from "../custom/activities/JointTextbook";
@@ -13,6 +15,7 @@ import Solidarity from "../custom/activities/Solidarity";
 import Textbook from "../custom/activities/Textbook";
 import About from "../custom/intro/About";
 import Greeting from "../custom/intro/Greeting";
+import History from "../custom/intro/History";
 import Location from "../custom/intro/Location";
 import Organization from "../custom/intro/Organization";
 import SubTop from "./-components/SubTop";
@@ -53,7 +56,9 @@ export default function Sub({
     return (
         <>
             <SubTop category={category} />
-            {configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/greeting" ? (
+            {postIdx && (configData?.data?.c_content_type?.[0] === 4 || configData?.data?.c_content_type?.[0] === 5) ? (
+                <PostDetail category={category} detailIdx={postIdx} />
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/greeting" ? (
                 <Greeting />
             ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/about" ? (
                 <About />
@@ -61,6 +66,8 @@ export default function Sub({
                 <Location />
             ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/organization" ? (
                 <Organization />
+            ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/history" ? (
+                <History />
             ) : configData?.data?.c_content_type?.[0] === 3 &&
               configData?.data?.file_path === "/activities/textbook" ? (
                 <Textbook />
@@ -74,6 +81,10 @@ export default function Sub({
             ) : configData?.data?.c_content_type?.[0] === 3 &&
               configData?.data?.file_path === "/activities/solidarity" ? (
                 <Solidarity />
+            ) : configData?.data?.c_content_type?.[0] === 4 ? (
+                <PostList category={category} boardType="board" />
+            ) : configData?.data?.c_content_type?.[0] === 5 ? (
+                <PostList category={category} boardType="gallery" />
             ) : null}
         </>
     );

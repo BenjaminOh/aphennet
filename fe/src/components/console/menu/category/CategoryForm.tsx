@@ -18,7 +18,6 @@ import ListSizeSelect from "@/components/console/form/ListSizeSelect";
 import Radio from "@/components/console/form/Radio";
 import Textarea from "@/components/console/form/Textarea";
 import Toggle from "@/components/console/form/Toggle";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { API_URL } from "@/config/apiConfig";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -33,7 +32,7 @@ import {
 } from "@/service/console/menu/category";
 import { usePopupStore } from "@/store/common/usePopupStore";
 
-import BoardGroupPop from "./-components/BoardGroupPop";
+import BoardGroupPop from "../../popup/BoardGroupPop";
 
 const schema = z
     .object({
@@ -234,7 +233,6 @@ export default function CategoryForm({
     const [getSubCategory, setGetSubCategory] = useState(false);
     const [files, setFiles] = useState<FileData[]>([]);
     const [filesData, setFilesData] = useState<File[]>([]);
-    const [boardGroupPop, setBoardGroupPop] = useState(false);
     const {
         data: categoryData,
         isLoading: isCategoryLoading,
@@ -988,7 +986,7 @@ export default function CategoryForm({
                                                                 render={({ field }) => <ListSizeSelect {...field} />}
                                                             />
                                                         </li>
-                                                        {tabOn > 4 && ( // FAQ, 문의게시판일때만 노출
+                                                        {tabOn > 2 && ( // 게시판 카테고리일때만 노출
                                                             <li className="flex w-full flex-col gap-[8px]">
                                                                 <p className="text-[#666]">게시판 분류 사용여부</p>
                                                                 {mode === "create" && (
@@ -1019,33 +1017,17 @@ export default function CategoryForm({
                                                                                 )}
                                                                             />
                                                                         </div>
-                                                                        <Dialog
-                                                                            open={boardGroupPop}
-                                                                            onOpenChange={setBoardGroupPop}
-                                                                        >
-                                                                            <DialogTrigger asChild>
-                                                                                <button
-                                                                                    type="button"
-                                                                                    className="h-[34px] rounded-[8px] border border-[#181818] px-[16px] font-[500]"
-                                                                                >
-                                                                                    분류 설정
-                                                                                </button>
-                                                                            </DialogTrigger>
-                                                                            {boardGroupPop && (
-                                                                                <BoardGroupPop
-                                                                                    parentId={detailIdx}
-                                                                                    allUseCheck={
-                                                                                        values.c_kind_use === "Y"
-                                                                                    }
-                                                                                    handleAllUseCheck={checked => {
-                                                                                        setValue(
-                                                                                            "c_kind_use",
-                                                                                            checked ? "Y" : "N",
-                                                                                        );
-                                                                                    }}
-                                                                                />
-                                                                            )}
-                                                                        </Dialog>
+                                                                        <BoardGroupPop
+                                                                            showAllUseCheck={true}
+                                                                            parentId={detailIdx}
+                                                                            allUseCheck={values.c_kind_use === "Y"}
+                                                                            handleAllUseCheck={checked => {
+                                                                                setValue(
+                                                                                    "c_kind_use",
+                                                                                    checked ? "Y" : "N",
+                                                                                );
+                                                                            }}
+                                                                        />
                                                                     </div>
                                                                 )}
                                                             </li>

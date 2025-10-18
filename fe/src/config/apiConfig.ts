@@ -35,6 +35,10 @@ export const USER_API_ROUTES = {
     },
 
     GET_MAIN_BANNER: "/v1/main/banner",
+
+    POST: {
+        GET_GROUP: "/v1/menu/boardGroup/:parent_id",
+    },
 };
 
 // 관리자

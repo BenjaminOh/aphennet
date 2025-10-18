@@ -54,6 +54,18 @@
         local("Lato-Bold"),
         url("../../fonts/Lato-Bold.ttf") format("truetype");
 }
+@font-face {
+    font-family: "GmarketSans";
+    font-style: normal;
+    font-weight: 700;
+    src:
+        local("GmarketSansTTFBold"),
+        url("../../fonts/GmarketSansTTFBold.ttf") format("truetype");
+}
+
+html {
+    scroll-behavior: smooth;
+}
 
 .user-layout {
     font-family:

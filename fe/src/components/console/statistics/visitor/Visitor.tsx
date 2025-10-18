@@ -14,8 +14,8 @@ import Input from "@/components/console/form/Input";
 import SelectBox from "@/components/console/form/SelectBox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { initialPage, VisitorListParams } from "@/constants/console/listParams";
-import { usePagination } from "@/hooks/console/usePagination";
-import { useUrlParams } from "@/hooks/console/useUrlParams";
+import { usePagination } from "@/hooks/common/usePagination";
+import { useUrlParams } from "@/hooks/common/useUrlParams";
 import { useGetVisitor } from "@/service/console/statistics";
 import { getOneMonthAgo, getSevenDaysAgo, getSixMonthsAgo, getThreeMonthsAgo, getToday } from "@/utils/dateUtils";
 

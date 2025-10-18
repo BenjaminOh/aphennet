@@ -11,12 +11,13 @@ export const useGetPostList = (
     options: { enabled: boolean },
     search?: string,
     searchtxt?: string,
+    group?: string,
 ) => {
     return useQuery({
-        queryKey: ["postList", category, limit, page, search, searchtxt],
+        queryKey: ["postList", category, limit, page, search, searchtxt, group],
         queryFn: async () => {
             const res = await consoleAxios.get(
-                `${COMMON_API_ROUTES.POST.GET_LIST.replace(":category", category).replace(":limit", limit)}?page=${page}${search ? `&search=${search}` : ""}${searchtxt ? `&searchtxt=${searchtxt}` : ""}`,
+                `${COMMON_API_ROUTES.POST.GET_LIST.replace(":category", category).replace(":limit", limit)}?page=${page}${search ? `&search=${search}` : ""}${searchtxt ? `&searchtxt=${searchtxt}` : ""}${group ? `&group_id=${group}` : ""}`,
             );
             return res.data;
         },

@@ -11,6 +11,7 @@ module.exports = {
             fontFamily: {
                 batang: ["KoPubWorld Batang", "serif"],
                 lato: ["Lato", "serif"],
+                gmarket: ["GmarketSans", "serif"],
             },
             colors: {
                 background: "hsl(var(--background))",
@@ -64,6 +65,7 @@ module.exports = {
             },
             backgroundImage: {
                 logo: "url('../assets/images/user/logo.png')",
+                logoFooter: "url('../assets/images/user/logoFooter.png')",
                 icMenu: "url('../assets/images/user/icMenu.png')",
                 icClose: "url('../assets/images/user/icClose.png')",
                 icInstagram: "url('../assets/images/user/icInstagram.png')",

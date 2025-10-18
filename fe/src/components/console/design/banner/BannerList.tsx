@@ -25,9 +25,9 @@ import {
     initialListSize,
     initialPage,
 } from "@/constants/console/listParams";
+import { usePagination } from "@/hooks/common/usePagination";
+import { useUrlParams } from "@/hooks/common/useUrlParams";
 import { useCheckboxList } from "@/hooks/console/useCheckboxList";
-import { usePagination } from "@/hooks/console/usePagination";
-import { useUrlParams } from "@/hooks/console/useUrlParams";
 import { useToast } from "@/hooks/use-toast";
 import { useDelBanner, useGetBannerList, usePostBannerOpen, usePutBannerOrder } from "@/service/console/design/banner";
 import { usePopupStore } from "@/store/common/usePopupStore";
