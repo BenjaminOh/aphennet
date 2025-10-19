@@ -133,12 +133,22 @@ export default function Header({ menuList = [] }: HeaderProps) {
                                 <div className="flex flex-col gap-[20px]">
                                     <ul className="flex flex-col gap-[8px] rounded-[8px] border border-[#ddd] p-[16px] md:p-[20px]">
                                         <li>
-                                            <a href="/" className="text-[18px] font-[500] text-[#666]">
+                                            <a
+                                                href="https://link.donationbox.co.kr/donationBoxList.jsp?campaignuid=okIiz0H7Vu"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-[18px] font-[500] text-[#666]"
+                                            >
                                                 후원하기
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="/" className="text-[18px] font-[500] text-[#666]">
+                                            <a
+                                                href="https://www.apnhi.net/"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-[18px] font-[500] text-[#666]"
+                                            >
                                                 아시아평화와역사연구소
                                             </a>
                                         </li>
@@ -146,7 +156,9 @@ export default function Header({ menuList = [] }: HeaderProps) {
                                     <ul className="flex gap-[20px]">
                                         <li>
                                             <a
-                                                href="/"
+                                                href="https://www.instagram.com/aphen2001"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
                                                 className="block size-[32px] bg-icInstagram bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
                                             >
                                                 인스타그램
@@ -154,10 +166,22 @@ export default function Header({ menuList = [] }: HeaderProps) {
                                         </li>
                                         <li>
                                             <a
-                                                href="/"
+                                                href="https://www.facebook.com/aphen2001"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
                                                 className="block size-[32px] bg-icFacebook bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
                                             >
                                                 페이스북
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                href="https://www.youtube.com/channel/UCLfVW_PlNxA7jXePV8wpE8w"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="block size-[32px] bg-icYoutube bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
+                                            >
+                                                유튜브
                                             </a>
                                         </li>
                                     </ul>
@@ -200,12 +224,22 @@ export default function Header({ menuList = [] }: HeaderProps) {
                     <div className="flex items-center gap-[20px]">
                         <ul className="flex items-center gap-[40px] rounded-[20px] border border-[#ddd] p-[8px_24px]">
                             <li>
-                                <a href="/" className="text-[18px] font-[500] text-[#666]">
+                                <a
+                                    href="https://link.donationbox.co.kr/donationBoxList.jsp?campaignuid=okIiz0H7Vu"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[18px] font-[500] text-[#666]"
+                                >
                                     후원하기
                                 </a>
                             </li>
                             <li>
-                                <a href="/" className="text-[18px] font-[500] text-[#666]">
+                                <a
+                                    href="https://www.apnhi.net/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[18px] font-[500] text-[#666]"
+                                >
                                     아시아평화와역사연구소
                                 </a>
                             </li>
@@ -233,7 +267,7 @@ export default function Header({ menuList = [] }: HeaderProps) {
                             </li>
                             <li>
                                 <a
-                                    href="www.youtube.com/channel/UCLfVW_PlNxA7jXePV8wpE8w"
+                                    href="https://www.youtube.com/channel/UCLfVW_PlNxA7jXePV8wpE8w"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="block size-[40px] bg-icYoutube bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"

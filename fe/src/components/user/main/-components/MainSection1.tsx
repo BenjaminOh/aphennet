@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import bgMainSection1 from "@/assets/images/user/bgMainSection1.jpg";
 import icMainSection1 from "@/assets/images/user/icMainSection1.png";
@@ -11,6 +12,7 @@ export default function MainSection1({
     sectRef: React.RefObject<HTMLDivElement>;
     sectOn: boolean;
 }) {
+    const router = useRouter();
     return (
         <div ref={sectRef} className="mx-auto max-w-[1720px] px-[20px] md:px-[28px] min-[1760px]:px-0">
             <div className="relative overflow-hidden rounded-[20px] py-[160px] md:rounded-[40px] md:py-[136px] xl:py-[160px]">
@@ -46,7 +48,7 @@ export default function MainSection1({
                             <br />
                             동아시아 공동의 기억을 함께 써 내려갑니다.
                         </p>
-                        <LinkButton txt="단체 소개" handleClick={() => {}} />
+                        <LinkButton txt="단체 소개" handleClick={() => router.push("/220")} />
                     </div>
                 </div>
             </div>
