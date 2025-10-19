@@ -58,7 +58,9 @@ const corsOptions = {
         'http://www.aphen.net',
         'https://www.aphen.net',
     ],
-    methods: ['GET', 'PUT', 'POST', 'DELETE'],
+    methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH'],  // OPTIONS, PATCH 추가
+    credentials: true,  // 추가
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept', 'Accept-Language', 'Content-Language'],  // 추가
 };
 
 app.set('trust proxy', 1); // 1단계 프록시 신뢰
