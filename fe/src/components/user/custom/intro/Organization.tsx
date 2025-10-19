@@ -133,7 +133,7 @@ export default function Organization() {
                                     조기홍
                                 </td>
                                 <td className="p-[16px_8px] text-[#666] md:px-[20px] md:text-[18px]">
-                                    삼우회계 공인회계사
+                                    삼우회계사무소 공인회계사
                                 </td>
                             </tr>
                             <tr className="border-b border-[#999999]">
@@ -304,7 +304,7 @@ export default function Organization() {
                                     이신철
                                 </td>
                                 <td className="p-[16px_8px] text-[#666] md:px-[20px] md:text-[18px]">
-                                    아시아평화와역사 연구위원
+                                    아시아평화와역사연구소 연구위원
                                 </td>
                             </tr>
                             <tr className="border-b border-[#999999]">
