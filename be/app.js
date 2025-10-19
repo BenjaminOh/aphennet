@@ -119,8 +119,8 @@ app.use(bodyParser.json({ limit: '50mb' })); // JSON 데이터 허용 크기
 
 app.use('/storage', express.static(path.join(process.cwd(), 'storage')));
 
-// Rate limiting 적용
-app.use(securityMiddleware.requestLimiter);
+// Rate limiting 적용 (임시 비활성화)
+// app.use(securityMiddleware.requestLimiter);
 
 // logs
 app.use(utilMiddleware.trimQuery);
@@ -129,8 +129,8 @@ app.use((req, res, next) => {
     next();
 });
 
-// 보안 미들웨어 적용
-app.use(securityMiddleware.security);
+// 보안 미들웨어 적용 (임시 비활성화)
+// app.use(securityMiddleware.security);
 
 // Routes
 app.use('/v1/board', boardRoutes);
