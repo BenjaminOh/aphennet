@@ -48,19 +48,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(requestIp.mw());
 
-const corsOptions = {
-    origin: [
-        'http://localhost:3000',
-        'http://localhost:3001',
-        'https://aphennet.likeweb.co.kr',
-        'http://aphen.net',
-        'https://aphen.net',
-        'http://www.aphen.net',
-        'https://www.aphen.net',
-    ],
-    methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH'],  // OPTIONS, PATCH 추가
-};
-
+// CORS 설정 - 모든 origin 허용 (개발용)
 app.use(cors());
 
 // 상세한 요청 로깅 미들웨어
@@ -118,10 +106,14 @@ app.use((req, res, next) => {
             },
         })(req, res, next);
     } else {
-        helmet()(req, res, next);
+        // CORS와 호환되는 helmet 설정
+        helmet({
+            crossOriginResourcePolicy: { policy: 'cross-origin' },
+            crossOriginEmbedderPolicy: false, // CORS를 위해 비활성화
+            crossOriginOpenerPolicy: false,    // CORS를 위해 비활성화
+        })(req, res, next);
     }
 });
-app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' })); // URL-encoded 데이터 허용 크기
 app.use(bodyParser.json({ limit: '50mb' })); // JSON 데이터 허용 크기
 
