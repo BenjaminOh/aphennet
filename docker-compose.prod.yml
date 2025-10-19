@@ -53,6 +53,8 @@ services:
             timeout: 10s
             retries: 3
             start_period: 40s
+        volumes:
+            - upload_data:/app/upload
 
     # MariaDB (운영환경) - MariaDB 최신 버전 사용
     mariadb:
@@ -82,6 +84,7 @@ volumes:
     mariadb_data:
     nextjs_node_modules:
     nodejs_node_modules:
+    upload_data:
 
 networks:
     nginx-network:

@@ -68,6 +68,7 @@ services:
 volumes:
     nextjs_node_modules:
     nodejs_node_modules:
+    upload_data:
 
 networks:
     nginx-network:
