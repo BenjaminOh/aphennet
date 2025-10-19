@@ -67,6 +67,45 @@ app.set('trust proxy', 1); // 1단계 프록시 신뢰
 
 app.use(cors());
 
+// 상세한 요청 로깅 미들웨어
+app.use((req, res, next) => {
+    const timestamp = new Date().toISOString();
+    const clientIp = req.clientIp || req.ip || req.connection.remoteAddress;
+    
+    console.log('\n=== 요청 정보 ===');
+    console.log(`[${timestamp}] ${req.method} ${req.url}`);
+    console.log(`클라이언트 IP: ${clientIp}`);
+    console.log(`User-Agent: ${req.get('User-Agent') || 'N/A'}`);
+    console.log(`Origin: ${req.get('Origin') || 'N/A'}`);
+    console.log(`Referer: ${req.get('Referer') || 'N/A'}`);
+    console.log(`Host: ${req.get('Host') || 'N/A'}`);
+    console.log(`X-Forwarded-For: ${req.get('X-Forwarded-For') || 'N/A'}`);
+    console.log(`X-Real-IP: ${req.get('X-Real-IP') || 'N/A'}`);
+    
+    // 요청 헤더 전체 출력
+    console.log('\n=== 요청 헤더 ===');
+    Object.keys(req.headers).forEach(key => {
+        console.log(`${key}: ${req.headers[key]}`);
+    });
+    
+    // 요청 본문 (POST, PUT, PATCH의 경우)
+    if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
+        console.log('\n=== 요청 본문 ===');
+        console.log('Body:', JSON.stringify(req.body, null, 2));
+        console.log('Content-Type:', req.get('Content-Type') || 'N/A');
+    }
+    
+    // 쿼리 파라미터
+    if (Object.keys(req.query).length > 0) {
+        console.log('\n=== 쿼리 파라미터 ===');
+        console.log('Query:', JSON.stringify(req.query, null, 2));
+    }
+    
+    console.log('==================\n');
+    
+    next();
+});
+
 // Swagger 경로를 제외한 모든 경로에 helmet 적용
 app.use((req, res, next) => {
     if (req.path.startsWith('/api-docs')) {
