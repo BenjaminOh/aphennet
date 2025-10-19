@@ -31,7 +31,7 @@ export default function SupportSection({
                             ‘대안’을 제시하면서 나아가겠습니다.
                         </p>
                         <a
-                            href="/"
+                            href="https://www.apnhi.net/"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-start gap-[10px] md:text-[20px]"
