@@ -20,7 +20,7 @@ echo "✅ 모든 컨테이너가 재시작되었습니다."
 
 # 3. nginx 재시작 (중요!)
 echo "### nginx 재시작 중..."
-cd ../nginx/infrastructure
+cd cd ../nginxcertbot/infrastructure
 docker compose -f docker-compose.prod.yml restart nginx
 echo "✅ nginx가 재시작되었습니다."
 
