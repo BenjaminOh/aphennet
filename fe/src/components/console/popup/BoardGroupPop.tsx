@@ -167,7 +167,7 @@ export default function BoardGroupPop({
             <DialogTrigger asChild>
                 <button
                     type="button"
-                    className="bg h-[34px] rounded-[8px] border border-[#181818] bg-white px-[16px] font-[500]"
+                    className="h-[34px] rounded-[8px] border border-[#181818] bg bg-white px-[16px] font-[500]"
                 >
                     분류 설정
                 </button>
