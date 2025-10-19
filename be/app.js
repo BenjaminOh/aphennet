@@ -136,8 +136,8 @@ app.use((req, res, next) => {
     next();
 });
 
-// 보안 미들웨어 적용
-app.use(securityMiddleware.security);
+// 보안 미들웨어 적용 (임시 비활성화)
+// app.use(securityMiddleware.security);
 
 // Routes
 app.use('/v1/board', boardRoutes);
