@@ -18,7 +18,13 @@ echo "### 컨테이너 재시작 중..."
 docker compose -f docker-compose.prod.yml up -d --build
 echo "✅ 모든 컨테이너가 재시작되었습니다."
 
-# 3. 상태 확인
+# 3. nginx 재시작 (중요!)
+echo "### nginx 재시작 중..."
+cd ../nginx/infrastructure
+docker compose -f docker-compose.prod.yml restart nginx
+echo "✅ nginx가 재시작되었습니다."
+
+# 4. 상태 확인
 echo "### 상태 확인 중..."
 sleep 5
 

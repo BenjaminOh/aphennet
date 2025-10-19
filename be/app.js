@@ -65,7 +65,7 @@ const corsOptions = {
 
 app.set('trust proxy', 1); // 1단계 프록시 신뢰
 
-app.use(cors(corsOptions));
+app.use(cors());
 
 // Swagger 경로를 제외한 모든 경로에 helmet 적용
 app.use((req, res, next) => {
