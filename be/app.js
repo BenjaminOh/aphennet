@@ -48,47 +48,18 @@ const PORT = process.env.PORT || 3000;
 
 app.use(requestIp.mw());
 
-// CORS 설정 - 모든 origin 허용 (개발용)
-app.use(cors());
+const corsOptions = {
+    origin: [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'https://aphennet.likeweb.co.kr',
+    ],
+    methods: ['GET', 'PUT', 'POST', 'DELETE'],
+};
 
-// 상세한 요청 로깅 미들웨어
-app.use((req, res, next) => {
-    const timestamp = new Date().toISOString();
-    const clientIp = req.clientIp || req.ip || req.connection.remoteAddress;
-    
-    console.log('\n=== 요청 정보 ===');
-    console.log(`[${timestamp}] ${req.method} ${req.url}`);
-    console.log(`클라이언트 IP: ${clientIp}`);
-    console.log(`User-Agent: ${req.get('User-Agent') || 'N/A'}`);
-    console.log(`Origin: ${req.get('Origin') || 'N/A'}`);
-    console.log(`Referer: ${req.get('Referer') || 'N/A'}`);
-    console.log(`Host: ${req.get('Host') || 'N/A'}`);
-    console.log(`X-Forwarded-For: ${req.get('X-Forwarded-For') || 'N/A'}`);
-    console.log(`X-Real-IP: ${req.get('X-Real-IP') || 'N/A'}`);
-    
-    // 요청 헤더 전체 출력
-    console.log('\n=== 요청 헤더 ===');
-    Object.keys(req.headers).forEach(key => {
-        console.log(`${key}: ${req.headers[key]}`);
-    });
-    
-    // 요청 본문 (POST, PUT, PATCH의 경우)
-    if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
-        console.log('\n=== 요청 본문 ===');
-        console.log('Body:', JSON.stringify(req.body, null, 2));
-        console.log('Content-Type:', req.get('Content-Type') || 'N/A');
-    }
-    
-    // 쿼리 파라미터
-    if (Object.keys(req.query).length > 0) {
-        console.log('\n=== 쿼리 파라미터 ===');
-        console.log('Query:', JSON.stringify(req.query, null, 2));
-    }
-    
-    console.log('==================\n');
-    
-    next();
-});
+app.set('trust proxy', 1); // 1단계 프록시 신뢰
+
+app.use(cors(corsOptions));
 
 // Swagger 경로를 제외한 모든 경로에 helmet 적용
 app.use((req, res, next) => {
@@ -106,21 +77,17 @@ app.use((req, res, next) => {
             },
         })(req, res, next);
     } else {
-        // CORS와 호환되는 helmet 설정
-        helmet({
-            crossOriginResourcePolicy: { policy: 'cross-origin' },
-            crossOriginEmbedderPolicy: false, // CORS를 위해 비활성화
-            crossOriginOpenerPolicy: false,    // CORS를 위해 비활성화
-        })(req, res, next);
+        helmet()(req, res, next);
     }
 });
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' })); // URL-encoded 데이터 허용 크기
 app.use(bodyParser.json({ limit: '50mb' })); // JSON 데이터 허용 크기
 
 app.use('/storage', express.static(path.join(process.cwd(), 'storage')));
 
-// Rate limiting 적용 (임시 비활성화)
-// app.use(securityMiddleware.requestLimiter);
+// Rate limiting 적용
+app.use(securityMiddleware.requestLimiter);
 
 // logs
 app.use(utilMiddleware.trimQuery);
@@ -129,8 +96,8 @@ app.use((req, res, next) => {
     next();
 });
 
-// 보안 미들웨어 적용 (임시 비활성화)
-// app.use(securityMiddleware.security);
+// 보안 미들웨어 적용
+app.use(securityMiddleware.security);
 
 // Routes
 app.use('/v1/board', boardRoutes);
