@@ -11,7 +11,7 @@ import UserPopup from "@/components/user/popup/Popup";
 // 동적 메타데이터 생성
 export async function generateMetadata(): Promise<Metadata> {
     try {
-        const response = await fetch("https://api.aphen.net/v1/config/site/aphen/KR", {
+        const response = await fetch("https://api.aphen.net/v1/config/site/aphen/KR", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
         if (!response.ok) {
             return {
-                metadataBase: new URL("https://aphen.net/"),
+                metadataBase: new URL("https://aphen.net/"),
                 title: "아시아평화와역사교육연대",
                 description: "아시아평화와역사교육연대",
                 keywords: "아시아평화와역사교육연대",
@@ -34,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
                 robots: "index,follow",
                 openGraph: {
                     type: "website",
-                    url: "https://aphen.net/",
+                    url: "https://aphen.net/",
                     title: "아시아평화와역사교육연대",
                     description: "아시아평화와역사교육연대",
                     siteName: "아시아평화와역사교육연대",
@@ -57,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
         if (!siteInfo) {
             return {
-                metadataBase: new URL("https://aphen.net/"),
+                metadataBase: new URL("https://aphen.net/"),
                 title: "아시아평화와역사교육연대",
                 description: "아시아평화와역사교육연대",
                 keywords: "아시아평화와역사교육연대",
@@ -67,7 +67,7 @@ export async function generateMetadata(): Promise<Metadata> {
         const { c_b_title, c_meta, c_meta_tag } = siteInfo;
 
         return {
-            metadataBase: new URL("https://aphen.net/"),
+            metadataBase: new URL("https://aphen.net/"),
             title: c_b_title || "아시아평화와역사교육연대",
             description: c_meta || "아시아평화와역사교육연대",
             keywords: c_meta_tag || "아시아평화와역사교육연대",
@@ -75,7 +75,7 @@ export async function generateMetadata(): Promise<Metadata> {
             robots: "index,follow",
             openGraph: {
                 type: "website",
-                url: "https://aphen.net/",
+                url: "https://aphen.net/",
                 title: c_b_title || "아시아평화와역사교육연대",
                 description: c_meta || "아시아평화와역사교육연대",
                 siteName: "아시아평화와역사교육연대",
@@ -93,7 +93,7 @@ export async function generateMetadata(): Promise<Metadata> {
         };
     } catch {
         return {
-            metadataBase: new URL("https://aphen.net/"),
+            metadataBase: new URL("https://aphen.net/"),
             title: "아시아평화와역사교육연대",
             description: "아시아평화와역사교육연대",
             keywords: "아시아평화와역사교육연대",
@@ -101,7 +101,7 @@ export async function generateMetadata(): Promise<Metadata> {
             robots: "index,follow",
             openGraph: {
                 type: "website",
-                url: "https://aphen.net/",
+                url: "https://aphen.net/",
                 title: "아시아평화와역사교육연대",
                 description: "아시아평화와역사교육연대",
                 siteName: "아시아평화와역사교육연대",
