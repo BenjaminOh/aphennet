@@ -31,6 +31,8 @@ exports.getCategoryList = async (req, res, next) => {
                 'c_menu_off_img',
                 'c_content_type',
                 'c_lang',
+                'c_link_target',
+                'c_link_url',
             ],
             order: [
                 ['c_depth', 'ASC'],
@@ -107,6 +109,8 @@ exports.getCategoryList = async (req, res, next) => {
                             c_menu_off_img: item.c_menu_off_img,
                             c_content_type: utilMiddleware.mapContentType(item.c_content_type),
                             c_lang: item.c_lang,
+                            c_link_target: item.c_link_target,
+                            c_link_url: item.c_link_url,
                             submenu,
                         };
                     } else {
@@ -124,6 +128,8 @@ exports.getCategoryList = async (req, res, next) => {
                             c_menu_off_img: item.c_menu_off_img,
                             c_content_type: utilMiddleware.mapContentType(item.c_content_type),
                             c_lang: item.c_lang,
+                            c_link_target: item.c_link_target,
+                            c_link_url: item.c_link_url,
                         };
                     }
                 });

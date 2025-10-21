@@ -53,10 +53,11 @@ const corsOptions = {
         'http://localhost:3000',
         'http://localhost:3001',
         'https://aphen.net',
-        'https://www.aphen.net',
+        'https://www.aphen.net',  // 추가
         'https://api.aphen.net',
     ],
     methods: ['GET', 'PUT', 'POST', 'DELETE'],
+    credentials: true,
 };
 
 app.set('trust proxy', 1); // 1단계 프록시 신뢰
@@ -123,8 +124,8 @@ app.use((req, res, next) => {
     }
 });
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
-app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' })); // URL-encoded 데이터 허용 크기
-app.use(bodyParser.json({ limit: '50mb' })); // JSON 데이터 허용 크기
+app.use(bodyParser.json({ limit: '50mb' }));  // 기본값에서 증가
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use('/storage', express.static(path.join(process.cwd(), 'storage')));
 
@@ -142,9 +143,9 @@ app.use((req, res, next) => {
 // app.use(securityMiddleware.security);
 
 // Routes
-app.use('/v1/board', boardRoutes);
+app.use('/v1/board', boardRoutes); 
 app.use('/v1/comment', commentRoutes);
-app.use('/v1/auth', authRoutes);
+app.use('/v1/auth', authRoutes);  
 
 app.use('/v1/menu', menuUserRoutes);
 app.use('/v1/config', configUserRoutes);
