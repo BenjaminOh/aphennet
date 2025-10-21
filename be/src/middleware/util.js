@@ -54,8 +54,7 @@ exports.base64ToImagesPath = async b_contents => {
                 // Replace the base64 data with the image path in temp_contents
                 temp_contents = temp_contents.replace(imageData, process.env.API_URL + '/' + imagePath);
                 
-                // 메모리 정리
-                decodedImage = null;
+                // 메모리 정리 (Buffer는 자동으로 가비지 컬렉션됨)
             } catch (err) {
                 console.error('Failed to save the image: ' + err);
                 throw new Error('Image upload failed');
