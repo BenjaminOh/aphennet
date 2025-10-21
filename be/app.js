@@ -54,6 +54,7 @@ const corsOptions = {
         'http://localhost:3001',
         'https://aphen.net',
         'https://www.aphen.net',
+        'https://api.aphen.net',
     ],
     methods: ['GET', 'PUT', 'POST', 'DELETE'],
 };
