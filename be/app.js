@@ -53,6 +53,7 @@ const corsOptions = {
         'http://localhost:3000',
         'http://localhost:3001',
         'https://aphen.net',
+        'https://www.aphen.net',
     ],
     methods: ['GET', 'PUT', 'POST', 'DELETE'],
 };
