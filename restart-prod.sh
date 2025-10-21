@@ -34,5 +34,5 @@ docker compose -f docker-compose.prod.yml ps
 
 echo ""
 echo "=== 재시작 완료! ==="
-echo "🌐 프론트엔드: https://aphennet.likeweb.co.kr"
-echo "🔌 API: https://aphennetapi.likeweb.co.kr"
+echo "🌐 프론트엔드: https://aphen.net"
+echo "🔌 API: https://api.aphen.net"

@@ -10,7 +10,7 @@ services:
             dockerfile: Dockerfile
             target: production
             args:
-                NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL_PROD:-https://aphennetapi.likeweb.co.kr}
+                NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL_PROD:-https://api.aphen.net}
                 NEXT_PUBLIC_SITE_ID: ${NEXT_PUBLIC_SITE_ID:-aphennet}
                 NEXT_PUBLIC_MAINT_NAME: ${NEXT_PUBLIC_MAINT_NAME:-Aphennet}
                 NEXT_PUBLIC_ENCRYPTION_KEY: ${NEXT_PUBLIC_ENCRYPTION_KEY:-your_encryption_key}
@@ -19,7 +19,7 @@ services:
             - "${REACT_EXPOSE_PORT:-3000}:3000"
         environment:
             - NODE_ENV=production
-            - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL_PROD:-https://aphennetapi.likeweb.co.kr}
+            - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL_PROD:-https://api.aphen.net}
             - TZ=Asia/Seoul
         env_file:
             - ./.env

@@ -52,7 +52,7 @@ const corsOptions = {
     origin: [
         'http://localhost:3000',
         'http://localhost:3001',
-        'https://aphennet.likeweb.co.kr',
+        'https://aphen.net',
     ],
     methods: ['GET', 'PUT', 'POST', 'DELETE'],
 };
