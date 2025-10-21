@@ -9,15 +9,37 @@ const enumConfig = require('../middleware/enum');
 //게시글 내용 base64 이미지 변경
 exports.base64ToImagesPath = async b_contents => {
     let temp_contents = b_contents;
+    
+    // 서버 사양에 맞는 크기 제한 (1GB RAM)
+    const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+    const MAX_TOTAL_SIZE = 30 * 1024 * 1024; // 30MB
+    const MAX_IMAGES = 15; // 최대 15개 이미지
 
     const imageMatches = temp_contents.match(/data:image\/\w+;base64,([^"]+)/g);
     const imagePaths = [];
 
     if (imageMatches) {
+        // 이미지 개수 제한
+        if (imageMatches.length > MAX_IMAGES) {
+            throw new Error(`이미지는 최대 ${MAX_IMAGES}개까지 업로드 가능합니다.`);
+        }
+        
+        let totalSize = 0;
+        
         for (let index = 0; index < imageMatches.length; index++) {
             const imageData = imageMatches[index];
             const imageDataWithoutPrefix = imageData.replace(/^data:image\/\w+;base64,/, '');
-            const decodedImage = Buffer.from(imageDataWithoutPrefix, 'base64');
+            
+            // 크기 체크 (base64는 원본보다 33% 더 큼)
+            const decodedSize = (imageDataWithoutPrefix.length * 3) / 4;
+            if (decodedSize > MAX_IMAGE_SIZE) {
+                throw new Error(`이미지 크기가 너무 큽니다: ${Math.round(decodedSize / 1024 / 1024)}MB (최대 5MB)`);
+            }
+            
+            totalSize += decodedSize;
+            if (totalSize > MAX_TOTAL_SIZE) {
+                throw new Error(`전체 이미지 크기가 너무 큽니다: ${Math.round(totalSize / 1024 / 1024)}MB (최대 30MB)`);
+            }
 
             // 이미지 파일 경로 및 이름 생성
             const imageName = Date.now() + '_' + index + '.jpg';
@@ -26,11 +48,14 @@ exports.base64ToImagesPath = async b_contents => {
 
             // 이미지 파일을 저장
             try {
+                const decodedImage = Buffer.from(imageDataWithoutPrefix, 'base64');
                 await fs.promises.writeFile(imagePath, decodedImage);
-                //console.log('Image saved as ' + imagePath);
-
+                
                 // Replace the base64 data with the image path in temp_contents
                 temp_contents = temp_contents.replace(imageData, process.env.API_URL + '/' + imagePath);
+                
+                // 메모리 정리
+                decodedImage = null;
             } catch (err) {
                 console.error('Failed to save the image: ' + err);
                 throw new Error('Image upload failed');
@@ -38,8 +63,6 @@ exports.base64ToImagesPath = async b_contents => {
         }
     }
 
-    //console.log(temp_contents);
-    //console.log(imagePaths);
     return { temp_contents, imagePaths };
 };
 
