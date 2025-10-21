@@ -41,7 +41,7 @@ services:
         environment:
             - NODE_ENV=production
             - TZ=Asia/Seoul
-            - NODE_OPTIONS=--max-old-space-size=768
+            - NODE_OPTIONS=--max-old-space-size=600
         env_file:
             - ./.env
         networks:

@@ -11,9 +11,9 @@ exports.base64ToImagesPath = async b_contents => {
     let temp_contents = b_contents;
     
     // 서버 사양에 맞는 크기 제한 (1GB RAM)
-    const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
-    const MAX_TOTAL_SIZE = 30 * 1024 * 1024; // 30MB
-    const MAX_IMAGES = 15; // 최대 15개 이미지
+    const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
+    const MAX_TOTAL_SIZE = 10 * 1024 * 1024; // 10MB
+    const MAX_IMAGES = 5; // 최대 5개 이미지
 
     const imageMatches = temp_contents.match(/data:image\/\w+;base64,([^"]+)/g);
     const imagePaths = [];
@@ -33,12 +33,12 @@ exports.base64ToImagesPath = async b_contents => {
             // 크기 체크 (base64는 원본보다 33% 더 큼)
             const decodedSize = (imageDataWithoutPrefix.length * 3) / 4;
             if (decodedSize > MAX_IMAGE_SIZE) {
-                throw new Error(`이미지 크기가 너무 큽니다: ${Math.round(decodedSize / 1024 / 1024)}MB (최대 5MB)`);
+                throw new Error(`이미지 크기가 너무 큽니다: ${Math.round(decodedSize / 1024 / 1024)}MB (최대 3MB)`);
             }
             
             totalSize += decodedSize;
             if (totalSize > MAX_TOTAL_SIZE) {
-                throw new Error(`전체 이미지 크기가 너무 큽니다: ${Math.round(totalSize / 1024 / 1024)}MB (최대 30MB)`);
+                throw new Error(`전체 이미지 크기가 너무 큽니다: ${Math.round(totalSize / 1024 / 1024)}MB (최대 10MB)`);
             }
 
             // 이미지 파일 경로 및 이름 생성
