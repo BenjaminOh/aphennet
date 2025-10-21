@@ -156,12 +156,12 @@ export default function Header({ menuList = [] }: HeaderProps) {
                                     <ul className="flex gap-[20px]">
                                         <li>
                                             <a
-                                                href="https://www.instagram.com/aphen2001"
+                                                href="https://www.youtube.com/channel/UCLfVW_PlNxA7jXePV8wpE8w"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="block size-[32px] bg-icInstagram bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
+                                                className="block size-[32px] bg-icYoutube bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
                                             >
-                                                인스타그램
+                                                유튜브
                                             </a>
                                         </li>
                                         <li>
@@ -176,12 +176,12 @@ export default function Header({ menuList = [] }: HeaderProps) {
                                         </li>
                                         <li>
                                             <a
-                                                href="https://www.youtube.com/channel/UCLfVW_PlNxA7jXePV8wpE8w"
+                                                href="https://www.instagram.com/aphen2001"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="block size-[32px] bg-icYoutube bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
+                                                className="block size-[32px] bg-icInstagram bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
                                             >
-                                                유튜브
+                                                인스타그램
                                             </a>
                                         </li>
                                     </ul>
@@ -247,12 +247,12 @@ export default function Header({ menuList = [] }: HeaderProps) {
                         <ul className="flex gap-[24px]">
                             <li>
                                 <a
-                                    href="https://www.instagram.com/aphen2001"
+                                    href="https://www.youtube.com/channel/UCLfVW_PlNxA7jXePV8wpE8w"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="block size-[40px] bg-icInstagram bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
+                                    className="block size-[40px] bg-icYoutube bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
                                 >
-                                    인스타그램
+                                    유튜브
                                 </a>
                             </li>
                             <li>
@@ -267,12 +267,12 @@ export default function Header({ menuList = [] }: HeaderProps) {
                             </li>
                             <li>
                                 <a
-                                    href="https://www.youtube.com/channel/UCLfVW_PlNxA7jXePV8wpE8w"
+                                    href="https://www.instagram.com/aphen2001"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="block size-[40px] bg-icYoutube bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
+                                    className="block size-[40px] bg-icInstagram bg-contain bg-center bg-no-repeat -indent-[9999px] text-[0]"
                                 >
-                                    유튜브
+                                    인스타그램
                                 </a>
                             </li>
                         </ul>
