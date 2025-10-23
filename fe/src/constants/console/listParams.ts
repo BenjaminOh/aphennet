@@ -51,6 +51,7 @@ export interface BoardGroupParams {
 // 게시글관리 리스트 파라미터 타입
 export interface PostListParams extends ListParams, SearchParams, DetailParams, CreateParams, BoardGroupParams {
     edit: string; // 게시글 수정 ["0","1"]
+    listSize: number;
 }
 
 // 댓글관리 리스트 파라미터 타입

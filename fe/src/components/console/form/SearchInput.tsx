@@ -12,7 +12,7 @@ interface SearchInputProps extends InputProps {
 
 const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(({ boxClassName, handleClick, ...props }, ref) => {
     return (
-        <div className={twMerge("relative w-[240px]", boxClassName)}>
+        <div className={twMerge("relative w-[220px]", boxClassName)}>
             <Input
                 ref={ref}
                 {...props}
