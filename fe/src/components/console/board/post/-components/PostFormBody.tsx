@@ -3,6 +3,7 @@ import { Control, Controller, FieldErrors, UseFormRegister, UseFormSetValue } fr
 import InputError from "@/components/console/common/InputError";
 import TooltipBox from "@/components/console/common/TooltipBox";
 import Checkbox from "@/components/console/form/Checkbox";
+import DatePickerInput from "@/components/console/form/DatePickerInput";
 import EditorWithHtml2 from "@/components/console/form/EditorWithHtml2";
 import FileUpload, { FileData } from "@/components/console/form/FileUpload";
 import Input from "@/components/console/form/Input";
@@ -82,6 +83,10 @@ export default function PostFormBody({
                     />
                     <InputError message={errors.b_title?.message} />
                 </div>
+            </li>
+            <li className="flex w-full flex-col gap-[8px]">
+                <p className="text-[#666]">등록일자</p>
+                <DatePickerInput date={new Date()} setDate={() => {}} />
             </li>
             {/* 게시판 분류 사용시에만 노출 */}
             {boardSettingData.b_group === "Y" && (
