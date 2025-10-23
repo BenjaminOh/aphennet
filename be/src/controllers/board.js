@@ -171,6 +171,7 @@ exports.getBoardList = async (req, res, next) => {
                 'b_reply',
                 'b_num',
                 'b_img',
+                'b_reg_date',
                 [Sequelize.literal(subQuery), 'comment_count'],
                 [Sequelize.literal(subQuery2), 'c_content_type'],
                 [Sequelize.literal(subQuery3), 'file_count'],
