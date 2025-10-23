@@ -313,12 +313,12 @@ export default function MemberList() {
                                         </Link>
                                     </div>
                                     <div className="flex items-center gap-[8px]">
-                                        <button
+                                        {/* <button
                                             type="button"
                                             className="h-[34px] rounded-[8px] bg-console-2 px-[16px] font-[500] text-white"
                                         >
                                             단체문자 전송
-                                        </button>
+                                        </button> */}
                                         <MemberSearchFilterPop
                                             control={control}
                                             register={register}
