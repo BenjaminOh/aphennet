@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import arrowNext from "@/assets/images/user/arrowNext.svg";
@@ -27,7 +26,6 @@ interface InfoItem {
 }
 
 export default function PostDetail({ category, detailIdx }: { category: string; detailIdx: string }) {
-    const router = useRouter();
     const [downloadFile, setDownloadFile] = useState<{ idx: string; name: string } | null>(null);
     const { data: configData, isLoading: isInitialLoading } = useGetPost(category || "", detailIdx || "", "T", {
         enabled: Boolean(detailIdx),
@@ -173,13 +171,13 @@ export default function PostDetail({ category, detailIdx }: { category: string; 
                         <div />
                     )}
                 </div>
-                <button
-                    onClick={() => router.back()}
+                <Link
+                    href={`/${category}`}
                     className="xl: flex h-[60px] w-full items-center justify-between rounded-[8px] border border-[#D9D9D9] px-[24px] text-[18px] xl:absolute xl:left-1/2 xl:top-1/2 xl:w-[200px] xl:-translate-x-1/2 xl:-translate-y-1/2"
                 >
                     목록으로
                     <Image src={arrowUpRight} alt="목록으로" width={20} height={21} />
-                </button>
+                </Link>
             </div>
         </>
     );

@@ -204,11 +204,12 @@ export default function PostList({ category, boardType }: { category: string; bo
         });
         setCurrentPage(1);
     };
-
     return (
         <>
             <div
-                className={`flex flex-col gap-[6px] md:gap-[30px]${boardGroupList.length > 0 ? " md:-mt-[20px]" : ""}`}
+                className={`flex flex-col gap-[6px] pb-[80px] md:gap-[30px] md:pb-[120px]${
+                    boardGroupList.length > 0 ? " md:-mt-[20px]" : ""
+                }`}
             >
                 {boardGroupList.length > 0 && (
                     <BoardGroupTabs list={boardGroupList} active={boardGroup} handleClick={handleChangeBoardGroup} />

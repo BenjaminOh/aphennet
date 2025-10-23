@@ -20,6 +20,7 @@ import Location from "../custom/intro/Location";
 import Organization from "../custom/intro/Organization";
 import System from "../custom/japan-distortion-response/System";
 import Timeline from "../custom/japan-distortion-response/Timeline";
+import SubLayout from "./-components/SubLayout";
 import SubTop from "./-components/SubTop";
 
 export default function Sub({
@@ -59,7 +60,9 @@ export default function Sub({
         <>
             <SubTop category={category} />
             {postIdx && (configData?.data?.c_content_type?.[0] === 4 || configData?.data?.c_content_type?.[0] === 5) ? (
-                <PostDetail category={category} detailIdx={postIdx} />
+                <SubLayout>
+                    <PostDetail category={category} detailIdx={postIdx} />
+                </SubLayout>
             ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/Greeting" ? (
                 <Greeting />
             ) : configData?.data?.c_content_type?.[0] === 3 && configData?.data?.file_path === "/intro/About" ? (
