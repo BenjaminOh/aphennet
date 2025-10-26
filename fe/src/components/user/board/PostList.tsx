@@ -20,6 +20,7 @@ import { usePagination } from "@/hooks/common/usePagination";
 import { useUrlParams } from "@/hooks/common/useUrlParams";
 import { useGetPostGroupList, useGetPostList } from "@/service/user/board";
 import { initialBoardSettingData, useBoardStore } from "@/store/common/useBoardStore";
+import { useNavigationStore } from "@/store/user/useNavigationStore";
 import { usePopupStore } from "@/store/user/usePopupStore";
 import { makeIntComma } from "@/utils/numberUtils";
 
@@ -50,6 +51,7 @@ export interface PostItem {
 
 export default function PostList({ category, boardType }: { category: string; boardType: string }) {
     const { setBoardSettingData } = useBoardStore();
+    const { setCurrentPath } = useNavigationStore();
     const [boardGroupList, setBoardGroupList] = useState<SelectItem[]>([]);
     const [boardGroup, setBoardGroup] = useState("");
     const [useGroup, setUseGroup] = useState(false);
@@ -204,6 +206,11 @@ export default function PostList({ category, boardType }: { category: string; bo
         });
         setCurrentPage(1);
     };
+
+    const handlePostClick = () => {
+        setCurrentPath(window.location.pathname + window.location.search);
+    };
+
     return (
         <>
             <div
@@ -247,9 +254,9 @@ export default function PostList({ category, boardType }: { category: string; bo
                         <></>
                     ) : items && items.length > 0 ? (
                         boardType === "board" ? (
-                            <BasicList items={items} category={category} />
+                            <BasicList items={items} category={category} handlePostClick={handlePostClick} />
                         ) : boardType === "gallery" ? (
-                            <GalleryList items={items} category={category} />
+                            <GalleryList items={items} category={category} handlePostClick={handlePostClick} />
                         ) : null
                     ) : (
                         <NoData />

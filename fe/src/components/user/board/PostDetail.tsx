@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import arrowNext from "@/assets/images/user/arrowNext.svg";
@@ -9,6 +10,7 @@ import arrowPrev from "@/assets/images/user/arrowPrev.svg";
 import arrowUpRight from "@/assets/images/user/arrowUpRight.svg";
 import { FileData } from "@/components/user/form/FileUpload";
 import { useGetPost, useGetPostFileDownload } from "@/service/user/board";
+import { useNavigationStore } from "@/store/user/useNavigationStore";
 import { usePopupStore } from "@/store/user/usePopupStore";
 
 import QuillContent from "../../common/common/QuillContent";
@@ -26,6 +28,8 @@ interface InfoItem {
 }
 
 export default function PostDetail({ category, detailIdx }: { category: string; detailIdx: string }) {
+    const router = useRouter();
+    const { currentPath, clearPath } = useNavigationStore();
     const [downloadFile, setDownloadFile] = useState<{ idx: string; name: string } | null>(null);
     const { data: configData, isLoading: isInitialLoading } = useGetPost(category || "", detailIdx || "", "T", {
         enabled: Boolean(detailIdx),
@@ -51,6 +55,18 @@ export default function PostDetail({ category, detailIdx }: { category: string; 
     );
     const [info, setInfo] = useState<InfoItem>(initialInfo);
     const { setLoadingPop } = usePopupStore();
+
+    // 목록으로 버튼 클릭 핸들러
+    const handleBackToList = () => {
+        if (currentPath && currentPath.includes(`/${category}`)) {
+            router.push(currentPath);
+        } else {
+            router.push(`/${category}`);
+        }
+
+        // 사용 후 경로 초기화
+        clearPath();
+    };
 
     // 데이터 수정,삭제 중일 때 로딩 팝업 표시
     useEffect(() => {
@@ -171,13 +187,14 @@ export default function PostDetail({ category, detailIdx }: { category: string; 
                         <div />
                     )}
                 </div>
-                <Link
-                    href={`/${category}`}
+                <button
+                    type="button"
+                    onClick={handleBackToList}
                     className="xl: flex h-[60px] w-full items-center justify-between rounded-[8px] border border-[#D9D9D9] px-[24px] text-[18px] xl:absolute xl:left-1/2 xl:top-1/2 xl:w-[200px] xl:-translate-x-1/2 xl:-translate-y-1/2"
                 >
                     목록으로
                     <Image src={arrowUpRight} alt="목록으로" width={20} height={21} />
-                </Link>
+                </button>
             </div>
         </>
     );
