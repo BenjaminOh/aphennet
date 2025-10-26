@@ -203,6 +203,7 @@ export default function PostList({ category, boardType }: { category: string; bo
             ...urlParams,
             page: 1,
             group: value,
+            searchtxt: undefined,
         });
         setCurrentPage(1);
     };
