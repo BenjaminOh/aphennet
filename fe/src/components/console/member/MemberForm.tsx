@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { notFound } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
@@ -12,7 +12,7 @@ import Input from "@/components/console/form/Input";
 import LevelSelect from "@/components/console/form/LevelSelect";
 import Radio from "@/components/console/form/Radio";
 import { useToast } from "@/hooks/use-toast";
-import { useDelMember, useGetMember, usePutMember } from "@/service/console/member";
+import { useDelMember, useGetMember, usePostMember, usePutMember } from "@/service/console/member";
 import { usePopupStore } from "@/store/common/usePopupStore";
 import { makeIntComma } from "@/utils/numberUtils";
 
@@ -23,7 +23,7 @@ const schema = z.object({
     reg_date: z.string(),
     m_name: z.string().min(1, "이름을 입력해주세요."),
     m_level: z.number(),
-    m_email: z.string(),
+    m_email: z.string().email("이메일을 입력해주세요."),
     m_mobile: z.string().regex(/^01[016789]-\d{3,4}-\d{4}$/, "휴대폰번호를 입력해주세요."),
     m_sms_yn: z.enum(["Y", "N"]),
     m_mail_yn: z.enum(["Y", "N"]),
@@ -32,6 +32,21 @@ const schema = z.object({
 });
 
 type FormValues = z.infer<typeof schema>;
+
+const initialValues: FormValues = {
+    log_cnt: 0,
+    board_cnt: 0,
+    comment_cnt: 0,
+    reg_date: "",
+    m_name: "",
+    m_level: 9,
+    m_email: "",
+    m_mobile: "",
+    m_sms_yn: "N",
+    m_mail_yn: "N",
+    m_memo: "",
+    m_menu_auth: [],
+};
 
 interface MemberFormProps {
     detailIdx: string;
@@ -58,23 +73,9 @@ export default function MemberForm({
         setValue,
     } = useForm<FormValues>({
         resolver: zodResolver(schema),
-        defaultValues: {
-            log_cnt: 0,
-            board_cnt: 0,
-            comment_cnt: 0,
-            reg_date: "",
-            m_name: "",
-            m_level: 0,
-            m_email: "",
-            m_mobile: "",
-            m_sms_yn: "N",
-            m_mail_yn: "N",
-            m_memo: "",
-            m_menu_auth: [],
-        },
+        defaultValues: initialValues,
     });
     const values = useWatch({ control });
-    const [level, setLevel] = useState(0);
     const {
         data: configData,
         isLoading: isInitialLoading,
@@ -83,6 +84,7 @@ export default function MemberForm({
     } = useGetMember(detailIdx, {
         enabled: Boolean(detailIdx),
     });
+    const postMemberMutation = usePostMember();
     const putMemberMutation = usePutMember();
     const delMemberMutation = useDelMember();
     const { setConfirmPop, setLoadingPop } = usePopupStore();
@@ -97,28 +99,31 @@ export default function MemberForm({
 
     // 상세 조회
     useEffect(() => {
-        if (configData) {
-            setLevel(configData.data.m_level || 0);
-            const menuAuth =
-                configData.data.m_menu_auth !== null
-                    ? configData.data.m_menu_auth.map((item: string[]) => item[0])
-                    : [];
-            reset({
-                log_cnt: configData.data.log_cnt,
-                board_cnt: configData.data.board_cnt,
-                comment_cnt: configData.data.comment_cnt,
-                reg_date: configData.data.reg_date,
-                m_name: configData.data.m_name,
-                m_level: configData.data.m_level || 0,
-                m_email: configData.data.m_email,
-                m_mobile: configData.data.m_mobile,
-                m_sms_yn: configData.data.m_sms_yn[0],
-                m_mail_yn: configData.data.m_mail_yn[0],
-                m_memo: configData.data.m_memo || "",
-                m_menu_auth: menuAuth,
-            });
+        if (detailIdx) {
+            if (configData) {
+                const menuAuth =
+                    configData.data.m_menu_auth !== null
+                        ? configData.data.m_menu_auth.map((item: string[]) => item[0])
+                        : [];
+                reset({
+                    log_cnt: configData.data.log_cnt,
+                    board_cnt: configData.data.board_cnt,
+                    comment_cnt: configData.data.comment_cnt,
+                    reg_date: configData.data.reg_date,
+                    m_name: configData.data.m_name,
+                    m_level: configData.data.m_level || initialValues.m_level,
+                    m_email: configData.data.m_email,
+                    m_mobile: configData.data.m_mobile,
+                    m_sms_yn: configData.data.m_sms_yn[0],
+                    m_mail_yn: configData.data.m_mail_yn[0],
+                    m_memo: configData.data.m_memo || initialValues.m_memo,
+                    m_menu_auth: menuAuth,
+                });
+            }
+        } else {
+            reset(initialValues);
         }
-    }, [configData, reset]);
+    }, [configData, detailIdx]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // 404 에러 처리
     useEffect(() => {
@@ -166,14 +171,25 @@ export default function MemberForm({
             m_menu_auth: m_menu_auth.length > 0 ? m_menu_auth.join(",") : null,
         };
 
-        putMemberMutation.mutate(body, {
-            onSuccess: () => {
-                toast({
-                    title: "수정되었습니다.",
-                });
-                onComplete();
-            },
-        });
+        if (detailIdx) {
+            putMemberMutation.mutate(body, {
+                onSuccess: () => {
+                    toast({
+                        title: "수정되었습니다.",
+                    });
+                    onComplete();
+                },
+            });
+        } else {
+            postMemberMutation.mutate(body, {
+                onSuccess: () => {
+                    toast({
+                        title: "등록되었습니다.",
+                    });
+                    onComplete();
+                },
+            });
+        }
     };
 
     // 회원탈퇴 확인
@@ -207,35 +223,39 @@ export default function MemberForm({
                         <form onSubmit={handleSubmit(handleConfirmSave)}>
                             <div className="flex items-center justify-between p-[16px_20px]">
                                 <p className="text-[20px] font-[700]">회원 관리</p>
-                                <button
-                                    type="button"
-                                    className="h-[34px] rounded-[8px] bg-[#FEE2E2] px-[16px] font-[500] text-[#E5313D]"
-                                    onClick={handleConfirmDelete}
-                                >
-                                    탈퇴
-                                </button>
+                                {detailIdx && (
+                                    <button
+                                        type="button"
+                                        className="h-[34px] rounded-[8px] bg-[#FEE2E2] px-[16px] font-[500] text-[#E5313D]"
+                                        onClick={handleConfirmDelete}
+                                    >
+                                        탈퇴
+                                    </button>
+                                )}
                             </div>
                             <ul className="flex flex-wrap gap-[20px] border-t border-[#D9D9D9] p-[20px_40px]">
-                                <li className="w-full">
-                                    <ul className="flex flex-1 gap-[20px]">
-                                        <li className="flex w-1/4 flex-col gap-[4px]">
-                                            <p className="text-[14px] text-[#9F9FA5]">로그인수</p>
-                                            <p>{makeIntComma(values.log_cnt)}</p>
-                                        </li>
-                                        <li className="flex w-1/4 flex-col gap-[4px]">
-                                            <p className="text-[14px] text-[#9F9FA5]">게시글</p>
-                                            <p>{makeIntComma(values.board_cnt)}</p>
-                                        </li>
-                                        <li className="flex w-1/4 flex-col gap-[4px]">
-                                            <p className="text-[14px] text-[#9F9FA5]">댓글</p>
-                                            <p>{makeIntComma(values.comment_cnt)}</p>
-                                        </li>
-                                        <li className="flex w-1/4 flex-col gap-[4px]">
-                                            <p className="text-[14px] text-[#9F9FA5]">가입일자</p>
-                                            <p>{values.reg_date}</p>
-                                        </li>
-                                    </ul>
-                                </li>
+                                {detailIdx && (
+                                    <li className="w-full">
+                                        <ul className="flex flex-1 gap-[20px]">
+                                            <li className="flex w-1/4 flex-col gap-[4px]">
+                                                <p className="text-[14px] text-[#9F9FA5]">로그인수</p>
+                                                <p>{makeIntComma(values.log_cnt)}</p>
+                                            </li>
+                                            <li className="flex w-1/4 flex-col gap-[4px]">
+                                                <p className="text-[14px] text-[#9F9FA5]">게시글</p>
+                                                <p>{makeIntComma(values.board_cnt)}</p>
+                                            </li>
+                                            <li className="flex w-1/4 flex-col gap-[4px]">
+                                                <p className="text-[14px] text-[#9F9FA5]">댓글</p>
+                                                <p>{makeIntComma(values.comment_cnt)}</p>
+                                            </li>
+                                            <li className="flex w-1/4 flex-col gap-[4px]">
+                                                <p className="text-[14px] text-[#9F9FA5]">가입일자</p>
+                                                <p>{values.reg_date}</p>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                )}
                                 <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
                                     <label htmlFor="m_name" className="text-[#666]">
                                         이름
@@ -271,9 +291,28 @@ export default function MemberForm({
                                 </li>
                                 <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
                                     <p className="text-[#666]">이메일</p>
-                                    <div className="flex h-[48px] items-center justify-start">
-                                        <p>{values.m_email}</p>
-                                    </div>
+                                    {detailIdx && (
+                                        <div className="flex h-[48px] items-center justify-start">
+                                            <p>{values.m_email}</p>
+                                        </div>
+                                    )}
+                                    {!detailIdx && (
+                                        <div>
+                                            <Controller
+                                                name="m_email"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <Input
+                                                        {...field}
+                                                        id="m_email"
+                                                        className="w-full"
+                                                        placeholder="이메일을 입력해주세요."
+                                                    />
+                                                )}
+                                            />
+                                            <InputError message={errors.m_email?.message} />
+                                        </div>
+                                    )}
                                 </li>
                                 <li className="flex w-[calc(50%-10px)] flex-col gap-[8px]">
                                     <label htmlFor="m_mobile" className="text-[#666]">
@@ -296,7 +335,7 @@ export default function MemberForm({
                                         <InputError message={errors.m_mobile?.message} />
                                     </div>
                                 </li>
-                                {level === 9 && ( // 관리자 회원일때만 노출
+                                {values.m_level === 9 && ( // 관리자 회원일때만 노출
                                     <li className="flex w-full flex-col gap-[8px]">
                                         <p className="text-[#666]">관리자 권한</p>
                                         <Controller

@@ -67,7 +67,7 @@ export interface CategoryListParams extends LanguageParams, DetailParams, Create
 }
 
 // 회원관리 리스트 파라미터 타입
-export interface MemberListParams extends ListParams, SearchParams, DetailParams, DateParams {
+export interface MemberListParams extends ListParams, SearchParams, DetailParams, DateParams, CreateParams {
     mLevel: string;
 }
 

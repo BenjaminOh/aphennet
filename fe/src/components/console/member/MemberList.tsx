@@ -60,11 +60,13 @@ export default function MemberList() {
         edate: { defaultValue: "", type: "string" },
         mLevel: { defaultValue: "", type: "string" },
         detail: { defaultValue: "", type: "string" },
+        create: { defaultValue: "0", type: "string" },
     });
     const { currentPage, pages, setCurrentPage } = usePagination({ totalPages, initialPage: urlParams.page });
     const { allCheck, setCheckList, checkedList, setCheckedList, handleAllCheck, handleCheck } = useCheckboxList();
     const { levelOptions } = useLevelSelectOptions();
     const [detailOn, setDetailOn] = useState("");
+    const [createOn, setCreateOn] = useState(false);
     const [level, setLevel] = useState("");
     const [detailRefetch, setDetailRefetch] = useState(false);
     const [searchFilterOpen, setSearchFilterOpen] = useState(false);
@@ -79,11 +81,7 @@ export default function MemberList() {
         },
     });
     const searchFilterValues = useWatch({ control });
-    const {
-        data: configData,
-        isLoading: isInitialLoading,
-        refetch,
-    } = useGetMemberList(
+    const { data: configData, isLoading: isInitialLoading } = useGetMemberList(
         initialListSize.toString(),
         urlParams.page.toString(),
         urlParams.search,
@@ -110,6 +108,11 @@ export default function MemberList() {
     useEffect(() => {
         setDetailOn(urlParams.detail ? urlParams.detail : "");
     }, [urlParams.detail]);
+
+    // create 파라미터 동기화
+    useEffect(() => {
+        setCreateOn(urlParams.create === "1");
+    }, [urlParams.create]);
 
     // currentPage 변경 시 URL 파라미터 업데이트
     const handleChangeCurrentPage = (page: number) => {
@@ -172,13 +175,25 @@ export default function MemberList() {
             updateUrlParams({
                 ...urlParams,
                 detail: undefined,
+                create: undefined,
             });
         } else {
             updateUrlParams({
                 ...urlParams,
                 detail: idx.toString(),
+                create: undefined,
             });
         }
+    };
+
+    // 회원 등록 열기
+    const handleOpenCreate = () => {
+        const create = createOn ? "0" : "1";
+        updateUrlParams({
+            ...urlParams,
+            detail: undefined,
+            create,
+        });
     };
 
     // 회원등급 변경 확인
@@ -201,7 +216,6 @@ export default function MemberList() {
                     title: "회원등급이 변경되었습니다.",
                 });
                 setLevel("");
-                refetch();
                 setDetailRefetch(true);
             },
         });
@@ -235,7 +249,6 @@ export default function MemberList() {
                         detail: undefined,
                     });
                 }
-                refetch();
             },
         });
     };
@@ -250,7 +263,11 @@ export default function MemberList() {
 
     // 회원 정보수정 완료시
     const onEditComplete = () => {
-        refetch();
+        updateUrlParams({
+            ...urlParams,
+            detail: detailOn ? detailOn : undefined,
+            create: undefined,
+        });
     };
 
     // 회원탈퇴 완료시
@@ -263,7 +280,6 @@ export default function MemberList() {
             page: prevPage,
             detail: undefined,
         });
-        refetch();
         setCurrentPage(prevPage);
     };
 
@@ -274,10 +290,17 @@ export default function MemberList() {
                     <div className="min-h-0 flex-1">
                         <ScrollArea className="h-full pr-[7px]">
                             <div className="flex h-full flex-col">
-                                <div className="border-b border-[#D9D9D9] py-[8px]">
+                                <div className="flex items-center justify-between border-b border-[#D9D9D9] py-[8px]">
                                     <p className="font-[500]">
                                         <span className="text-console">{makeIntComma(totalCount)} </span>명
                                     </p>
+                                    <button
+                                        type="button"
+                                        className="h-[40px] rounded-[8px] bg-black px-[20px] text-[18px] font-[700] text-white"
+                                        onClick={handleOpenCreate}
+                                    >
+                                        회원 등록
+                                    </button>
                                 </div>
                                 <div className="flex flex-wrap items-center justify-between py-[8px]">
                                     <div className="flex items-center gap-[8px]">
@@ -394,7 +417,7 @@ export default function MemberList() {
             }
             right={
                 <ScrollArea className="h-[calc(100vh-90px)]">
-                    {detailOn ? (
+                    {detailOn || createOn ? (
                         <MemberForm
                             detailIdx={detailOn}
                             onComplete={onEditComplete}

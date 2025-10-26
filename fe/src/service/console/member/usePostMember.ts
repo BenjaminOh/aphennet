@@ -4,22 +4,27 @@ import { CONSOLE_API_ROUTES } from "@/config/apiConfig";
 import consoleAxios from "@/service/axios/consoleAxios";
 
 interface body {
-    idx: (string | number)[];
+    m_email: string;
+    m_name: string;
+    m_mobile: string;
     m_level: number;
+    m_sms_yn: string;
+    m_mail_yn: string;
+    m_memo: string;
+    m_menu_auth: string | null;
 }
 
-// 회원 등급 변경
-export const usePutMemberLevel = () => {
+// 회원 등록
+export const usePostMember = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async (body: body) => {
-            const res = await consoleAxios.put(CONSOLE_API_ROUTES.MEMBER.PUT_LEVEL, body);
+            const res = await consoleAxios.post(CONSOLE_API_ROUTES.MEMBER.BASE, body);
             return res.data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["memberList"] });
-            queryClient.invalidateQueries({ queryKey: ["memberDetail"] });
         },
     });
 };
