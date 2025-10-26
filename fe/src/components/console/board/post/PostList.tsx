@@ -281,6 +281,7 @@ export default function PostList() {
             ...urlParams,
             page: 1,
             group: value,
+            searchtxt: undefined,
         });
         setCurrentPage(1);
     };
