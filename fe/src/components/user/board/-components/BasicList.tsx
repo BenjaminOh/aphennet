@@ -14,7 +14,15 @@ const formatDate = (dateStr: string) => {
     };
 };
 
-export default function BasicList({ items, category }: { items: PostItem[]; category: string }) {
+export default function BasicList({
+    items,
+    category,
+    handlePostClick,
+}: {
+    items: PostItem[];
+    category: string;
+    handlePostClick: () => void;
+}) {
     return (
         <ul className="-ml-[20px] w-[calc(100%+40px)] border-t border-[#ddd] md:ml-0 md:w-full">
             {items.map((item, i) => {
@@ -23,6 +31,7 @@ export default function BasicList({ items, category }: { items: PostItem[]; cate
                     <li key={`post_${i}`} className="border-b border-[#ddd]">
                         <Link
                             href={`/${category}/${item.idx}`}
+                            onClick={handlePostClick}
                             className="group relative flex items-center gap-[8px] px-[20px] transition-all duration-300 hover:bg-white hover:pr-[88px] hover:shadow-[4px_4px_20px_0_rgba(0,0,0,0.08)] md:gap-[20px] md:py-[16px] xl:gap-[40px] xl:p-[20px_8px]"
                         >
                             <div className="flex min-h-[100px] w-[80px] flex-col items-center justify-center p-[10px] text-primary md:size-[120px]">
