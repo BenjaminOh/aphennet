@@ -49,7 +49,7 @@ export default function Sub({
         return () => setLoadingPop(false);
     }, [isLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // 404 에러 시 notFound 페이지로 이동
+    // 에러 시 notFound 페이지로 이동
     useEffect(() => {
         if (getSubCategoryError) {
             notFound();
