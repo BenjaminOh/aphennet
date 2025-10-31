@@ -10,7 +10,7 @@ cp .env.prod .env
 
 # 1. 기존 컨테이너 중지
 echo "### 기존 컨테이너 중지 중..."
-docker compose -f docker-compose.prod.yml down
+docker compose -f docker-compose.prod.yml down --remove-orphans
 echo "✅ 기존 컨테이너가 중지되었습니다."
 
 # 2. 컨테이너 재시작 (빌드 없이)
@@ -18,13 +18,7 @@ echo "### 컨테이너 재시작 중..."
 docker compose -f docker-compose.prod.yml up -d --build
 echo "✅ 모든 컨테이너가 재시작되었습니다."
 
-# 3. nginx 재시작 (중요!)
-echo "### nginx 재시작 중..."
-cd ../nginxcertbot/infrastructure
-docker compose -f docker-compose.prod.yml restart nginx
-echo "✅ nginx가 재시작되었습니다."
-
-# 4. 상태 확인
+# 3. 상태 확인
 echo "### 상태 확인 중..."
 sleep 5
 
