@@ -24,7 +24,7 @@ services:
         env_file:
             - ./.env
         networks:
-            - nginx-network
+            - aphennet-network
         depends_on:
             - mariadb
 
@@ -45,7 +45,7 @@ services:
         env_file:
             - ./.env
         networks:
-            - nginx-network
+            - aphennet-network
         depends_on:
             - mariadb
         healthcheck:
@@ -75,7 +75,7 @@ services:
             - mariadb_data:/var/lib/mysql
             - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
         networks:
-            - nginx-network
+            - aphennet-network
         healthcheck:
             test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
             interval: 10s
@@ -88,6 +88,4 @@ volumes:
     nodejs_node_modules:
     
 networks:
-    nginx-network:
-        external: true
-        name: infrastructure_nginx-network
+    aphennet-network:

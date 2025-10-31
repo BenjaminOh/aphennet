@@ -31,7 +31,7 @@ services:
         env_file:
             - ./.env 
         networks:
-            - nginx-network
+            - aphennet-network
 
     # Node.js 백엔드 (개발환경) - 운영 DB 사용
     node-app:
@@ -57,7 +57,7 @@ services:
         env_file:
             - ./.env
         networks:
-            - nginx-network
+            - aphennet-network
         healthcheck:
             test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
             interval: 30s
@@ -71,6 +71,4 @@ volumes:
     upload_data:
 
 networks:
-    nginx-network:
-        external: true
-        name: infrastructure_nginx-network
+    aphennet-network:
