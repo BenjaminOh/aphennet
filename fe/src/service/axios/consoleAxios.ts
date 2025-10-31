@@ -85,6 +85,11 @@ consoleAxios.interceptors.response.use(
             return Promise.reject(error);
         }
 
+        // 409: 요청 헤더로 개별 처리 허용
+        if (status === 409 && originalRequest?.headers?.["X-Handle-409"] === "true") {
+            return Promise.reject(error);
+        }
+
         if (status === 500) {
             setConfirmPop(true, "서버 오류가 발생했습니다.", 1);
         } else {

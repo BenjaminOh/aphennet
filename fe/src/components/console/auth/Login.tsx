@@ -31,8 +31,8 @@ export default function Login() {
     } = useForm<FormValues>({
         resolver: zodResolver(schema),
         defaultValues: {
-            m_email: "ohsjwe@gmail.com",
-            m_password: "test1!@#$",
+            m_email: "",
+            m_password: "",
         },
     });
 

@@ -15,13 +15,20 @@ import Pagination from "@/components/console/common/Pagination";
 import ResizableSplit from "@/components/console/common/ResizableSplit";
 import AllCheckbox from "@/components/console/form/AllCheckbox";
 import Checkbox from "@/components/console/form/Checkbox";
+import ListSizeSelect from "@/components/console/form/ListSizeSelect";
 import SearchInput from "@/components/console/form/SearchInput";
 import SelectBox, { SelectItem } from "@/components/console/form/SelectBox";
 import Toggle from "@/components/console/form/Toggle";
 import BoardGroupPop from "@/components/console/popup/BoardGroupPop";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { API_URL } from "@/config/apiConfig";
-import { initialListSize, initialPage, listSearchTypes, PostListParams } from "@/constants/console/listParams";
+import {
+    initialListSize,
+    initialPage,
+    listSearchTypes,
+    listSizes,
+    PostListParams,
+} from "@/constants/console/listParams";
 import { usePagination } from "@/hooks/common/usePagination";
 import { useUrlParams } from "@/hooks/common/useUrlParams";
 import { useCheckboxList } from "@/hooks/console/useCheckboxList";
@@ -82,6 +89,7 @@ export default function PostList() {
         create: { defaultValue: "0", type: "string" },
         edit: { defaultValue: "0", type: "string" },
         group: { defaultValue: "all", type: "string" },
+        listSize: { defaultValue: initialListSize, type: "number", validValues: listSizes },
     });
     const { currentPage, pages, setCurrentPage } = usePagination({ totalPages, initialPage: urlParams.page });
     const { allCheck, setCheckList, checkedList, setCheckedList, handleAllCheck, handleCheck } = useCheckboxList();
@@ -106,7 +114,7 @@ export default function PostList() {
         error: getPostListError,
     } = useGetPostList(
         category || "",
-        initialListSize.toString(),
+        urlParams.listSize.toString(),
         urlParams.page.toString(),
         { enabled: Boolean(category) },
         urlParams.search,
@@ -273,6 +281,7 @@ export default function PostList() {
             ...urlParams,
             page: 1,
             group: value,
+            searchtxt: undefined,
         });
         setCurrentPage(1);
     };
@@ -449,7 +458,7 @@ export default function PostList() {
                                         게시글 등록
                                     </button>
                                 </div>
-                                <div className="flex items-center justify-between py-[8px]">
+                                <div className="flex flex-wrap items-center justify-between gap-[8px] py-[8px]">
                                     <div className="flex items-center gap-[8px]">
                                         <AllCheckbox
                                             checked={allCheck}
@@ -461,7 +470,7 @@ export default function PostList() {
                                                     list={boardGroupList}
                                                     value={boardGroup}
                                                     onChange={handleChangeBoardGroup}
-                                                    triggerClassName="h-[34px]"
+                                                    triggerClassName="h-[34px] min-w-[120px]"
                                                 />
                                                 <BoardGroupPop parentId={category} />
                                             </>
@@ -474,7 +483,14 @@ export default function PostList() {
                                             삭제
                                         </button>
                                     </div>
-                                    <SearchInput {...register("searchtxt")} handleClick={handleSearch} />
+                                    <div className="flex gap-[8px]">
+                                        <SearchInput {...register("searchtxt")} handleClick={handleSearch} />
+                                        <ListSizeSelect
+                                            value={urlParams.listSize}
+                                            onChange={value => updateUrlParams({ listSize: value })}
+                                            className="h-[34px] min-w-[100px]"
+                                        />
+                                    </div>
                                 </div>
                                 {isInitialLoading ? (
                                     <LoadingSpinner />
