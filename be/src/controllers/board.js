@@ -574,6 +574,7 @@ exports.getBoardView = async (req, res, next) => {
                 'b_secret',
                 'b_reply',
                 'group_id',
+                'b_num',
                 [Sequelize.literal(subQuery), 'comment_count'],
                 [Sequelize.literal(subQuery5), 'reply_count'],
                 [Sequelize.literal(subQuery4), 'g_name'],
@@ -585,6 +586,9 @@ exports.getBoardView = async (req, res, next) => {
             return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
         }
         console.log(result);
+
+        // 게시글 순서
+        const b_num = result.b_num;
 
         if (result.b_secret) {
             if (pass !== enumConfig.passTrueFalse.T[0]) {
@@ -599,18 +603,18 @@ exports.getBoardView = async (req, res, next) => {
                 where: {
                     category: category,
                     b_depth: { [Op.eq]: 0 },
-                    idx: { [Op.lt]: idx },
+                    b_num: { [Op.lt]: b_num },
                 },
-                order: [['idx', 'DESC']],
+                order: [['b_num', 'DESC']],
                 attributes: ['idx', 'b_title'],
             }),
             i_board.findOne({
                 where: {
                     category: category,
                     b_depth: { [Op.eq]: 0 },
-                    idx: { [Op.gt]: idx },
+                    b_num: { [Op.gt]: b_num },
                 },
-                order: [['idx', 'DESC']],
+                order: [['b_num', 'DESC']],
                 attributes: ['idx', 'b_title'],
             }),
         ]);
