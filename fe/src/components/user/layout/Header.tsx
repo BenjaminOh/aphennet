@@ -55,7 +55,7 @@ export default function Header({ menuList = [] }: HeaderProps) {
                 />
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
-                        <button className="size-[40px] bg-icMenu bg-contain bg-center bg-no-repeat xl:hidden">
+                        <button className="size-[40px] bg-icMenu bg-contain bg-center bg-no-repeat 2xl:hidden">
                             <span className="sr-only">메뉴 열기</span>
                         </button>
                     </PopoverTrigger>
@@ -134,16 +134,6 @@ export default function Header({ menuList = [] }: HeaderProps) {
                                     <ul className="flex flex-col gap-[8px] rounded-[8px] border border-[#ddd] p-[16px] md:p-[20px]">
                                         <li>
                                             <a
-                                                href="https://link.donationbox.co.kr/donationBoxList.jsp?campaignuid=okIiz0H7Vu"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-[18px] font-[500] text-[#666]"
-                                            >
-                                                후원하기
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a
                                                 href="https://www.apnhi.net/"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
@@ -190,7 +180,7 @@ export default function Header({ menuList = [] }: HeaderProps) {
                         </div>
                     </PopoverContent>
                 </Popover>
-                <div className="hidden flex-1 items-center justify-between xl:flex">
+                <div className="hidden flex-1 items-center justify-between 2xl:flex">
                     <ul className="flex flex-1 items-center">
                         {menuList.map((menu, idx) => (
                             <li className="group relative max-w-[150px] flex-1" key={`menu_${idx}`}>
@@ -223,16 +213,6 @@ export default function Header({ menuList = [] }: HeaderProps) {
                     </ul>
                     <div className="flex items-center gap-[20px]">
                         <ul className="flex items-center gap-[40px] rounded-[20px] border border-[#ddd] p-[8px_24px]">
-                            <li>
-                                <a
-                                    href="https://link.donationbox.co.kr/donationBoxList.jsp?campaignuid=okIiz0H7Vu"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-[18px] font-[500] text-[#666]"
-                                >
-                                    후원하기
-                                </a>
-                            </li>
                             <li>
                                 <a
                                     href="https://www.apnhi.net/"
