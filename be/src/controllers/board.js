@@ -585,8 +585,6 @@ exports.getBoardView = async (req, res, next) => {
         if (!result) {
             return errorHandler.errorThrow(enumConfig.statusErrorCode._404_ERROR[0], '');
         }
-        console.log(result);
-
         // 게시글 순서
         const b_num = result.b_num;
 
