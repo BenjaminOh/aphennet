@@ -55,19 +55,6 @@ export default function PostDetail({ category, detailIdx }: { category: string; 
     );
     const [info, setInfo] = useState<InfoItem>(initialInfo);
     const { setLoadingPop } = usePopupStore();
-
-    // 목록으로 버튼 클릭 핸들러
-    const handleBackToList = () => {
-        if (currentPath && currentPath.includes(`/${category}`)) {
-            router.push(currentPath);
-        } else {
-            router.push(`/${category}`);
-        }
-
-        // 사용 후 경로 초기화
-        clearPath();
-    };
-
     // 데이터 수정,삭제 중일 때 로딩 팝업 표시
     useEffect(() => {
         const isLoading = isInitialLoading || isFileDownloadLoading;
@@ -102,6 +89,18 @@ export default function PostDetail({ category, detailIdx }: { category: string; 
     const handleFileDownload = (idx: string, file_name: string) => {
         if (!category || !detailIdx) return;
         setDownloadFile({ idx, name: file_name });
+    };
+
+    // 목록으로 버튼 클릭 핸들러
+    const handleBackToList = () => {
+        if (currentPath && currentPath.includes(`/${category}`)) {
+            router.push(currentPath);
+        } else {
+            router.push(`/${category}`);
+        }
+
+        // 사용 후 경로 초기화
+        clearPath();
     };
 
     return (
