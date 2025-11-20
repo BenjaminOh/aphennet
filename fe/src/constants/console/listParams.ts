@@ -114,7 +114,7 @@ export const memberListSearchTypes = [
 export const initialPage = 1;
 
 // 리스트 페이지 크기 옵션
-export const listSizes = [10, 20, 30, 50];
+export const listSizes = [10, 20, 30, 50, 100];
 
 // 리스트 페이지 크기 초기값
 export const initialListSize = 10;
