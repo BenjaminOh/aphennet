@@ -82,6 +82,70 @@
         local("Pretendard-ExtraBold"),
         url("../assets/fonts/Pretendard-ExtraBold.ttf") format("truetype");
 }
+@font-face {
+    font-family: "KoPubWorld Dotum";
+    font-style: normal;
+    font-weight: 400;
+    src:
+        local("KoPubWorld-Dotum-Light"),
+        url("../assets/fonts/KoPubWorld-Dotum-Light.ttf") format("truetype");
+}
+@font-face {
+    font-family: "KoPubWorld Dotum";
+    font-style: normal;
+    font-weight: 500;
+    src:
+        local("KoPubWorld-Dotum-Medium"),
+        url("../assets/fonts/KoPubWorld-Dotum-Medium.ttf") format("truetype");
+}
+@font-face {
+    font-family: "KoPubWorld Dotum";
+    font-style: normal;
+    font-weight: 600;
+    src:
+        local("KoPubWorld-Dotum-Bold"),
+        url("../assets/fonts/KoPubWorld-Dotum-Bold.ttf") format("truetype");
+}
+@font-face {
+    font-family: "KoPubWorld Batang";
+    font-style: normal;
+    font-weight: 400;
+    src:
+        local("KoPubWorld-Batang-Light"),
+        url("../assets/fonts/KoPubWorld-Batang-Light.ttf") format("truetype");
+}
+@font-face {
+    font-family: "KoPubWorld Batang";
+    font-style: normal;
+    font-weight: 500;
+    src:
+        local("KoPubWorld-Batang-Medium"),
+        url("../assets/fonts/KoPubWorld-Batang-Medium.ttf") format("truetype");
+}
+@font-face {
+    font-family: "KoPubWorld Batang";
+    font-style: normal;
+    font-weight: 600;
+    src:
+        local("KoPubWorld-Batang-Bold"),
+        url("../assets/fonts/KoPubWorld-Batang-Bold.ttf") format("truetype");
+}
+@font-face {
+    font-family: "Lato";
+    font-style: normal;
+    font-weight: 700;
+    src:
+        local("Lato-Bold"),
+        url("../assets/fonts/Lato-Bold.ttf") format("truetype");
+}
+@font-face {
+    font-family: "GmarketSans";
+    font-style: normal;
+    font-weight: 700;
+    src:
+        local("GmarketSansTTFBold"),
+        url("../assets/fonts/GmarketSansTTFBold.ttf") format("truetype");
+}
 
 body {
     font-family:
@@ -144,7 +208,7 @@ table {
 
 
 @layer base {
-  :root {
+    :root {
         --background: 0 0% 100%;
         --foreground: 0 0% 3.9%;
         --card: 0 0% 100%;
@@ -171,7 +235,7 @@ table {
         --chart-5: 27 87% 67%;
         --radius: 0.5rem;
     }
-  .dark {
+    .dark {
         --background: 0 0% 3.9%;
         --foreground: 0 0% 98%;
         --card: 0 0% 3.9%;
@@ -196,6 +260,14 @@ table {
         --chart-3: 30 80% 55%;
         --chart-4: 280 65% 60%;
         --chart-5: 340 75% 55%;
+    }
+    .user-layout {
+        font-family:
+            "KoPubWorld Dotum", "맑은 고딕", "malgun gothic", "Apple SD Gothic Neo",
+            sans-serif;
+        line-height: 1.5;
+        font-weight: 400;
+        color: #222;
     }
 }
 
