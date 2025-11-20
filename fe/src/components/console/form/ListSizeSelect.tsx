@@ -19,6 +19,7 @@ const ListSizeSelect = React.forwardRef<HTMLButtonElement, ListSizeSelectProps>(
                 { value: "20", label: "20개씩" },
                 { value: "30", label: "30개씩" },
                 { value: "50", label: "50개씩" },
+                { value: "100", label: "100개씩" },
             ],
             className = "w-[160px]",
         },

@@ -223,6 +223,30 @@ export default function PostList({ category, boardType }: { category: string; bo
                     <BoardGroupTabs list={boardGroupList} active={boardGroup} handleClick={handleChangeBoardGroup} />
                 )}
                 <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-[16px] px-[20px] md:gap-[24px] md:px-[28px] min-[1400px]:px-0">
+                    {category === "238" && ( // 재정보고 게시판일 때만 노출
+                        <ul className="flex w-fit items-center gap-[20px] rounded-[30px] bg-[#F3F9F5] p-[12px_20px] md:gap-[60px] md:p-[16px_40px]">
+                            <li>
+                                <a
+                                    href="https://www.nts.go.kr"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[16px] font-[700] text-[#056547] md:text-[18px]"
+                                >
+                                    국세청
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="https://www.mois.go.kr/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[16px] font-[700] text-[#056547] md:text-[18px]"
+                                >
+                                    행정안전부
+                                </a>
+                            </li>
+                        </ul>
+                    )}
                     <div className="flex flex-col gap-[8px] md:flex-row md:items-center md:justify-between">
                         <p className="font-[500]">
                             총<span className="px-[4px] text-primary">{makeIntComma(totalCount)}</span>개

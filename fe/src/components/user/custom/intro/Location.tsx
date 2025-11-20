@@ -44,13 +44,15 @@ export default function Location() {
                             </div>
                             <p className="flex-1 text-[18px] md:text-[20px]">{siteInfoData.c_tel}</p>
                         </li>
-                        <li className="flex flex-col gap-[8px] md:flex-row md:items-center">
-                            <div className="flex items-center gap-[8px] md:w-[132px]">
-                                <Image src={icFax} alt="팩스" width={24} height={24} />
-                                <p className="text-[20px] font-[700]">팩스</p>
-                            </div>
-                            <p className="flex-1 text-[18px] md:text-[20px]">{siteInfoData.c_fax}</p>
-                        </li>
+                        {siteInfoData.c_fax && (
+                            <li className="flex flex-col gap-[8px] md:flex-row md:items-center">
+                                <div className="flex items-center gap-[8px] md:w-[132px]">
+                                    <Image src={icFax} alt="팩스" width={24} height={24} />
+                                    <p className="text-[20px] font-[700]">팩스</p>
+                                </div>
+                                <p className="flex-1 text-[18px] md:text-[20px]">{siteInfoData.c_fax}</p>
+                            </li>
+                        )}
                         <li className="flex flex-col gap-[8px] md:flex-row md:items-center">
                             <div className="flex items-center gap-[8px] md:w-[132px]">
                                 <Image src={icMail} alt="이메일" width={24} height={24} />
