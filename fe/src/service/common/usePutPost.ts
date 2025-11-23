@@ -10,6 +10,7 @@ interface body {
     m_name: string;
     m_pwd: string;
     b_title: string;
+    b_reg_date?: string;
     b_contents: string;
     b_content_type: string; // (editor, html)
     b_depth: number;

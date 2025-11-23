@@ -86,7 +86,10 @@ export default function PostFormBody({
             </li>
             <li className="flex w-full flex-col gap-[8px]">
                 <p className="text-[#666]">등록일자</p>
-                <DatePickerInput date={new Date()} setDate={() => {}} />
+                <DatePickerInput
+                    date={values.b_reg_date ?? null}
+                    setDate={date => date && setValue("b_reg_date", date)}
+                />
             </li>
             {/* 게시판 분류 사용시에만 노출 */}
             {boardSettingData.b_group === "Y" && (
