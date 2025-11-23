@@ -128,7 +128,7 @@ export const useBoardStore = create<BoardStore>()(
             setRefreshBoardMenu: (refresh: boolean) => set({ refreshBoardMenu: refresh }),
         }),
         {
-            name: "board-storage",
+            name: "aphen-board-storage",
             storage: createJSONStorage(() => customStorage),
         },
     ),
