@@ -13,18 +13,18 @@ export const useUserPopupStore = create<UserPopupStore>()(
         closedPopups: new Set(),
         setClosedPopup: index =>
             set(state => ({
-                closedPopups: new Set(Array.from(state.closedPopups).concat(`popup_${index}`)),
+                closedPopups: new Set(Array.from(state.closedPopups).concat(`aphen-popup-${index}`)),
             })),
         setOneDayClosedPopup: index => {
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             tomorrow.setHours(0, 0, 0, 0);
-            localStorage.setItem(`popup_${index}_hide_until`, tomorrow.toISOString());
+            localStorage.setItem(`aphen-popup-${index}-hide-until`, tomorrow.toISOString());
             get().setClosedPopup(index);
         },
         isPopupClosed: index => {
-            const popupKey = `popup_${index}`;
-            const hideUntil = localStorage.getItem(`${popupKey}_hide_until`);
+            const popupKey = `aphen-popup-${index}`;
+            const hideUntil = localStorage.getItem(`aphen-popup-${popupKey}-hide-until`);
 
             if (hideUntil) {
                 const hideDate = new Date(hideUntil);
@@ -32,7 +32,7 @@ export const useUserPopupStore = create<UserPopupStore>()(
                 if (now < hideDate) {
                     return true;
                 }
-                localStorage.removeItem(`${popupKey}_hide_until`);
+                localStorage.removeItem(`aphen-popup-${popupKey}-hide-until`);
             }
 
             return get().closedPopups.has(popupKey);

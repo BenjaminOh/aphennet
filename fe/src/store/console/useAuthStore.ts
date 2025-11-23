@@ -80,7 +80,7 @@ export const useAuthStore = create<AuthStore>()(
             clearUser: () => set({ loginUser: initialLoginUser }),
         }),
         {
-            name: "auth-storage",
+            name: "aphen-auth-storage",
             storage: createJSONStorage(() => customStorage),
         },
     ),

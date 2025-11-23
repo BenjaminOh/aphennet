@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
 import { notFound } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -17,6 +18,7 @@ import { useAuthStore } from "@/store/console/useAuthStore";
 export const schema = z
     .object({
         b_title: z.string().min(1, "제목을 입력해주세요."),
+        b_reg_date:z.date(),
         b_notice: z.string(),
         b_contents: z.string(),
         b_contents_html: z.string(),
@@ -64,12 +66,13 @@ export type FormValues = z.infer<typeof schema>;
 
 const initialValues:FormValues = {
     b_title: "",
+    b_reg_date: new Date(),
     b_notice: "0",
     b_contents: "",
     b_contents_html: "",
     b_content_type: "editor",
     m_pwd: "",
-    b_secret: "",
+    b_secret: "N",
     c_content_type: null,
     b_depth: 0,
     parent_id: null,
@@ -139,16 +142,17 @@ export function usePostForm(
             });
         }
         if (mode === "edit" && configData) {
-            const { b_title, b_notice, b_contents, b_content_type, group_id, b_file, b_img, parent_id, b_secret} = configData.data;
+            const { b_title, b_reg_date, b_notice, b_contents, b_content_type, group_id, b_file, b_img, parent_id, b_secret} = configData.data;
             reset({
                 ...initialValues,
                 b_title,
+                b_reg_date: b_reg_date && b_reg_date !== "" ? new Date(b_reg_date) : undefined,
                 b_notice,
                 b_content_type: b_content_type ?? initialValues.b_content_type,
                 b_contents: b_content_type === "editor" ? b_contents : initialValues.b_contents,
                 b_contents_html: b_content_type === "html" ? b_contents : initialValues.b_contents_html,
                 parent_id,
-                b_secret,
+                b_secret: b_secret ?? initialValues.b_secret,
                 ...(boardSettingData.b_group === "Y" ? { b_group: "Y" } : { b_group: "N" }),
                 ...(group_id && { group_id: group_id.toString() }),
                 ...(boardSettingData.c_content_type && { c_content_type: boardSettingData.c_content_type }),
@@ -189,6 +193,10 @@ export function usePostForm(
             }
         }
     }, [boardGroupList, mode, configData]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(()=>{
+console.log(errors);
+    },[errors]);
 
     useEffect(() => {
         if (refetch) {
@@ -251,12 +259,13 @@ export function usePostForm(
     // 저장하기
     const onSubmit = (data: FormValues) => {
         if (!category) return;
-        const { c_content_type, b_img_name, b_contents_html, b_content_type, b_contents, ...formData} = data;
+        const { c_content_type, b_img_name, b_contents_html, b_content_type, b_contents, b_reg_date,...formData} = data;
         const baseBody = {
             ...formData,
             category,
             m_email: loginUser.m_email,
             m_name: loginUser.m_name,
+            b_reg_date: format(b_reg_date, "yyyy.MM.dd"),
             b_file: filesData.length > 0 ? filesData : [],
             m_pwd: formData.m_pwd || "",
             b_secret: formData.b_secret || "",

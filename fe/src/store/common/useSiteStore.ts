@@ -62,7 +62,7 @@ export const useSiteStore = create<SiteStore>()(
             setSiteInfoData: (data: SiteInfoItem) => set({ siteInfoData: data }),
         }),
         {
-            name: "site-storage",
+            name: "aphen-site-storage",
             storage: createJSONStorage(() => localStorage),
         },
     ),
