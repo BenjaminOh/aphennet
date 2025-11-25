@@ -155,7 +155,7 @@ export default function Organization() {
                                     김숙진
                                 </td>
                                 <td className="p-[16px_8px] text-[#666] md:px-[20px] md:text-[18px]">
-                                    전)한국노총 공공노련 대외협력실장 · 더불어민주당 이수진국회의원 보좌관
+                                    전)한국노총 공공노련 대외협력실장, 아시아평화와역사연구소 이사
                                 </td>
                             </tr>
                             <tr className="border-b border-[#999999]">
