@@ -413,7 +413,7 @@ export default function Organization() {
                                 </th>
                                 <td className="border-l border-r border-[#ddd] p-[16px_5px] text-center text-[18px] font-[500] md:text-[20px]"></td>
                                 <td className="p-[16px_8px] text-[#666] md:px-[20px] md:text-[18px]">
-                                    국회의원 김주영 · 이수진 · 박해철
+                                    국회의원 김주영 · 이수진 · 박해철 · 용혜인
                                 </td>
                             </tr>
                         </tbody>
