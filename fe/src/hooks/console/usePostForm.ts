@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
+import { format, isValid, parse } from "date-fns";
 import { notFound } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -143,10 +143,19 @@ export function usePostForm(
         }
         if (mode === "edit" && configData) {
             const { b_title, b_reg_date, b_notice, b_contents, b_content_type, group_id, b_file, b_img, parent_id, b_secret} = configData.data;
+            
+            // 날짜 파싱: "2025.06.04" 형식을 안전하게 파싱
+            const parsedDate = b_reg_date && b_reg_date !== "" 
+                ? (() => {
+                    const date = parse(b_reg_date, "yyyy.MM.dd", new Date());
+                    return isValid(date) ? date : undefined;
+                })()
+                : undefined;
+            
             reset({
                 ...initialValues,
                 b_title,
-                b_reg_date: b_reg_date && b_reg_date !== "" ? new Date(b_reg_date) : undefined,
+                b_reg_date: parsedDate,
                 b_notice,
                 b_content_type: b_content_type ?? initialValues.b_content_type,
                 b_contents: b_content_type === "editor" ? b_contents : initialValues.b_contents,
@@ -193,10 +202,6 @@ export function usePostForm(
             }
         }
     }, [boardGroupList, mode, configData]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    useEffect(()=>{
-console.log(errors);
-    },[errors]);
 
     useEffect(() => {
         if (refetch) {
