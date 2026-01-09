@@ -771,3 +771,86 @@ exports.getPopupList = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.getPopupDetail = async (req, res, next) => {
+    const { idx } = req.params;
+
+    try {
+        if (!idx) {
+            return errorHandler.errorThrow(enumConfig.statusErrorCode._400_ERROR[0], 'idx 값이 없습니다.');
+        }
+
+        const result = await i_popup.findOne({
+            where: { idx: idx },
+            attributes: [
+                'idx',
+                'p_type',
+                'p_title',
+                'p_s_date',
+                'p_e_date',
+                'p_width_size',
+                'p_height_size',
+                'p_one_day',
+                'p_left_point',
+                'p_top_point',
+                'p_open',
+                'p_layer_pop',
+                'p_scroll',
+                'p_link_target',
+                'p_link_url',
+                'p_content',
+                'p_content_type',
+            ],
+            raw: true,
+        });
+
+        const formattedResult = {
+            idx: result.idx,
+            p_type:
+                result.p_type === enumConfig.bannerType.PC[0]
+                    ? enumConfig.bannerType.PC
+                    : result.p_type === enumConfig.bannerType.MOBILE[0]
+                    ? enumConfig.bannerType.MOBILE
+                    : null,
+            p_title: result.p_title,
+            p_s_date: result.p_s_date,
+            p_e_date: result.p_e_date,
+            p_width_size: result.p_width_size,
+            p_height_size: result.p_height_size,
+            p_one_day:
+                result.p_one_day === enumConfig.useType.Y[0]
+                    ? enumConfig.useType.Y
+                    : result.p_one_day === enumConfig.useType.N[0]
+                    ? enumConfig.useType.N
+                    : null,
+            p_left_point: result.p_left_point,
+            p_top_point: result.p_top_point,
+            p_open:
+                result.p_open === enumConfig.bannerOpenType.Y[0]
+                    ? enumConfig.bannerOpenType.Y
+                    : result.p_open === enumConfig.bannerOpenType.N[0]
+                    ? enumConfig.bannerOpenType.N
+                    : null,
+            p_layer_pop:
+                result.p_layer_pop === enumConfig.popupType.LAYER[0]
+                    ? enumConfig.popupType.LAYER
+                    : result.p_layer_pop === enumConfig.popupType.POPUP[0]
+                    ? enumConfig.popupType.POPUP
+                    : null,
+            p_scroll: result.p_scroll,
+            p_link_target:
+                result.p_link_target === enumConfig.bannerLinkType.PARENT[0]
+                    ? enumConfig.bannerLinkType.PARENT
+                    : result.p_link_target === enumConfig.bannerLinkType.BLANK[0]
+                    ? enumConfig.bannerLinkType.BLANK
+                    : null,
+            p_link_url: result.p_link_url,
+            p_content: result.p_content,
+            p_content_type: result.p_content_type,
+        };
+
+        return errorHandler.successThrow(res, '', formattedResult);
+    } catch (err) {
+        next(err);
+    }
+};

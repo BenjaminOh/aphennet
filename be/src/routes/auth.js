@@ -29,6 +29,7 @@ router.put('/user', validatorMiddleware.mobileValidatorRequired, isAuthMiddlewar
 router.delete('/user', isAuthMiddleware.isAuth, authController.deleteUserDestroy); // 회원탈퇴하기
 
 router.get('/popup', authController.getPopupList); //팝업 리스트
+router.get('/popupDetail/:idx', authController.getPopupDetail); //팝업 상세
 
 router.post('/refresh', authController.postTokenRefresh); // 토큰 리프레시
 
