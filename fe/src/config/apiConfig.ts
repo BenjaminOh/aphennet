@@ -36,6 +36,11 @@ export const USER_API_ROUTES = {
 
     GET_MAIN_BANNER: "/v1/main/banner",
 
+    POPUP: {
+        GET_LIST: "/v1/auth/popup/",
+        GET_DETAIL: "/v1/auth/popupDetail/:idx",
+    },
+
     POST: {
         GET_GROUP: "/v1/menu/boardGroup/:parent_id",
     },

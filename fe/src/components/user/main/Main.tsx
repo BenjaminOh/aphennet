@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import SupportSection from "@/components/user/common/SupportSection";
 
+import UserPopup from "../popup/UserPopup";
 import MainBanner from "./-components/MainBanner";
 import MainLink from "./-components/MainLink";
 import MainSection1 from "./-components/MainSection1";
@@ -58,6 +59,7 @@ export default function Main() {
             <MainSection1 sectRef={sect1Ref} sectOn={sect1On} />
             <MainSection2 sectRef={sect2Ref} sectOn={sect2On} />
             <SupportSection sectRef={sect3Ref} sectOn={sect3On} />
+            <UserPopup />
         </>
     );
 }
