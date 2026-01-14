@@ -301,17 +301,6 @@ export default function Organization() {
                                     운영위원
                                 </th>
                                 <td className="border-l border-r border-[#ddd] p-[16px_5px] text-center text-[18px] font-[500] md:text-[20px]">
-                                    이신철
-                                </td>
-                                <td className="p-[16px_8px] text-[#666] md:px-[20px] md:text-[18px]">
-                                    아시아평화와역사연구소 연구위원
-                                </td>
-                            </tr>
-                            <tr className="border-b border-[#999999]">
-                                <th className="bg-[#FAFAFA] p-[20px_8px] text-[18px] font-[500] md:text-[24px]">
-                                    운영위원
-                                </th>
-                                <td className="border-l border-r border-[#ddd] p-[16px_5px] text-center text-[18px] font-[500] md:text-[20px]">
                                     임국평
                                 </td>
                                 <td className="p-[16px_8px] text-[#666] md:px-[20px] md:text-[18px]">
