@@ -58,30 +58,6 @@ services:
             - ./be/upload:/app/upload
             - ./be/storage:/app/storage
 
-    # MariaDB (운영환경) - MariaDB 최신 버전 사용
-    mariadb:
-        container_name: aphennet-mariadb
-        image: mariadb:10.11
-        restart: always
-        environment:
-            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-aphennet_root!@34}
-            MYSQL_DATABASE: ${DB_NAME:-aphennet_db}
-            MYSQL_USER: ${DB_USER:-aphennet}
-            MYSQL_PASSWORD: ${DB_PASS:-aphennet!@34}
-            TZ: Asia/Seoul
-        ports:
-            - "${DB_EXPOSE_PORT:-3306}:3306"
-        volumes:
-            - mariadb_data:/var/lib/mysql
-            - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-        networks:
-            - aphennet-network
-        healthcheck:
-            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
-            interval: 10s
-            timeout: 5s
-            retries: 5
-
 volumes:
     mariadb_data:
     nextjs_node_modules:
