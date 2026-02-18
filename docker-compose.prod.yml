@@ -22,7 +22,7 @@ services:
         env_file:
             - ./.env
         networks:
-            - aphennet-network
+            - app-network
         deploy:
             resources:
                 limits:
@@ -51,7 +51,7 @@ services:
         env_file:
             - ./.env
         networks:
-            - aphennet-network
+            - app-network
         healthcheck:
             test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
             interval: 60s
@@ -73,5 +73,5 @@ services:
                 max-file: "3"
 
 networks:
-    aphennet-network:
+    app-network:
         external: true
