@@ -17,7 +17,7 @@ ENV NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY
 COPY package*.json ./
 
 # 프로젝트 의존성 설치
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 COPY . .
 
@@ -45,7 +45,7 @@ ENV NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY
 COPY package*.json ./
 
 # 프로젝트 의존성 설치
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 COPY . .
 
