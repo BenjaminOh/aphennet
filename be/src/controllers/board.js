@@ -711,6 +711,7 @@ exports.postBoardCreate = async (req, res, next) => {
         b_email_yn,
         b_secret,
         group_id,
+        b_reg_date,
     } = req.body;
 
     try {
@@ -727,6 +728,14 @@ exports.postBoardCreate = async (req, res, next) => {
         const board_b_img = req.files['b_img'];
 
         const processedContents = await utilMiddleware.base64ToImagesPath(b_contents);
+
+        // b_reg_date 처리: yyyy.mm.dd 형식이 들어오면 현재 시각(HH:mm:ss)을 붙여 Date 로 변환
+        let processedRegDate = null;
+        if (b_reg_date) {
+            const currentTime = moment().format('HH:mm:ss');
+            const dateTimeString = `${b_reg_date} ${currentTime}`;
+            processedRegDate = moment(dateTimeString, 'YYYY.MM.DD HH:mm:ss').toDate();
+        }
 
         let boardCreate;
         await db.mariaDBSequelize.transaction(async transaction => {
@@ -762,6 +771,7 @@ exports.postBoardCreate = async (req, res, next) => {
                     b_secret: b_secret,
                     group_id: group_id ? group_id : null,
                     b_num: newBNum,
+                    ...(processedRegDate && { b_reg_date: processedRegDate }),
                 },
                 { transaction },
             );
@@ -902,6 +912,7 @@ exports.putBoardUpdate = async (req, res, next) => {
 		group_id,
 		pass,
 		b_state,
+		b_reg_date,
 	} = req.body;
 
 	try {
@@ -972,6 +983,14 @@ exports.putBoardUpdate = async (req, res, next) => {
 
 			const processedContents = await utilMiddleware.base64ToImagesPath(b_contents);
 
+			// b_reg_date 처리: yyyy.mm.dd 형식이 들어오면 현재 시각(HH:mm:ss)을 붙여 Date 로 변환
+			let processedRegDate = null;
+			if (b_reg_date) {
+				const currentTime = moment().format('HH:mm:ss');
+				const dateTimeString = `${b_reg_date} ${currentTime}`;
+				processedRegDate = moment(dateTimeString, 'YYYY.MM.DD HH:mm:ss').toDate();
+			}
+
 			//에디터 이미지 경로 저장
 			if (processedContents.imagePaths) {
 				for (const editFile of processedContents.imagePaths) {
@@ -1003,6 +1022,7 @@ exports.putBoardUpdate = async (req, res, next) => {
 					b_email_yn: b_email_yn,
 					group_id: group_id,
 					b_state: b_state,
+					...(processedRegDate && { b_reg_date: processedRegDate }),
 				},
 				{
 					where: {
