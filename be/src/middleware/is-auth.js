@@ -79,8 +79,9 @@ module.exports = {
                 );
             }
 
-            // 회원인증
-            authenticate(req);
+            // 회원인증 (READ 권한이면 비회원도 허용 - 권한 결정은 boardAuth.authorizeUser에 위임)
+            const allowGuest = (boardAuthType === enumConfig.boardAuthType.READ);
+            authenticate(req, allowGuest);
 
             const authorizationResult = await boardAuth.authorizeUser(category, boardAuthType, req.level);
 
