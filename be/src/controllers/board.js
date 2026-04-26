@@ -166,6 +166,7 @@ exports.getBoardList = async (req, res, next) => {
                 'b_notice',
                 'b_secret',
                 'b_title',
+                'b_contents',
                 'm_email',
                 'm_name',
                 'b_reply',
@@ -189,12 +190,22 @@ exports.getBoardList = async (req, res, next) => {
             ],
         });
 
+        const extractFirstImage = (html) => {
+            if (!html || typeof html !== 'string') {
+                return null;
+            }
+            const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+            return match ? match[1] : null; // 첫 번째 이미지 src 반환, 없으면 null
+        };
+
         const formattedResult = result.rows.map((list, index) => ({
             idx: list.idx,
             num: list.b_notice === '1' ? '공지' : result.count - (offset + index),
             category: list.category,
             b_depth: list.b_depth,
             b_title: list.b_title,
+            b_contents: list.b_contents,
+            first_image: extractFirstImage(list.b_contents),
             m_email: list.m_email,
             m_name: list.m_name,
             b_reg_date: moment(list.b_reg_date).format('YYYY.MM.DD'),
@@ -421,12 +432,22 @@ exports.postMyBoardList = async (req, res, next) => {
             ],
         });
 
+        const extractFirstImage = (html) => {
+            if (!html || typeof html !== 'string') {
+                return null;
+            }
+            const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+            return match ? match[1] : null; // 첫 번째 이미지 src 반환, 없으면 null
+        };
+
         const formattedResult = result.rows.map((list, index) => ({
             idx: list.idx,
             num: list.b_notice === '1' ? '공지' : result.count - (offset + index),
             category: list.category,
             b_depth: list.b_depth,
             b_title: list.b_title,
+            b_contents: list.b_contents,
+            first_image: extractFirstImage(list.b_contents),
             m_email: list.m_email,
             m_name: list.m_name,
             b_reg_date: moment(list.b_reg_date).format('YYYY.MM.DD'),
