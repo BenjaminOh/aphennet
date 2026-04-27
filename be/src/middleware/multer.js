@@ -64,9 +64,46 @@ const allowedMimeTypes = [
     'application/haansoftxlsx', // 한컴오피스 Excel 파일
 ];
 
+// 확장자 기반 허용 목록 (mimetype이 application/octet-stream이어도 허용)
+const allowedExtensions = [
+    'hwp', // 한글 파일
+    'hwpx', // 한글 파일 (XML 형식)
+    'pdf',
+    'doc',
+    'docx',
+    'xls',
+    'xlsx',
+    'ppt',
+    'pptx',
+    'zip',
+    'txt',
+    'png',
+    'jpg',
+    'jpeg',
+    'gif',
+    'mpg',
+    'mpeg',
+    'avi',
+    'wmv',
+    'mp4',
+];
+
 const fileFilter = (req, file, cb) => {
     const fileExtension = file.originalname.split('.').pop().toLowerCase();
-    if (allowedMimeTypes.includes(file.mimetype) && fileExtension !== 'exe') {
+
+    // exe 파일은 무조건 거부
+    if (fileExtension === 'exe') {
+        const errorMessage = `허용되지 않는 파일 형식입니다.`;
+        cb(new Error(errorMessage), false);
+        return;
+    }
+
+    // mimetype이 허용 목록에 있거나, application/octet-stream이지만 확장자가 허용 목록에 있는 경우 허용
+    const isMimeTypeAllowed = allowedMimeTypes.includes(file.mimetype);
+    const isExtensionAllowed = allowedExtensions.includes(fileExtension);
+    const isOctetStreamWithAllowedExt = file.mimetype === 'application/octet-stream' && isExtensionAllowed;
+
+    if (isMimeTypeAllowed || isOctetStreamWithAllowedExt) {
         cb(null, true); // 파일을 허용합니다.
     } else {
         console.log(file);
