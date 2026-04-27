@@ -96,8 +96,8 @@ exports.clearFile = async filePath => {
 };
 
 // Add a file size limit (in bytes)
-const fileSizeLimit = (Number(process.env.FILESIZE) || 5) * 1024 * 1024; // 기본 5MB
-const fieldSizeLimit = 50 * 1024 * 1024; // 50MB
+const fileSizeLimit = (Number(process.env.FILESIZE) || 30) * 1024 * 1024; // 파일당 30MB
+const fieldSizeLimit = 100 * 1024 * 1024; // 100MB
 
 exports.fileMulter = multer({
     storage: fileStorage('storage/board'),

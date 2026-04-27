@@ -124,8 +124,8 @@ app.use((req, res, next) => {
     }
 });
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
-app.use(bodyParser.json({ limit: '50mb' }));  // 기본값에서 증가
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(bodyParser.json({ limit: '100mb' }));  // 전체 요청 본문 최대 100MB
+app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
 app.use('/storage', express.static(path.join(process.cwd(), 'storage')));
 
