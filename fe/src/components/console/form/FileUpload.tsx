@@ -10,10 +10,37 @@ import { usePopupStore } from "@/store/common/usePopupStore";
 
 export type FileData = { idx: string | number; original_name: string; url: string };
 
+// 서버(be/src/middleware/multer.js)의 allowedExtensions 와 동일하게 유지할 것
+export const ALLOWED_EXTENSIONS = [
+    "hwp",
+    "hwpx",
+    "pdf",
+    "doc",
+    "docx",
+    "xls",
+    "xlsx",
+    "ppt",
+    "pptx",
+    "zip",
+    "txt",
+    "png",
+    "jpg",
+    "jpeg",
+    "gif",
+    "mpg",
+    "mpeg",
+    "avi",
+    "wmv",
+    "mp4",
+];
+
+// 서버 .env 의 FILESIZE(MB) 와 동일하게 유지할 것
+export const MAX_FILE_SIZE_MB = 30;
+
 interface FileUploadProps {
     uploadFiles: FileData[];
     setFiles: (file: FileData[]) => void;
-    setFilesData: (fileData: File[]) => void;
+    setFilesData: React.Dispatch<React.SetStateAction<File[]>>;
     boxClassName?: string;
     className?: string;
     showPreview?: boolean;
@@ -46,19 +73,36 @@ const FileUpload: React.FC<FileUploadProps> = ({
                 return;
             } else if (files > maxLength) {
                 setConfirmPop(true, `최대 ${maxLength}개까지 첨부 가능합니다.`, 1);
-            } else {
-                const newFiles = acceptedFiles.map(file => ({
-                    idx: uuidv4(), // 고유한 ID
-                    original_name: file.name,
-                    url: URL.createObjectURL(file),
-                }));
-
-                // 파일 리스트를 업데이트
-                setFiles([...uploadFiles, ...newFiles]);
-
-                // 실제 파일 데이터도 업데이트
-                setFilesData([...acceptedFiles]);
+                return;
             }
+
+            // 서버 왕복 전에 확장자·용량을 먼저 걸러낸다
+            const invalidExt = acceptedFiles.find(
+                file => !ALLOWED_EXTENSIONS.includes(file.name.split(".").pop()?.toLowerCase() ?? ""),
+            );
+            if (invalidExt) {
+                setConfirmPop(true, `허용되지 않는 파일 형식입니다. (${invalidExt.name})`, 1);
+                return;
+            }
+
+            const oversized = acceptedFiles.find(file => file.size > MAX_FILE_SIZE_MB * 1024 * 1024);
+            if (oversized) {
+                setConfirmPop(true, `파일 크기가 너무 큽니다. 최대 ${MAX_FILE_SIZE_MB}MB (${oversized.name})`, 1);
+                return;
+            }
+
+            const newFiles = acceptedFiles.map(file => ({
+                idx: uuidv4(), // 고유한 ID
+                original_name: file.name,
+                url: URL.createObjectURL(file),
+            }));
+
+            // 파일 리스트를 업데이트
+            setFiles([...uploadFiles, ...newFiles]);
+
+            // 실제 파일 데이터도 누적한다.
+            // (기존에는 덮어써서 두 번 나눠 첨부하면 앞서 고른 파일이 전송되지 않았다)
+            setFilesData(prev => [...prev, ...acceptedFiles]);
         },
     });
 

@@ -88,13 +88,21 @@ const allowedExtensions = [
     'mp4',
 ];
 
+// 거부 사유가 클라이언트까지 전달되도록 MulterError로 감싼다.
+// plain Error를 던지면 error.js의 MulterError 분기를 타지 못해
+// 메시지가 'SERVER ERROR'(500)로 덮어써진다.
+const invalidFileTypeError = () => {
+    const error = new multer.MulterError('INVALID_FILE_TYPE');
+    error.message = '허용되지 않는 파일 형식입니다.';
+    return error;
+};
+
 const fileFilter = (req, file, cb) => {
     const fileExtension = file.originalname.split('.').pop().toLowerCase();
 
     // exe 파일은 무조건 거부
     if (fileExtension === 'exe') {
-        const errorMessage = `허용되지 않는 파일 형식입니다.`;
-        cb(new Error(errorMessage), false);
+        cb(invalidFileTypeError(), false);
         return;
     }
 
@@ -109,8 +117,7 @@ const fileFilter = (req, file, cb) => {
         console.log(file);
         console.log(`file.mimetype : ${file.mimetype}`);
         console.log(`fileExtension : ${fileExtension}`);
-        const errorMessage = `허용되지 않는 파일 형식입니다.`;
-        cb(new Error(errorMessage), false); // 에러 메시지와 함께 파일을 거부합니다.
+        cb(invalidFileTypeError(), false); // 에러 메시지와 함께 파일을 거부합니다.
     }
 };
 

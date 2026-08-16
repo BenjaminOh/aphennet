@@ -5,7 +5,7 @@ import TooltipBox from "@/components/console/common/TooltipBox";
 import Checkbox from "@/components/console/form/Checkbox";
 import DatePickerInput from "@/components/console/form/DatePickerInput";
 import EditorWithHtml2 from "@/components/console/form/EditorWithHtml2";
-import FileUpload, { FileData } from "@/components/console/form/FileUpload";
+import FileUpload, { ALLOWED_EXTENSIONS, FileData, MAX_FILE_SIZE_MB } from "@/components/console/form/FileUpload";
 import Input from "@/components/console/form/Input";
 import SelectBox, { SelectItem } from "@/components/console/form/SelectBox";
 import { FormValues } from "@/hooks/console/usePostForm";
@@ -21,10 +21,10 @@ interface PostFormBodyProps {
     boardGroupList: SelectItem[];
     files: FileData[];
     setFiles: (files: FileData[]) => void;
-    setFilesData: (files: File[]) => void;
+    setFilesData: React.Dispatch<React.SetStateAction<File[]>>;
     imgFiles: FileData[];
     setImgFiles: (files: FileData[]) => void;
-    setImgFilesData: (files: File[]) => void;
+    setImgFilesData: React.Dispatch<React.SetStateAction<File[]>>;
     handleConfirmDeleteFile: (idx: number, file_idx: number | string, img?: boolean) => void;
     reply?: boolean; // 답글달기 인지 여부
 }
@@ -138,7 +138,7 @@ export default function PostFormBody({
                 <div className="flex items-center gap-[8px]">
                     <p className="text-[#666]">파일 첨부</p>
                     <TooltipBox
-                        text={`&middot; 최대 10개의 파일만 첨부 가능합니다.<br/> &middot; 개별 파일 크기: 5MB 이하<br/> &middot; 총 용량: 50MB 이하`}
+                        text={`&middot; 최대 10개의 파일만 첨부 가능합니다.<br/> &middot; 개별 파일 크기: ${MAX_FILE_SIZE_MB}MB 이하<br/> &middot; 첨부 가능 형식: ${ALLOWED_EXTENSIONS.join(", ")}`}
                     />
                 </div>
                 <FileUpload
