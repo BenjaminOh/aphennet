@@ -125,6 +125,9 @@ export default function PostFormBody({
             )}
             <li className="w-full">
                 <EditorWithHtml2
+                    // 2026-08-17: 게시판만 Lexical 로 전환 (YouTube 링크 임베드).
+                    // 배너 등 다른 EditorWithHtml2 소비자는 기본값 quill 을 유지한다.
+                    engine="lexical"
                     editorValue={values.b_contents || ""}
                     htmlValue={values.b_contents_html || ""}
                     type={values.b_content_type ?? "editor"}

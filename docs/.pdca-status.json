@@ -1,18 +1,47 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-18T13:08:12.881Z",
-  "activeFeatures": [],
-  "primaryFeature": null,
-  "features": {},
+  "lastUpdated": "2026-08-17T00:00:00.000Z",
+  "activeFeatures": ["board-editor-lexical"],
+  "primaryFeature": "board-editor-lexical",
+  "features": {
+    "board-editor-lexical": {
+      "phase": "design",
+      "scope": "관리자 게시판 에디터를 Quill에서 basic_solution의 Lexical로 교체 — YouTube 링크 임베드 + 비디오 최대폭 1024px 반응형",
+      "transferDoc": "docs/02-design/features/board-editor-lexical.transfer.md",
+      "source": "/Users/benjaminoh/dev/project/likeweb/basic_solution/fe/src/components/{editor,blocks/editor-x}",
+      "verdict": "혼합 (코어 이식 + 결합부 재작성)",
+      "testTarget": 12,
+      "baseline": {
+        "unitTests": 0,
+        "e2e": "없음 — 테스트 하네스 미보유",
+        "typecheck": "0 에러 (exit 0)",
+        "build": "exit 0 (기존 경고 1건: route group + standalone ENOENT, 회귀 아님)",
+        "bundle": {
+          "console/board/post/[category]": "346 kB First Load JS (교체 대상)",
+          "[category]/[post_idx]": "267 kB",
+          "sharedByAll": "84.6 kB"
+        }
+      },
+      "decisions": "124파일·31,820줄이고 @lexical/* 13개 패키지 통합이 본체라 재구현 비현실적. 다만 emoji-list.ts가 52%(16,602줄)이고 죽은 파일 22개 + 주석 처리된 배선 18줄이라 약 74%는 미이관. 결합 82건 중 76건이 @/components/ui인데 두 프로젝트의 shadcn 토큰 규약이 달라(hsl(var(--x)) vs 직접 변수) 프리미티브 12개는 복사가 아니라 신규 작성. 원본이 HTML in/out이라 기존 259건 데이터 마이그레이션 불필요.",
+      "openQuestions": "color-picker(1,759줄) 이식 여부 / 번들 증가폭 허용치 / 임베드 전용 글의 갤러리 썸네일 부재 / Lexical 익스포트가 QuillContent Shadow DOM에서 서식 유지하는지 / React 19 전용 패턴 혼입 여부"
+    }
+  },
   "pipeline": {
-    "currentPhase": 1,
+    "currentPhase": 2,
     "level": "Dynamic",
     "phaseHistory": []
   },
   "session": {
     "startedAt": "2026-02-18T13:08:12.881Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-02-18T13:08:12.881Z"
+    "lastActivity": "2026-08-17T00:00:00.000Z"
   },
-  "history": []
+  "history": [
+    {
+      "date": "2026-08-17",
+      "feature": "board-editor-lexical",
+      "action": "transfer-doc-created",
+      "note": "basic_solution Lexical 에디터 이관 지시서 작성 + 기준선 실측(typecheck 0 에러, build exit 0)"
+    }
+  ]
 }

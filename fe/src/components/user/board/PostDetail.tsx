@@ -13,7 +13,7 @@ import { useGetPost, useGetPostFileDownload } from "@/service/user/board";
 import { useNavigationStore } from "@/store/user/useNavigationStore";
 import { usePopupStore } from "@/store/user/usePopupStore";
 
-import QuillContent from "../../common/common/QuillContent";
+import PostContent from "../../common/common/PostContent";
 
 interface InfoItem {
     b_title: string;
@@ -137,8 +137,7 @@ export default function PostDetail({ category, detailIdx }: { category: string; 
             </div>
             <div className="min-h-[300px] border-b border-[#D9D9D9] py-[24px]">
                 <div className="flex justify-center pb-[20px]"></div>
-                {info.b_content_type === "editor" && <QuillContent content={info.b_contents} />}
-                {info.b_content_type === "html" && <div dangerouslySetInnerHTML={{ __html: info.b_contents }} />}
+                <PostContent contentType={info.b_content_type} content={info.b_contents} />
             </div>
             {info.b_file.length > 0 && (
                 <div className="flex border-b border-[#D9D9D9] p-[16px_20px]">
