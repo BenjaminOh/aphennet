@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 
 import Tabs from "@/components/console/common/Tabs";
+import { normalizeQuillAlignment } from "@/lib/quillCompat";
 
 import Editor from "./Editor";
 import Textarea from "./Textarea";
@@ -64,7 +65,9 @@ export default function EditorWithHtml2({
                 // Quill 은 붙여넣은 YouTube URL 을 <a> 로 자동 링크만 해서 임베드가 불가능했다.
                 // Lexical 은 HTML in/out 이라 기존 게시물이 그대로 열린다.
                 <LexicalEditor
-                    htmlValue={editorValue}
+                    // 과거 Quill 게시물의 class="ql-align-*" 를 인라인 text-align 으로 바꿔서 넣는다.
+                    // 안 하면 에디터로 열어 재저장하는 순간 정렬이 사라진다.
+                    htmlValue={normalizeQuillAlignment(editorValue)}
                     onHtmlChange={onChangeEditorValue}
                     className={editorClassName}
                 />
