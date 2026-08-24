@@ -51,5 +51,10 @@ COPY . .
 EXPOSE 3000
 
 # 실행하기 위한 명령어
-# CMD ["npx", "nodemon", "--max-old-space-size=4096", "app.js"]
-CMD ["npx", "nodemon", "app.js"]
+# 운영에서는 nodemon 을 쓰지 않는다.
+# nodemon 이 PID 1 이면 자식 node 가 죽어도(예: heap OOM) nodemon 은
+# "waiting for file changes" 상태로 살아남아 컨테이너가 Up 을 유지한다.
+# 그러면 compose 의 restart: always 가 발동하지 않고 healthcheck 는
+# unhealthy 만 표시할 뿐이어서 API 가 무한정 다운된 채 방치된다.
+# (2026-08-23 게시물 등록 중 OOM → 26시간 API 다운)
+CMD ["node", "app.js"]
