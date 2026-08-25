@@ -22,8 +22,16 @@ export const MAX_IMAGE_EDGE_PX = 1600;
 /** 캔버스로 다시 인코딩해도 되는 MIME. 이 목록 밖은 원본을 그대로 둔다. */
 const RE_ENCODABLE_MIME = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 
-/** JPEG/WebP 로 재인코딩할 때 쓰는 품질. PNG 는 무손실이라 이 값이 무시된다. */
-const ENCODE_QUALITY = 0.92;
+/**
+ * 출력 포맷은 WebP 로 통일한다.
+ * 1600px PNG 는 장당 2~3MB 라 사진 12장이면 본문이 30MB 를 넘고,
+ * 그 상태로 저장하면 서버가 감당하지 못한다(2026-08-25 heap 장애).
+ * WebP 는 같은 화질에서 ~300KB 로 10배 작고 투명도도 유지된다.
+ */
+const OUTPUT_MIME = "image/webp";
+
+/** WebP 인코딩 품질. */
+const ENCODE_QUALITY = 0.85;
 
 export interface ResizedImage {
     /** 본문에 삽입할 data URL */
@@ -115,15 +123,16 @@ export async function resizeImageFile(file: File, maxEdge: number = MAX_IMAGE_ED
     const { source, width, height } = decoded;
     const longEdge = Math.max(width, height);
 
-    // 이미 충분히 작거나, 재인코딩하면 안 되는 포맷(GIF 애니메이션·SVG)이면 원본 유지
-    if (!canReEncode || longEdge <= maxEdge) {
+    // 재인코딩하면 안 되는 포맷(GIF 애니메이션·SVG)은 원본 유지
+    if (!canReEncode) {
         if (typeof ImageBitmap !== "undefined" && source instanceof ImageBitmap) {
             source.close();
         }
         return passthrough(width, height);
     }
 
-    const scale = maxEdge / longEdge;
+    // 상한 이하라도 WebP 로 다시 인코딩한다. 폭이 작아도 PNG 는 수 MB 가 될 수 있다.
+    const scale = longEdge > maxEdge ? maxEdge / longEdge : 1;
     const targetWidth = Math.max(1, Math.round(width * scale));
     const targetHeight = Math.max(1, Math.round(height * scale));
 
@@ -139,12 +148,10 @@ export async function resizeImageFile(file: File, maxEdge: number = MAX_IMAGE_ED
         ctx.imageSmoothingQuality = "high";
         ctx.drawImage(source, 0, 0, targetWidth, targetHeight);
 
-        // jpg 는 표준 MIME 이 아니라 캔버스가 png 로 떨어뜨린다. jpeg 로 정규화한다.
-        const outMime = mime === "image/jpg" ? "image/jpeg" : mime;
-        const blob = await toBlob(canvas, outMime);
+        const blob = await toBlob(canvas, OUTPUT_MIME);
 
-        // 축소했는데 원본보다 커졌다면(드문 PNG 케이스) 의미가 없으니 원본을 쓴다.
-        if (blob.size >= file.size) {
+        // 변환 결과가 원본보다 크고 크기도 그대로면 굳이 바꿀 이유가 없다.
+        if (blob.size >= file.size && scale === 1) {
             return passthrough(width, height);
         }
 

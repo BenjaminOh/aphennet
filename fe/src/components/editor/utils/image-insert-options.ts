@@ -20,11 +20,14 @@ export const IMAGE_MARGIN = 10;
 export const DEFAULT_IMAGE_WIDTH = 800;
 
 /**
- * 서버 저장 상한. be/src/middleware/util.js 의 MAX_IMAGE_SIZE / MAX_TOTAL_SIZE 와
- * 반드시 같은 값을 유지해야 한다. (한쪽만 바뀌면 저장 시점에야 500 이 뜬다)
+ * 서버 저장 상한. be/src/middleware/util.js 의 MAX_IMAGE_SIZE / MAX_TOTAL_SIZE / MAX_IMAGES 와
+ * 반드시 같은 값을 유지해야 한다. (한쪽만 바뀌면 저장 시점에야 에러가 뜬다)
+ *
+ * 이 값은 API 컨테이너가 감당할 수 있는 본문 크기에 묶여 있다.
+ * 2026-08-25 에 30MB/300MB 로 올렸다가 37MB 요청에서 heap 이 터져 되돌렸다.
  */
-export const MAX_IMAGE_BYTES = 30 * 1024 * 1024;
-export const MAX_TOTAL_IMAGE_BYTES = 300 * 1024 * 1024;
+export const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+export const MAX_TOTAL_IMAGE_BYTES = 50 * 1024 * 1024;
 
 /** 사진 폭 선택지. "original" 은 각 사진의 실제 폭, "custom" 은 숫자 직접 입력. */
 export const IMAGE_WIDTH_OPTIONS = [
@@ -69,6 +72,10 @@ function formatMb(bytes: number): string {
  * 통과하면 null, 걸리면 사용자에게 보여줄 안내 문구를 돌려준다.
  */
 export function validateImageBytes(items: { name: string; bytes: number }[]): string | null {
+    if (items.length > MAX_IMAGE_COUNT) {
+        return `사진은 한 번에 최대 ${MAX_IMAGE_COUNT}장까지 넣을 수 있습니다.`;
+    }
+
     const tooBig = items.find(item => item.bytes > MAX_IMAGE_BYTES);
     if (tooBig) {
         return (

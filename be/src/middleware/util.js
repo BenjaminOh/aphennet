@@ -7,69 +7,81 @@ const errorHandler = require('../middleware/error');
 const enumConfig = require('../middleware/enum');
 
 //게시글 내용 base64 이미지 변경
+//
+// 주의: 이 함수는 요청 본문 전체(수십 MB가 될 수 있는 문자열)를 다룬다.
+// 예전 구현은 이미지마다 `temp_contents.replace(...)` 로 본문 전체를 새로 복사해
+// 12장이면 37MB 문자열을 12번 만들었고, heap 을 넘겨 프로세스가 죽었다.
+// (2026-08-25 운영 장애: FATAL ERROR: Reached heap limit)
+// 지금은 regex.exec 로 위치만 잡아 조각을 모으고 마지막에 한 번만 join 한다.
 exports.base64ToImagesPath = async b_contents => {
-    let temp_contents = b_contents;
-    
     // 본문에 실려 오는 base64 이미지 상한.
     // fe/src/components/editor/utils/image-insert-options.ts 의
-    // MAX_IMAGE_BYTES / MAX_TOTAL_IMAGE_BYTES 와 반드시 같은 값을 유지할 것.
+    // MAX_IMAGE_BYTES / MAX_TOTAL_IMAGE_BYTES / MAX_IMAGE_COUNT 와 반드시 같은 값을 유지할 것.
     // (한쪽만 바뀌면 프런트는 통과시키고 저장 시점에야 에러가 난다)
-    const MAX_IMAGE_SIZE = 30 * 1024 * 1024; // 30MB
-    const MAX_TOTAL_SIZE = 300 * 1024 * 1024; // 300MB
-    const MAX_IMAGES = 15; // 최대 15개 이미지
+    const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+    const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50MB
+    const MAX_IMAGES = 12; // 최대 12장
 
-    const imageMatches = temp_contents.match(/data:image\/\w+;base64,([^"]+)/g);
+    const toMb = bytes => Math.round((bytes / 1024 / 1024) * 10) / 10;
+
+    const re = /data:image\/\w+;base64,([^"]+)/g;
+    const parts = [];
     const imagePaths = [];
+    let lastIndex = 0;
+    let index = 0;
+    let totalSize = 0;
+    let match;
 
-    if (imageMatches) {
-        // 이미지 개수 제한
-        if (imageMatches.length > MAX_IMAGES) {
-            throw new Error(`이미지는 최대 ${MAX_IMAGES}개까지 업로드 가능합니다.`);
+    while ((match = re.exec(b_contents)) !== null) {
+        if (index >= MAX_IMAGES) {
+            errorHandler.errorThrow(413, `이미지는 최대 ${MAX_IMAGES}장까지 넣을 수 있습니다.`);
         }
-        
-        let totalSize = 0;
-        
-        for (let index = 0; index < imageMatches.length; index++) {
-            const imageData = imageMatches[index];
-            const imageDataWithoutPrefix = imageData.replace(/^data:image\/\w+;base64,/, '');
-            
-            // 크기 체크 (base64는 원본보다 33% 더 큼)
-            const decodedSize = (imageDataWithoutPrefix.length * 3) / 4;
-            if (decodedSize > MAX_IMAGE_SIZE) {
-                throw new Error(
-                    `이미지 크기가 너무 큽니다: ${Math.round(decodedSize / 1024 / 1024)}MB (최대 ${MAX_IMAGE_SIZE / 1024 / 1024}MB)`,
-                );
-            }
-            
-            totalSize += decodedSize;
-            if (totalSize > MAX_TOTAL_SIZE) {
-                throw new Error(
-                    `전체 이미지 크기가 너무 큽니다: ${Math.round(totalSize / 1024 / 1024)}MB (최대 ${MAX_TOTAL_SIZE / 1024 / 1024}MB)`,
-                );
-            }
 
-            // 이미지 파일 경로 및 이름 생성
-            const imageName = Date.now() + '_' + index + '.jpg';
-            const imagePath = 'storage/board/' + imageName;
-            imagePaths.push(imagePath);
+        const base64 = match[1];
 
-            // 이미지 파일을 저장
-            try {
-                const decodedImage = Buffer.from(imageDataWithoutPrefix, 'base64');
-                await fs.promises.writeFile(imagePath, decodedImage);
-                
-                // Replace the base64 data with the image path in temp_contents
-                temp_contents = temp_contents.replace(imageData, process.env.API_URL + '/' + imagePath);
-                
-                // 메모리 정리 (Buffer는 자동으로 가비지 컬렉션됨)
-            } catch (err) {
-                console.error('Failed to save the image: ' + err);
-                throw new Error('Image upload failed');
-            }
+        // 크기 체크 (base64는 원본보다 33% 더 큼)
+        const decodedSize = (base64.length * 3) / 4;
+        if (decodedSize > MAX_IMAGE_SIZE) {
+            errorHandler.errorThrow(
+                413,
+                `이미지 크기가 너무 큽니다: ${toMb(decodedSize)}MB (최대 ${toMb(MAX_IMAGE_SIZE)}MB)`,
+            );
         }
+
+        totalSize += decodedSize;
+        if (totalSize > MAX_TOTAL_SIZE) {
+            errorHandler.errorThrow(
+                413,
+                `전체 이미지 크기가 너무 큽니다: ${toMb(totalSize)}MB (최대 ${toMb(MAX_TOTAL_SIZE)}MB)`,
+            );
+        }
+
+        // 이미지 파일 경로 및 이름 생성
+        const imageName = Date.now() + '_' + index + '.jpg';
+        const imagePath = 'storage/board/' + imageName;
+        imagePaths.push(imagePath);
+
+        try {
+            await fs.promises.writeFile(imagePath, Buffer.from(base64, 'base64'));
+        } catch (err) {
+            console.error('Failed to save the image: ' + err);
+            errorHandler.errorThrow(500, '이미지 저장에 실패했습니다.');
+        }
+
+        // 본문 전체를 복사하지 않고, base64 앞부분 조각 + 저장된 URL 만 쌓는다.
+        parts.push(b_contents.slice(lastIndex, match.index), process.env.API_URL + '/' + imagePath);
+        lastIndex = match.index + match[0].length;
+        index += 1;
     }
 
-    return { temp_contents, imagePaths };
+    // 이미지가 하나도 없으면 원본을 그대로 돌려준다 (불필요한 복사 방지)
+    if (index === 0) {
+        return { temp_contents: b_contents, imagePaths };
+    }
+
+    parts.push(b_contents.slice(lastIndex));
+
+    return { temp_contents: parts.join(''), imagePaths };
 };
 
 //이메일 전송

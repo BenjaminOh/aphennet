@@ -6,6 +6,25 @@ const { accessVerify } = require('../middleware/jwt');
 // bodyLog 컬럼은 TEXT(65535 bytes). 한글은 UTF-8 3바이트라 여유를 두고 자른다.
 const BODY_LOG_MAX_BYTES = 60000;
 
+// 게시글 본문(b_contents)은 base64 이미지를 품어 수십 MB가 되기도 한다.
+// 60KB로 자르겠다고 전체를 JSON.stringify 하면 그 자체로 heap을 밀어올린다.
+// 그래서 stringify 전에 긴 문자열 필드를 먼저 잘라낸다.
+const FIELD_PREVIEW_CHARS = 2000;
+
+const previewBody = body => {
+    if (!body || typeof body !== 'object') return null;
+
+    const preview = {};
+    for (const [key, value] of Object.entries(body)) {
+        if (typeof value === 'string' && value.length > FIELD_PREVIEW_CHARS) {
+            preview[key] = value.slice(0, FIELD_PREVIEW_CHARS) + `…(${value.length}자 중 일부)`;
+        } else {
+            preview[key] = value;
+        }
+    }
+    return preview;
+};
+
 const sanitizeBodyLog = value => {
     if (!value) return null;
 
@@ -50,7 +69,9 @@ exports.logs = async (req, res, next) => {
     //  multer와 같은 스트림을 두고 경합해 첨부파일이 유실되거나 요청이 멈췄다.)
     res.on('finish', async () => {
         try {
-            let bodyLog = req.body && Object.keys(req.body).length > 0 ? JSON.stringify(req.body) : null;
+            const bodyPreview = previewBody(req.body);
+            const bodyLog =
+                bodyPreview && Object.keys(bodyPreview).length > 0 ? JSON.stringify(bodyPreview) : null;
 
             await i_logs.create({
                 user: decodedTokenUser,
