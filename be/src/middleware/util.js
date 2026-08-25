@@ -24,7 +24,7 @@ exports.base64ToImagesPath = async b_contents => {
 
     const toMb = bytes => Math.round((bytes / 1024 / 1024) * 10) / 10;
 
-    const re = /data:image\/\w+;base64,([^"]+)/g;
+    const re = /data:image\/(\w+);base64,([^"]+)/g;
     const parts = [];
     const imagePaths = [];
     let lastIndex = 0;
@@ -37,7 +37,8 @@ exports.base64ToImagesPath = async b_contents => {
             errorHandler.errorThrow(413, `이미지는 최대 ${MAX_IMAGES}장까지 넣을 수 있습니다.`);
         }
 
-        const base64 = match[1];
+        const ext = match[1].toLowerCase() === 'jpeg' ? 'jpg' : match[1].toLowerCase();
+        const base64 = match[2];
 
         // 크기 체크 (base64는 원본보다 33% 더 큼)
         const decodedSize = (base64.length * 3) / 4;
@@ -57,7 +58,7 @@ exports.base64ToImagesPath = async b_contents => {
         }
 
         // 이미지 파일 경로 및 이름 생성
-        const imageName = Date.now() + '_' + index + '.jpg';
+        const imageName = Date.now() + '_' + index + '.' + ext;
         const imagePath = 'storage/board/' + imageName;
         imagePaths.push(imagePath);
 

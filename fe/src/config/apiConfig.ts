@@ -7,6 +7,7 @@ export const COMMON_API_ROUTES = {
         GET_LIST: "/v1/board/:category/:limit",
         GET_DETAIL: "/v1/board/view/:category/:idx",
         CRUD: "/v1/board", // POST, PUT, DELETE 모두 동일한 URL 사용
+        EDITOR_IMAGE: "/v1/board/editor-image", // 에디터 본문 이미지 업로드
     },
     POST_FILE: {
         DELETE: "/v1/board/file",

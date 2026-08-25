@@ -97,6 +97,7 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { MAX_IMAGE_EDGE_PX, resizeImageFile } from "@/lib/imageResize"
 import { cn } from "@/lib/utils"
+import { uploadEditorImage } from "@/service/common/uploadEditorImage"
 import { usePopupStore } from "@/store/common/usePopupStore"
 
 // 원본(basic_solution)은 @/constants/console/messages 의 CONSOLE_CONFIRM_MESSAGES 를 참조했다.
@@ -174,7 +175,10 @@ type PickedImageStatus = "loading" | "loaded" | "error"
 type PickedImage = {
   id: string
   name: string
-  src: string
+  /** 업로드할 실제 바이트 */
+  blob: Blob | null
+  /** 썸네일용 objectURL. data URL 을 쓰면 12장에 수십 MB 가 메모리에 남는다. */
+  previewUrl: string
   status: PickedImageStatus
   /** 축소 후 실제 픽셀 폭 */
   naturalWidth: number
@@ -228,7 +232,7 @@ function SortableThumbnail({
       {image.status === "loaded" && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={image.src}
+          src={image.previewUrl}
           alt={image.name}
           className="size-full object-cover"
           draggable={false}
@@ -268,6 +272,7 @@ export function InsertImageUploadedDialogBody({
   const [onePerLine, setOnePerLine] = useState(true)
   const [useMargin, setUseMargin] = useState(true)
   const [isDragOver, setIsDragOver] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const { setConfirmPop } = usePopupStore()
 
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -289,22 +294,24 @@ export function InsertImageUploadedDialogBody({
   }, [])
 
   /**
-   * 파일을 긴 변 1600px 이하로 줄여 data URL 로 읽는다.
-   * 원본을 그대로 실으면 서버 저장 상한에 걸릴 수 있고 본문이 무거워지며,
-   * 썸네일 12장이 원본 해상도로 메모리에 남는 것도 막는다.
+   * 파일을 긴 변 1600px 이하로 줄여 Blob 으로 보관한다.
+   * 업로드는 "확인" 을 눌렀을 때 한다. 취소하면 서버에 고아 파일이 남지 않는다.
    */
   const loadFile = useCallback(
     async (file: File, id: string) => {
       try {
-        const { src, width, bytes } = await resizeImageFile(file)
-        if (!src) {
-          markError(id)
-          return
-        }
+        const { blob, width, bytes } = await resizeImageFile(file)
         setImages((prev) =>
           prev.map((img) =>
             img.id === id
-              ? { ...img, src, status: "loaded", naturalWidth: width, bytes }
+              ? {
+                  ...img,
+                  blob,
+                  previewUrl: URL.createObjectURL(blob),
+                  status: "loaded",
+                  naturalWidth: width,
+                  bytes,
+                }
               : img
           )
         )
@@ -332,7 +339,8 @@ export function InsertImageUploadedDialogBody({
       const entries: PickedImage[] = accepted.map((file) => ({
         id: `picked-${(idRef.current += 1)}`,
         name: file.name,
-        src: "",
+        blob: null,
+        previewUrl: "",
         status: "loading",
         naturalWidth: 0,
         bytes: 0,
@@ -346,7 +354,13 @@ export function InsertImageUploadedDialogBody({
   )
 
   const handleRemove = useCallback((id: string) => {
-    setImages((prev) => prev.filter((img) => img.id !== id))
+    setImages((prev) => {
+      const target = prev.find((img) => img.id === id)
+      if (target?.previewUrl) {
+        URL.revokeObjectURL(target.previewUrl)
+      }
+      return prev.filter((img) => img.id !== id)
+    })
   }, [])
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
@@ -368,12 +382,22 @@ export function InsertImageUploadedDialogBody({
   // URL 탭으로 전환되면 이 본문이 언마운트되므로 보관 중이던 수도 함께 비운다.
   useEffect(() => () => onCountChange(0), [onCountChange])
 
+  // 언마운트 시 남은 objectURL 을 해제한다. 안 하면 탭을 오갈 때마다 메모리가 샌다.
+  useEffect(
+    () => () => {
+      imagesRef.current.forEach((img) => {
+        if (img.previewUrl) URL.revokeObjectURL(img.previewUrl)
+      })
+    },
+    []
+  )
+
   const loadedImages = images.filter((img) => img.status === "loaded")
   const isLoading = images.some((img) => img.status === "loading")
   const isFull = images.length >= MAX_IMAGE_COUNT
 
-  const handleConfirm = () => {
-    // 서버 저장 상한(be/src/middleware/util.js)을 저장 버튼이 아니라 여기서 먼저 잡는다.
+  const handleConfirm = async () => {
+    // 서버 저장 상한(be/src/middleware/util.js)을 업로드 전에 먼저 잡는다.
     const invalid = validateImageBytes(loadedImages)
     if (invalid) {
       setConfirmPop(true, invalid, 1)
@@ -391,13 +415,30 @@ export function InsertImageUploadedDialogBody({
       fixedWidth = parseInt(widthMode, 10)
     }
 
-    const payloads = loadedImages.map<InsertImagePayload>((img) => {
+    // 본문에 base64 로 싣지 않고 여기서 파일로 올린 뒤 URL 만 넣는다.
+    setIsUploading(true)
+    let uploaded: { url: string; image: PickedImage }[]
+    try {
+      uploaded = await Promise.all(
+        loadedImages.map(async (image) => ({
+          image,
+          url: await uploadEditorImage(image.blob as Blob, image.name),
+        }))
+      )
+    } catch {
+      // consoleAxios 인터셉터가 이미 사유를 띄운다. 여기서 중복 안내하지 않는다.
+      setIsUploading(false)
+      return
+    }
+    setIsUploading(false)
+
+    const payloads = uploaded.map<InsertImagePayload>(({ url, image }) => {
       // 디코딩에 실패한 파일(HEIC 등)은 naturalWidth 가 0 이다.
       // 그대로 두면 maxWidth 가 0 이 되어 이미지가 보이지 않으므로 undefined 로 떨군다.
-      const width = fixedWidth ?? (img.naturalWidth || undefined)
+      const width = fixedWidth ?? (image.naturalWidth || undefined)
       return {
-        src: img.src,
-        altText: stripExtension(img.name),
+        src: url,
+        altText: stripExtension(image.name),
         width,
         maxWidth: width,
         margin: useMargin ? IMAGE_MARGIN : 0,
@@ -429,8 +470,15 @@ export function InsertImageUploadedDialogBody({
             type="button"
             variant="ghost"
             size="sm"
-            disabled={images.length === 0}
-            onClick={() => setImages([])}
+            disabled={images.length === 0 || isUploading}
+            onClick={() =>
+              setImages((prev) => {
+                prev.forEach((img) => {
+                  if (img.previewUrl) URL.revokeObjectURL(img.previewUrl)
+                })
+                return []
+              })
+            }
           >
             <Trash2Icon className="mr-1 size-4" />
             전체 삭제
@@ -594,17 +642,26 @@ export function InsertImageUploadedDialogBody({
       </div>
 
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={onClose}>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isUploading}
+          onClick={onClose}
+        >
           취소
         </Button>
         <Button
           type="submit"
-          disabled={loadedImages.length === 0 || isLoading}
-          onClick={handleConfirm}
+          disabled={loadedImages.length === 0 || isLoading || isUploading}
+          onClick={() => void handleConfirm()}
           className="bg-console-2 text-white hover:bg-console-2/90"
           data-test-id="image-modal-file-upload-btn"
         >
-          {isLoading ? "불러오는 중..." : `확인 (${loadedImages.length}장)`}
+          {isLoading
+            ? "불러오는 중..."
+            : isUploading
+              ? "올리는 중..."
+              : `확인 (${loadedImages.length}장)`}
         </Button>
       </DialogFooter>
     </div>

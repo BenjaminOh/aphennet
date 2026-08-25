@@ -34,8 +34,8 @@ const OUTPUT_MIME = "image/webp";
 const ENCODE_QUALITY = 0.85;
 
 export interface ResizedImage {
-    /** 본문에 삽입할 data URL */
-    src: string;
+    /** 업로드할 실제 바이트. 삽입 시점에 이걸 서버로 올린다. */
+    blob: Blob;
     /** 실제 픽셀 폭 (축소 후) */
     width: number;
     /** 실제 픽셀 높이 (축소 후) */
@@ -93,8 +93,11 @@ function toBlob(canvas: HTMLCanvasElement, mime: string): Promise<Blob> {
 }
 
 /**
- * 파일을 긴 변 `maxEdge` 픽셀 이하로 줄여 data URL 로 돌려준다.
- * 줄일 필요가 없거나 줄일 수 없는 파일은 원본 그대로 돌려준다.
+ * 파일을 긴 변 `maxEdge` 픽셀 이하로 줄여 Blob 으로 돌려준다.
+ * 줄일 필요가 없거나 줄일 수 없는 파일은 원본 Blob 을 그대로 돌려준다.
+ *
+ * data URL 은 만들지 않는다. 미리보기는 호출부에서 URL.createObjectURL 로 만들고,
+ * 본문에는 업로드 후 받은 서버 URL 이 들어간다.
  */
 export async function resizeImageFile(file: File, maxEdge: number = MAX_IMAGE_EDGE_PX): Promise<ResizedImage> {
     const mime = file.type.toLowerCase();
@@ -107,8 +110,8 @@ export async function resizeImageFile(file: File, maxEdge: number = MAX_IMAGE_ED
         decoded = null;
     }
 
-    const passthrough = async (width: number, height: number): Promise<ResizedImage> => ({
-        src: await readAsDataURL(file),
+    const passthrough = (width: number, height: number): ResizedImage => ({
+        blob: file,
         width,
         height,
         bytes: file.size,
@@ -156,7 +159,7 @@ export async function resizeImageFile(file: File, maxEdge: number = MAX_IMAGE_ED
         }
 
         return {
-            src: await readAsDataURL(blob),
+            blob,
             width: targetWidth,
             height: targetHeight,
             bytes: blob.size,

@@ -44,6 +44,7 @@ const allowedMimeTypes = [
     'image/jpg',
     'image/jpeg',
     'image/gif',
+    'image/webp',
     'application/pdf',
     'application/msword', // .doc
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
@@ -81,6 +82,7 @@ const allowedExtensions = [
     'jpg',
     'jpeg',
     'gif',
+    'webp',
     'mpg',
     'mpeg',
     'avi',
@@ -141,6 +143,8 @@ exports.clearFile = async filePath => {
 
 // Add a file size limit (in bytes)
 const fileSizeLimit = (Number(process.env.FILESIZE) || 30) * 1024 * 1024; // 파일당 30MB
+// 에디터 본문 이미지 1장 상한. fe 의 MAX_IMAGE_BYTES 와 같은 값을 유지할 것.
+const EDITOR_IMAGE_SIZE_LIMIT = 10 * 1024 * 1024; // 10MB
 const fieldSizeLimit = 300 * 1024 * 1024; // 300MB (nginx client_max_body_size / bodyParser 한도와 맞춘다)
 
 exports.fileMulter = multer({
@@ -178,3 +182,12 @@ exports.bannerMulter = multer({
     // fieldSize 를 빼면 multer 기본값 1MB 로 떨어져 다른 인스턴스와 규칙이 어긋난다
     limits: { fileSize: fileSizeLimit, fieldSize: fieldSizeLimit },
 }).single('b_file');
+
+// 에디터 본문에 넣는 이미지 전용. 삽입 시점에 한 장씩 올린다.
+// 게시글 본문에 base64 로 실어 보내면 요청이 수십 MB 가 되고 서버가 이를 문자열로
+// 처리하다 heap 을 넘긴다(2026-08-25 장애). 그래서 본문에는 URL 만 남긴다.
+exports.editorImageMulter = multer({
+    storage: fileStorage('storage/board'),
+    fileFilter: fileFilter,
+    limits: { fileSize: EDITOR_IMAGE_SIZE_LIMIT, files: 1 },
+}).single('image');

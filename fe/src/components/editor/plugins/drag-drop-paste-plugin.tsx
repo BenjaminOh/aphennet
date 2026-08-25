@@ -21,6 +21,7 @@ import {
   validateImageBytes,
 } from "@/components/editor/utils/image-insert-options"
 import { resizeImageFile } from "@/lib/imageResize"
+import { uploadEditorImage } from "@/service/common/uploadEditorImage"
 import { usePopupStore } from "@/store/common/usePopupStore"
 
 const ACCEPTABLE_IMAGE_TYPES = [
@@ -68,18 +69,30 @@ export function DragDropPastePlugin(): null {
               ...(await resizeImageFile(file)),
             }))
           )
-          const usable = resized.filter((image) => image.src)
-
-          // 서버 저장 상한(be/src/middleware/util.js)을 저장 버튼이 아니라 여기서 먼저 잡는다.
-          const invalid = validateImageBytes(usable)
+          // 서버 저장 상한(be/src/middleware/util.js)을 업로드 전에 먼저 잡는다.
+          const invalid = validateImageBytes(resized)
           if (invalid) {
             setConfirmPop(true, invalid, 1)
             return
           }
 
-          usable.forEach((image) => {
+          // 본문에 base64 로 싣지 않고 여기서 파일로 올린 뒤 URL 만 넣는다.
+          let uploaded: { name: string; url: string }[]
+          try {
+            uploaded = await Promise.all(
+              resized.map(async (image) => ({
+                name: image.name,
+                url: await uploadEditorImage(image.blob, image.name),
+              }))
+            )
+          } catch {
+            // consoleAxios 인터셉터가 이미 사유를 띄운다. 여기서 중복 안내하지 않는다.
+            return
+          }
+
+          uploaded.forEach((image) => {
             editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
-              src: image.src,
+              src: image.url,
               altText: stripExtension(image.name),
               // 폭을 지정해야 exportDOM 이 width·max-width 를 내보낸다.
               width: DEFAULT_INSERT_OPTIONS.width,

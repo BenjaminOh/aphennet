@@ -1430,3 +1430,22 @@ exports.putBoardMoveOrder = async (req, res, next) => {
         next(err);
     }
 };
+
+//에디터 본문 이미지 업로드
+//
+// 에디터에 사진을 넣는 순간 한 장씩 올리고 URL 만 돌려준다.
+// 예전처럼 본문에 base64 로 실어 보내면 저장 요청이 수십 MB 가 되어
+// 브라우저(타이핑마다 전체 직렬화)와 서버(문자열 처리 중 heap 초과) 양쪽이 무너진다.
+exports.postEditorImage = async (req, res, next) => {
+	try {
+		if (!req.file) {
+			errorHandler.errorThrow(422, '이미지 파일이 없습니다.');
+		}
+
+		const url = process.env.API_URL + '/storage/board/' + req.file.filename;
+
+		return errorHandler.successThrow(res, '', { url });
+	} catch (err) {
+		next(err);
+	}
+};

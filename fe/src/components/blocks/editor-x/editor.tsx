@@ -154,6 +154,9 @@ function HtmlImportPlugin({
     return null;
 }
 
+/** HTML 직렬화 디바운스(ms). 타이핑이 멈춘 뒤에만 본문을 다시 만든다. */
+const HTML_EXPORT_DEBOUNCE_MS = 300;
+
 // 에디터 변경을 감지해서 HTML 문자열로 변환하는 플러그인
 function HtmlExportPlugin({
     onHtmlChange,
@@ -167,17 +170,30 @@ function HtmlExportPlugin({
     const [editor] = useLexicalComposerContext();
 
     useEffect(() => {
-        return editor.registerUpdateListener(() => {
-            editor.getEditorState().read(() => {
-                if (isImportingRef.current) {
-                    return;
-                }
-                const html = $generateHtmlFromNodes(editor, null);
-                // 내부 변경 플래그 설정 후 상위로 알림
-                isInternalUpdateRef.current = true;
-                onHtmlChange(html);
-            });
+        // $generateHtmlFromNodes 는 문서 전체를 문자열로 직렬화한다.
+        // 디바운스 없이 매 업데이트마다 돌리면 타이핑 한 번에 본문 전체를 새로 만들어
+        // 사진이 많은 글에서 에디터가 눈에 띄게 느려진다.
+        let timer: ReturnType<typeof setTimeout> | null = null;
+
+        const unregister = editor.registerUpdateListener(() => {
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => {
+                editor.getEditorState().read(() => {
+                    if (isImportingRef.current) {
+                        return;
+                    }
+                    const html = $generateHtmlFromNodes(editor, null);
+                    // 내부 변경 플래그 설정 후 상위로 알림
+                    isInternalUpdateRef.current = true;
+                    onHtmlChange(html);
+                });
+            }, HTML_EXPORT_DEBOUNCE_MS);
         });
+
+        return () => {
+            if (timer) clearTimeout(timer);
+            unregister();
+        };
     }, [editor, onHtmlChange, isInternalUpdateRef, isImportingRef]);
 
     return null;

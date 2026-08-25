@@ -19,6 +19,17 @@ router.post(
     boardController.postBoardCreate,
 ); //게시글 등록
 
+// 에디터 본문 이미지 업로드 (관리자 콘솔 전용). 등록/수정보다 먼저 매칭되도록 위에 둔다.
+router.post(
+    '/editor-image',
+    // 인증을 multer 앞에 둔다. 반대로 두면 인증 실패 요청도 파일을 디스크에 쓰고 나서야 거절된다.
+    // (isAuthAdmin 은 Authorization 헤더만 보므로 body 파싱 전에 실행해도 된다.
+    //  반면 isAuthBoard 는 req.body.category 를 읽어 multer 뒤에 있어야 한다)
+    isAuthMiddleware.isAuthAdmin,
+    errorHandler.handleMulterUpload(multerMiddleware.editorImageMulter),
+    boardController.postEditorImage,
+); //에디터 본문 이미지 업로드
+
 router.post(
     '/reply',
     errorHandler.handleMulterUpload(multerMiddleware.fileMulter),
