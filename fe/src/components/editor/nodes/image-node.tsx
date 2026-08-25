@@ -144,9 +144,14 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
         if (this.__height !== "inherit") {
             element.setAttribute("height", this.__height.toString());
             styles.push(`height: ${this.__height}px`);
-        } else if (this.__width !== "inherit") {
+        } else {
             // 폭만 지정된 경우 비율 유지를 위해 높이는 자동으로 둔다.
             styles.push("height: auto");
+        }
+        if (this.__width === "inherit") {
+            // 폭이 없는 이미지(예전에 본문 드롭으로 들어가 폭 없이 저장된 게시물, 외부 붙여넣기)도
+            // 최소한 컨테이너를 넘지 않게 상한을 붙인다.
+            styles.push("max-width: 100%");
         }
         if (this.__margin > 0) {
             styles.push(`margin: ${this.__margin}px`);

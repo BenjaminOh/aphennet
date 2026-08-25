@@ -84,8 +84,11 @@ function LazyImage({
             ref={imageRef}
             style={{
                 height,
-                maxWidth,
                 width,
+                // 인라인 max-width 는 className 의 max-w-full 을 이기므로, "원본" 처럼
+                // 큰 폭이 들어오면 에디터 본문이 가로로 넘쳤다. 숫자 상한은 유지하되
+                // 컨테이너(100%)를 절대 넘지 않게 min() 으로 묶는다.
+                maxWidth: `min(${maxWidth}px, 100%)`,
             }}
             onError={onError}
             draggable="false"

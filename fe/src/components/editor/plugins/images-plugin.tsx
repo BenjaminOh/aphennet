@@ -60,18 +60,34 @@ import {
 import { JSX, useCallback, useEffect, useRef, useState } from "react"
 import * as React from "react"
 
+import Checkbox from "@/components/console/form/Checkbox"
 import {
   $createImageNode,
   $isImageNode,
   ImageNode,
   ImagePayload,
 } from "@/components/editor/nodes/image-node"
-import Checkbox from "@/components/console/form/Checkbox"
 import { CAN_USE_DOM } from "@/components/editor/shared/can-use-dom"
+import {
+  DEFAULT_IMAGE_WIDTH_MODE,
+  IMAGE_MARGIN,
+  IMAGE_WIDTH_OPTIONS,
+  ImageWidthMode,
+  MAX_IMAGE_COUNT,
+  stripExtension,
+  validateImageBytes,
+} from "@/components/editor/utils/image-insert-options"
 import { Button } from "@/components/ui/button"
 import { DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   Tabs,
   TabsContent,
@@ -79,6 +95,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { MAX_IMAGE_EDGE_PX, resizeImageFile } from "@/lib/imageResize"
 import { cn } from "@/lib/utils"
 import { usePopupStore } from "@/store/common/usePopupStore"
 
@@ -149,10 +166,8 @@ export function InsertImageUriDialogBody({
   )
 }
 
-/** 한 번에 넣을 수 있는 최대 사진 수 */
-const MAX_IMAGE_COUNT = 12
-/** "사진 여백 넣기" 체크 시 이미지에 적용할 여백(px) */
-const IMAGE_MARGIN = 10
+// MAX_IMAGE_COUNT / IMAGE_MARGIN / stripExtension 은 본문 직접 드롭 경로와 공유해야 하므로
+// @/components/editor/utils/image-insert-options 로 옮겼다.
 
 type PickedImageStatus = "loading" | "loaded" | "error"
 
@@ -161,12 +176,10 @@ type PickedImage = {
   name: string
   src: string
   status: PickedImageStatus
+  /** 축소 후 실제 픽셀 폭 */
   naturalWidth: number
-}
-
-/** 대체 텍스트 기본값으로 쓰기 위해 파일명에서 확장자를 뗀다. */
-function stripExtension(fileName: string): string {
-  return fileName.replace(/\.[^./\\]+$/, "")
+  /** 축소 후 바이트 수 — 서버 상한 사전 검사용 */
+  bytes: number
 }
 
 function SortableThumbnail({
@@ -247,11 +260,15 @@ export function InsertImageUploadedDialogBody({
   onCountChange: (count: number) => void
 }) {
   const [images, setImages] = useState<PickedImage[]>([])
+  const [widthMode, setWidthMode] = useState<ImageWidthMode>(
+    DEFAULT_IMAGE_WIDTH_MODE
+  )
   const [widthInput, setWidthInput] = useState("")
   const [align, setAlign] = useState<"left" | "center" | "right">("left")
   const [onePerLine, setOnePerLine] = useState(true)
   const [useMargin, setUseMargin] = useState(true)
   const [isDragOver, setIsDragOver] = useState(false)
+  const { setConfirmPop } = usePopupStore()
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const idRef = useRef(0)
@@ -271,36 +288,29 @@ export function InsertImageUploadedDialogBody({
     )
   }, [])
 
-  /** 파일을 data URL 로 읽고, 실제 디코딩까지 성공해야 "loaded" 로 바꾼다. */
+  /**
+   * 파일을 긴 변 1600px 이하로 줄여 data URL 로 읽는다.
+   * 원본을 그대로 실으면 서버 저장 상한에 걸릴 수 있고 본문이 무거워지며,
+   * 썸네일 12장이 원본 해상도로 메모리에 남는 것도 막는다.
+   */
   const loadFile = useCallback(
-    (file: File, id: string) => {
-      const reader = new FileReader()
-      reader.onerror = () => markError(id)
-      reader.onload = () => {
-        const src = typeof reader.result === "string" ? reader.result : ""
+    async (file: File, id: string) => {
+      try {
+        const { src, width, bytes } = await resizeImageFile(file)
         if (!src) {
           markError(id)
           return
         }
-        const probe = new window.Image()
-        probe.onload = () => {
-          setImages((prev) =>
-            prev.map((img) =>
-              img.id === id
-                ? {
-                    ...img,
-                    src,
-                    status: "loaded",
-                    naturalWidth: probe.naturalWidth,
-                  }
-                : img
-            )
+        setImages((prev) =>
+          prev.map((img) =>
+            img.id === id
+              ? { ...img, src, status: "loaded", naturalWidth: width, bytes }
+              : img
           )
-        }
-        probe.onerror = () => markError(id)
-        probe.src = src
+        )
+      } catch {
+        markError(id)
       }
-      reader.readAsDataURL(file)
     },
     [markError]
   )
@@ -325,11 +335,12 @@ export function InsertImageUploadedDialogBody({
         src: "",
         status: "loading",
         naturalWidth: 0,
+        bytes: 0,
       }))
 
       // 짧은 간격으로 연속 추가되어도 상한을 넘지 않도록 갱신 시점에 한 번 더 자른다.
       setImages((prev) => [...prev, ...entries].slice(0, MAX_IMAGE_COUNT))
-      accepted.forEach((file, index) => loadFile(file, entries[index].id))
+      accepted.forEach((file, index) => void loadFile(file, entries[index].id))
     },
     [loadFile]
   )
@@ -362,13 +373,28 @@ export function InsertImageUploadedDialogBody({
   const isFull = images.length >= MAX_IMAGE_COUNT
 
   const handleConfirm = () => {
-    const parsedWidth = parseInt(widthInput, 10)
-    // 폭을 비워두면 "원본" — 각 이미지의 실제 폭을 그대로 사용한다.
-    const fixedWidth =
-      Number.isNaN(parsedWidth) || parsedWidth <= 0 ? undefined : parsedWidth
+    // 서버 저장 상한(be/src/middleware/util.js)을 저장 버튼이 아니라 여기서 먼저 잡는다.
+    const invalid = validateImageBytes(loadedImages)
+    if (invalid) {
+      setConfirmPop(true, invalid, 1)
+      return
+    }
+
+    // "원본" 은 각 이미지의 (축소 후) 실제 폭을 그대로 쓴다.
+    // "직접 입력" 은 입력값을, 나머지는 선택값 자체가 픽셀 폭이다.
+    let fixedWidth: number | undefined
+    if (widthMode === "custom") {
+      const parsedWidth = parseInt(widthInput, 10)
+      fixedWidth =
+        Number.isNaN(parsedWidth) || parsedWidth <= 0 ? undefined : parsedWidth
+    } else if (widthMode !== "original") {
+      fixedWidth = parseInt(widthMode, 10)
+    }
 
     const payloads = loadedImages.map<InsertImagePayload>((img) => {
-      const width = fixedWidth ?? img.naturalWidth ?? undefined
+      // 디코딩에 실패한 파일(HEIC 등)은 naturalWidth 가 0 이다.
+      // 그대로 두면 maxWidth 가 0 이 되어 이미지가 보이지 않으므로 undefined 로 떨군다.
+      const width = fixedWidth ?? (img.naturalWidth || undefined)
       return {
         src: img.src,
         altText: stripExtension(img.name),
@@ -488,17 +514,35 @@ export function InsertImageUploadedDialogBody({
             <Label htmlFor="image-width" className="shrink-0 text-xs">
               사진 폭
             </Label>
-            <Input
-              id="image-width"
-              inputMode="numeric"
-              placeholder="원본"
-              value={widthInput}
-              onChange={(e) =>
-                setWidthInput(e.target.value.replace(/[^0-9]/g, ""))
-              }
-              className="h-8 w-20"
-            />
-            <span className="text-xs text-muted-foreground">픽셀</span>
+            <Select
+              value={widthMode}
+              onValueChange={(value) => setWidthMode(value as ImageWidthMode)}
+            >
+              <SelectTrigger id="image-width" className="h-8 w-28">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {IMAGE_WIDTH_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {widthMode === "custom" && (
+              <>
+                <Input
+                  inputMode="numeric"
+                  placeholder="예: 720"
+                  value={widthInput}
+                  onChange={(e) =>
+                    setWidthInput(e.target.value.replace(/[^0-9]/g, ""))
+                  }
+                  className="h-8 w-20"
+                />
+                <span className="text-xs text-muted-foreground">픽셀</span>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -543,6 +587,9 @@ export function InsertImageUploadedDialogBody({
 
         <p className="text-xs text-muted-foreground">
           높이는 비율에 맞게 자동 설정되며, 위 설정은 모든 사진에 적용됩니다.
+          <br />
+          원본이 큰 사진은 긴 변 {MAX_IMAGE_EDGE_PX}px 이하로 자동 축소되어
+          저장됩니다.
         </p>
       </div>
 
