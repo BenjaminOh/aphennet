@@ -8,7 +8,7 @@ import { z } from "zod";
 import InputError from "@/components/console/common/InputError";
 import TooltipBox from "@/components/console/common/TooltipBox";
 import Editor from "@/components/console/form/Editor";
-import FileUpload, { FileData } from "@/components/console/form/FileUpload";
+import FileUpload, { FileData, MAX_FILE_SIZE_MB } from "@/components/console/form/FileUpload";
 import Input from "@/components/console/form/Input";
 import { useToast } from "@/hooks/use-toast";
 import { usePostMaint } from "@/service/console/maintenance";
@@ -191,7 +191,7 @@ export default function MaintForm({ maintName, siteId, handleCancel, onComplete 
                             <div className="flex items-center gap-[8px]">
                                 <p className="text-[#666]">파일 첨부</p>
                                 <TooltipBox
-                                    text={`&middot; 1개의 파일만 첨부 가능합니다.<br/> &middot; 총 용량: 50MB 이하<br/> &middot; 여러개 파일 등록시에는 압축하여 등록해주세요.`}
+                                    text={`&middot; 1개의 파일만 첨부 가능합니다.<br/> &middot; 총 용량: ${MAX_FILE_SIZE_MB}MB 이하<br/> &middot; 여러개 파일 등록시에는 압축하여 등록해주세요.`}
                                 />
                             </div>
                             <FileUpload

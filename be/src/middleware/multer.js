@@ -141,7 +141,7 @@ exports.clearFile = async filePath => {
 
 // Add a file size limit (in bytes)
 const fileSizeLimit = (Number(process.env.FILESIZE) || 30) * 1024 * 1024; // 파일당 30MB
-const fieldSizeLimit = 100 * 1024 * 1024; // 100MB
+const fieldSizeLimit = 300 * 1024 * 1024; // 300MB (nginx client_max_body_size / bodyParser 한도와 맞춘다)
 
 exports.fileMulter = multer({
     storage: fileStorage('storage/board'),
@@ -165,7 +165,8 @@ exports.menuFileMulter = multer({
 exports.groupFileMulter = multer({
     storage: fileStorage('storage/menu'),
     fileFilter: fileFilter,
-    limits: { fileSize: fileSizeLimit },
+    // fieldSize 를 빼면 multer 기본값 1MB 로 떨어져 다른 인스턴스와 규칙이 어긋난다
+    limits: { fileSize: fileSizeLimit, fieldSize: fieldSizeLimit },
 }).fields([
     { name: 'g_img_on', maxCount: 1 },
     { name: 'g_img_off', maxCount: 1 },
@@ -174,5 +175,6 @@ exports.groupFileMulter = multer({
 exports.bannerMulter = multer({
     storage: fileStorage('storage/banner'),
     fileFilter: fileFilter,
-    limits: { fileSize: fileSizeLimit },
+    // fieldSize 를 빼면 multer 기본값 1MB 로 떨어져 다른 인스턴스와 규칙이 어긋난다
+    limits: { fileSize: fileSizeLimit, fieldSize: fieldSizeLimit },
 }).single('b_file');

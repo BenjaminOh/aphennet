@@ -10,9 +10,12 @@ const enumConfig = require('../middleware/enum');
 exports.base64ToImagesPath = async b_contents => {
     let temp_contents = b_contents;
     
-    // 서버 사양에 맞는 크기 제한 (1GB RAM)
-    const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
-    const MAX_TOTAL_SIZE = 30 * 1024 * 1024; // 30MB
+    // 본문에 실려 오는 base64 이미지 상한.
+    // fe/src/components/editor/utils/image-insert-options.ts 의
+    // MAX_IMAGE_BYTES / MAX_TOTAL_IMAGE_BYTES 와 반드시 같은 값을 유지할 것.
+    // (한쪽만 바뀌면 프런트는 통과시키고 저장 시점에야 에러가 난다)
+    const MAX_IMAGE_SIZE = 30 * 1024 * 1024; // 30MB
+    const MAX_TOTAL_SIZE = 300 * 1024 * 1024; // 300MB
     const MAX_IMAGES = 15; // 최대 15개 이미지
 
     const imageMatches = temp_contents.match(/data:image\/\w+;base64,([^"]+)/g);
@@ -33,12 +36,16 @@ exports.base64ToImagesPath = async b_contents => {
             // 크기 체크 (base64는 원본보다 33% 더 큼)
             const decodedSize = (imageDataWithoutPrefix.length * 3) / 4;
             if (decodedSize > MAX_IMAGE_SIZE) {
-                throw new Error(`이미지 크기가 너무 큽니다: ${Math.round(decodedSize / 1024 / 1024)}MB (최대 5MB)`);
+                throw new Error(
+                    `이미지 크기가 너무 큽니다: ${Math.round(decodedSize / 1024 / 1024)}MB (최대 ${MAX_IMAGE_SIZE / 1024 / 1024}MB)`,
+                );
             }
             
             totalSize += decodedSize;
             if (totalSize > MAX_TOTAL_SIZE) {
-                throw new Error(`전체 이미지 크기가 너무 큽니다: ${Math.round(totalSize / 1024 / 1024)}MB (최대 30MB)`);
+                throw new Error(
+                    `전체 이미지 크기가 너무 큽니다: ${Math.round(totalSize / 1024 / 1024)}MB (최대 ${MAX_TOTAL_SIZE / 1024 / 1024}MB)`,
+                );
             }
 
             // 이미지 파일 경로 및 이름 생성
