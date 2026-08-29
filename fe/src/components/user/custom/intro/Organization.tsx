@@ -31,7 +31,7 @@ export default function Organization() {
             </div>
             <div className="mx-auto max-w-[1360px] pb-[100px] xl:pb-[160px]">
                 <p className="pb-[24px] text-center text-[28px] font-[700] md:pb-[48px] md:text-[32px]">
-                    조직 현황 (2025년)
+                    조직 현황 (2026년)
                 </p>
                 <ul className="flex items-center bg-[#F3F9F5] py-[16px] text-center text-[18px] font-[500] text-primary-2 md:text-[20px] xl:rounded-[20px]">
                     <li className="w-[22%] px-[5px]">직위</li>
@@ -171,10 +171,10 @@ export default function Organization() {
                                     공동교재위원장
                                 </th>
                                 <td className="border-l border-r border-[#ddd] p-[16px_5px] text-center text-[18px] font-[500] md:text-[20px]">
-                                    김성보
+                                    홍종욱
                                 </td>
                                 <td className="p-[16px_8px] text-[#666] md:px-[20px] md:text-[18px]">
-                                    연세대학교 교수
+                                    서울대학교 인문학연구원 HK교수
                                 </td>
                             </tr>
                             <tr className="border-b border-[#999999]">
@@ -239,6 +239,17 @@ export default function Organization() {
                                 </td>
                                 <td className="p-[16px_8px] text-[#666] md:px-[20px] md:text-[18px]">
                                     아시아평화와역사연구소 소장 · 춘천교육대학교 교수
+                                </td>
+                            </tr>
+                            <tr className="border-b border-[#999999]">
+                                <th className="bg-[#FAFAFA] p-[20px_8px] text-[18px] font-[500] md:text-[24px]">
+                                    운영위원
+                                </th>
+                                <td className="border-l border-r border-[#ddd] p-[16px_5px] text-center text-[18px] font-[500] md:text-[20px]">
+                                    김성보
+                                </td>
+                                <td className="p-[16px_8px] text-[#666] md:px-[20px] md:text-[18px]">
+                                    연세대학교 교수
                                 </td>
                             </tr>
                             <tr className="border-b border-[#999999]">
